@@ -20,8 +20,8 @@ return new class extends Migration
             $table->dateTime('token_expiry')->nullable();
             $table->string('role');
             $table->boolean('status')->default(0);
-            $table->timestamp('last_login');
-            $table->timestamp('prev_login');
+            $table->timestamp('last_login')->nullable();
+            $table->timestamp('prev_login')->nullable();
             $table->timestamps();
         });
     }

@@ -23,7 +23,8 @@ class UpdateAdminRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'email' => 'required|string|emsil'
+            'email' => 'required|string|email',
+            'role' => 'required|string'
         ];
     }
 }

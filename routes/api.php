@@ -18,11 +18,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function(){
     Route::controller(AuthController::class)->group(function(){
-        Route::post('add-temp-admin', 'storeAdmin')->name('admin.addTempAdmin');
-        Route::get('/by-token', 'byToken')->name('admin.byToken');
+        Route::post('/add-temp-admin', 'storeAdmin')->name('admin.addTempAdmin');
+        Route::get('/by-token/{token}', 'byToken')->name('admin.byToken');
+        Route::post('activate-account', 'activate_account')->name('admin.activateAccount');
         Route::post('/login', 'login')->name('admin.login');
-        Route::post('/forgot-password')->name('admin.forgotPassword');
-        Route::post('/reset-password')->name('admin.resetPassword');
+        Route::post('/forgot-password', 'forgot_password')->name('admin.forgotPassword');
+        Route::post('/reset-password', 'reset_password')->name('admin.resetPassword');
     });
 
     Route::middleware('auth:admin-api')->group(function(){

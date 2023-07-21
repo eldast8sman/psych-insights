@@ -38,7 +38,7 @@ class AdminController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Admins fetched successfully',
-            'data' => $admins
+            'data' => $admins->get()
         ], 200);
     }
 

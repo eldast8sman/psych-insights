@@ -52,7 +52,22 @@ class AuthController extends Controller
     }
 
     public function storeAdmin(Request $request){
-        
+        $admin = Admin::create([
+            'email' => $request->email,
+            'name' => $request->name,
+            'role' => $request->role
+        ]);
+
+        $admin->token = base64_encode($admin->id."PsychInsights".Str::random(20));
+        $admin->token_expiry = date('Y-m-d H:i:s', time() + (60 * 60 * 24));
+        $admin->save();
+
+        Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+        return response([
+            'status' => 'success',
+            'message' => 'Admin added successfully',
+            'data' => $admin
+        ], 200);
     }
 
     public function byToken($token){
@@ -192,7 +207,7 @@ class AuthController extends Controller
     }
 
     public function reset_password(ActivateAccountRequest $request){
-        $admin = Admin::where('email', $request->email)->first();
+        $admin = Admin::where('token', $request->token)->first();
         if($admin->status != 1){
             return response([
                 'status' => 'failed',

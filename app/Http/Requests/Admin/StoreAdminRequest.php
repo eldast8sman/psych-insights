@@ -23,7 +23,8 @@ class StoreAdminRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'email' => 'required|string|email|unique:admins,email'
+            'email' => 'required|string|email|unique:admins,email',
+            'role' => 'required|string'
         ];
     }
 }
