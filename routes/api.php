@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,14 @@ Route::prefix('admin')->group(function(){
             Route::put('/admins/{admin}', 'update')->name('admin.update');
             Route::get('/admins/{admin}/activation', 'account_activation')->name('admin.accountActivation');
             Route::delete('/admins/{admin}', 'destroy')->name('admin.delete');
+        });
+
+        Route::controller(CategoryController::class)->group(function(){
+            Route::get('/categories', 'index')->name('admin.categories.index');
+            Route::post('/categories', 'store')->name('admin.categories.store');
+            Route::get('/categories/{category}', 'show')->name('admin.categories.show');
+            Route::put('/categories/{category}', 'update')->name('admin.categories.update');
+            Route::delete('/categories/{category}', 'delete')->name('admin.categories.delete');
         });
     });
 });
