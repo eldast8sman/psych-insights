@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
 
 class CategoryController extends Controller
 {
@@ -98,7 +98,7 @@ class CategoryController extends Controller
         if($category->update($request->all())){
             return response([
                 'status' => 'success',
-                'message' => 'Category fetched successfully',
+                'message' => 'Category updated successfully',
                 'data' => $category
             ], 200);
         } else {

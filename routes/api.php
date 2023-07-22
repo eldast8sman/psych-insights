@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DailyQuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -48,7 +49,17 @@ Route::prefix('admin')->group(function(){
             Route::post('/categories', 'store')->name('admin.categories.store');
             Route::get('/categories/{category}', 'show')->name('admin.categories.show');
             Route::put('/categories/{category}', 'update')->name('admin.categories.update');
-            Route::delete('/categories/{category}', 'delete')->name('admin.categories.delete');
+            Route::delete('/categories/{category}', 'destroy')->name('admin.categories.delete');
+        });
+
+        Route::controller(DailyQuestionController::class)->group(function(){
+            Route::get('/daily-questions', 'index')->name('admin.dailyQuestions.index');
+            Route::post('/daily-questions', 'store')->name('admin.dailyQuestions.store');
+            Route::get('/daily-questions/{question}', 'show')->name('admin.dailyQuestions.show');
+            Route::put('/daily-questions/{question}', 'update')->name('admin.dailyQuestions.update');
+            Route::post("/daily-question/{question_id}/options", 'add_option')->name('admin.dailyQuestions.options.store');
+            Route::delete('/daily-questions/options/{option}', 'remove_option')->name('admin.dailyQuestions.options.delete');
+            Route::delete('/daily-questions/{question}', 'destroy')->name('admin.dailyQuestions.delete');
         });
     });
 });
