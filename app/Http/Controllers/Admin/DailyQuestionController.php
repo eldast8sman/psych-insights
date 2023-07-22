@@ -30,7 +30,7 @@ class DailyQuestionController extends Controller
         foreach($category_ids as $id){
             $category = Category::find(trim($id));
             if(!empty($category)){
-                $categories[] = $categories;
+                $categories[] = $category->category;
             }
         }
 
@@ -42,7 +42,7 @@ class DailyQuestionController extends Controller
      */
     public function index()
     {
-        $questions = DailyQuestion::orderBy('created', 'asc');
+        $questions = DailyQuestion::orderBy('created_at', 'asc');
         if($questions->count() > 0){
             $questions = $questions->get();
             foreach($questions as $question){
@@ -126,10 +126,10 @@ class DailyQuestionController extends Controller
 
         $question->categories = $this->categories($question->id);
 
-        foreach($request->options as $option){
-            $option = DailyQuestionOption::find($option['id']);
-            $option->option = $option['option'];
-            $option->value = $option['value'];
+        foreach($request->options as $optioning){
+            $option = DailyQuestionOption::find($optioning['id']);
+            $option->option = $optioning['option'];
+            $option->value = $optioning['value'];
             $option->save();
             $options[] = $option;
         }

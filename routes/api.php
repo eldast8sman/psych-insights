@@ -57,7 +57,7 @@ Route::prefix('admin')->group(function(){
             Route::post('/daily-questions', 'store')->name('admin.dailyQuestions.store');
             Route::get('/daily-questions/{question}', 'show')->name('admin.dailyQuestions.show');
             Route::put('/daily-questions/{question}', 'update')->name('admin.dailyQuestions.update');
-            Route::post("/daily-question/{question_id}/options", 'add_option')->name('admin.dailyQuestions.options.store');
+            Route::post("/daily-questions/{question_id}/options", 'add_option')->name('admin.dailyQuestions.options.store');
             Route::delete('/daily-questions/options/{option}', 'remove_option')->name('admin.dailyQuestions.options.delete');
             Route::delete('/daily-questions/{question}', 'destroy')->name('admin.dailyQuestions.delete');
         });
