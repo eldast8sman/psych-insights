@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use Illuminate\Http\Request;
@@ -60,6 +61,19 @@ Route::prefix('admin')->group(function(){
             Route::post("/daily-questions/{question_id}/options", 'add_option')->name('admin.dailyQuestions.options.store');
             Route::delete('/daily-questions/options/{option}', 'remove_option')->name('admin.dailyQuestions.options.delete');
             Route::delete('/daily-questions/{question}', 'destroy')->name('admin.dailyQuestions.delete');
+        });
+
+        Route::controller(BasicQuestionController::class)->group(function(){
+            Route::post('/basic-question-options', 'add_options')->name('admin.basicQuestionOption.store');
+            Route::get('/basic-question-options', 'fetch_options')->name('admin.basicQuestionOption.index');
+            Route::put('/basic-question-options', 'update_options')->name('admin.basicQuestionOption.update');
+            Route::delete('/basic-question-options', 'remove_option')->name('admin.basicQuestionOption.delete');
+            Route::get('/basic-questions', 'index')->name('admin.basicQuestion.index');
+            Route::post('/basic-questions', 'store')->name('admin.basicQuestion.store');
+            Route::get('/basic-questions/{question}', 'show')->name('admin.basicQuestion.show');
+            Route::put('/basic-questions/{question}', 'update')->name('admin.basicQuestion.update');
+            Route::delete('/basic-question-special-options/{option}', 'delete_special_option')->name('admin.basicQuestionSpeciaOption.delete');
+            Route::delete('/basic-questions/{question}', 'destroy')->name('admin.basicQuestion.delete');
         });
     });
 });
