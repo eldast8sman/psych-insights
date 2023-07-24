@@ -26,10 +26,10 @@ class UpdateBasicQuestionRequest extends FormRequest
             'categories' => 'required|array',
             'is_k10' => 'required|boolean',
             'special_options' => 'required|boolean',
-            'option' => 'required_if:special_options,1|array',
-            'option.*.id' => 'nullable|exists:basic_question_special_options,id',
-            'option.*.option' => 'required|string',
-            'option.*.value' => 'required|integer'
+            'options' => 'required_if:special_options,1|array',
+            'options.*.id' => 'nullable|exists:basic_question_special_options,id',
+            'options.*.option' => 'required|string',
+            'options.*.value' => 'required|integer'
         ];
     }
 }

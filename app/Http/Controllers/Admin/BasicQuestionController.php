@@ -104,7 +104,7 @@ class BasicQuestionController extends Controller
 
     public function index()
     {
-        $questions = BasicQuestion::orderBy('created_at', 'desc');
+        $questions = BasicQuestion::orderBy('created_at', 'asc');
         if($questions->count() < 1){
             return response ([
                 'status' => 'failed',
@@ -157,7 +157,7 @@ class BasicQuestionController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Question fetched successfully',
+            'message' => 'Question added successfully',
             'data' => $question
         ], 200);
     }
