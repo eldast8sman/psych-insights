@@ -22,9 +22,9 @@ class StoreDassQuestionOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'options' => 'required_array',
+            'options' => 'required|array',
             'options.*.option' => 'required|string|unique:dass_question_options,option',
-            'options.*.value' => 'required|integer|min:1'
+            'options.*.value' => 'required|integer|min:0'
         ];
     }
 }

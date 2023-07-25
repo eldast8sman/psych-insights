@@ -23,7 +23,7 @@ class UpdateDassQuestionRequest extends FormRequest
     {
         return [
             'question' => 'required|string',
-            'value' => 'required|integer|min:1'
+            'categories' => 'required|array'
         ];
     }
 }

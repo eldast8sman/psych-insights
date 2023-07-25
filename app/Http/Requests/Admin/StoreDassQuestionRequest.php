@@ -11,7 +11,7 @@ class StoreDassQuestionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreDassQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'question' => 'required|string',
+            'categories' => 'required|array',
+            'categories.*' => 'required|integer|exists:categories,id'
         ];
     }
 }

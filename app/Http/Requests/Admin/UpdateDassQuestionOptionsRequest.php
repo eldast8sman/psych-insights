@@ -22,10 +22,10 @@ class UpdateDassQuestionOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'options' => 'required_array',
+            'options' => 'required|array',
             'options.*.id' => 'required|integer|exists:dass_question_options,id',
             'options.*.option' => 'required|string',
-            'options.*.value' => 'required|integer|min:1'
+            'options.*.value' => 'required|integer|min:0'
         ];
     }
 }
