@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\BasicQuestion;
 use App\Models\BasicQuestionOption;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\GiveBasicQuestionPrerequisiteRequest;
 use App\Models\BasicQuestionSpecialOption;
 use App\Http\Requests\Admin\StoreBasicQuestionRequest;
 use App\Http\Requests\Admin\StoreBasicQuestionOptionsRequest;
 use App\Http\Requests\Admin\UpdateBasicQuestionOptionsRequest;
 use App\Http\Requests\Admin\UpdateBasicQuestionRequest;
+use App\Models\PrerequisiteQuestion;
 
 class BasicQuestionController extends Controller
 {
@@ -36,6 +38,14 @@ class BasicQuestionController extends Controller
         }
 
         return $options;
+    }
+
+    public function has_prerequisite($question_id){
+        $prereq = PrerequisiteQuestion::where('basic_question_id', $question_id)->first();
+        if(empty($prereq)){
+            return null;
+        }
+        return $prereq;
     }
 
     public function add_options(StoreBasicQuestionOptionsRequest $request){
@@ -116,6 +126,7 @@ class BasicQuestionController extends Controller
         $questions = $questions->get();
         foreach($questions as $question){
             $question->categories = $this->categories($question->id);
+            $question->has_prerequisite = $this->has_prerequisite($question->id);
 
             $question->options = $this->fetch_question_options($question->id);
         }
@@ -153,6 +164,7 @@ class BasicQuestionController extends Controller
         }
 
         $question->categories = $this->categories($question->id);
+        $question->has_prerequisite = $this->has_prerequisite($question->id);
         $question->options = $this->fetch_question_options($question->id);
 
         return response([
@@ -165,6 +177,7 @@ class BasicQuestionController extends Controller
     public function show(BasicQuestion $question)
     {
         $question->categories = $this->categories($question->id);
+        $question->has_prerequisite = $this->has_prerequisite($question->id);
         $question->options = $this->fetch_question_options($question->id);
 
         return response([
@@ -213,11 +226,39 @@ class BasicQuestionController extends Controller
         }
 
         $question->categories = $this->categories($question->id);
+        $question->has_prerequisite = $this->has_prerequisite($question->id);
         $question->options = $this->fetch_question_options($question->id);
 
         return response([
             'status' => 'success',
             'message' => 'Question updated successfully',
+            'data' => $question
+        ], 200);
+    }
+
+    public function give_prerequisite(GiveBasicQuestionPrerequisiteRequest $request, BasicQuestion $question){
+        if($question->id == $request->prerequisite_id){
+            return response([
+                'status' => 'failed',
+                'message' => 'Question must be different from the Prerequisite'
+            ], 409);
+        }
+        $all = $request->all();
+        $prerequisite = PrerequisiteQuestion::where('basic_question_id', $question->id)->first();
+        if(empty($prerequisite)){
+            $all['basic_question_id'] = $question->id;
+            PrerequisiteQuestion::create($all);
+        } else {
+            $prerequisite->update($all);
+        }
+
+        $question->categories = $this->categories($question->id);
+        $question->has_prerequisiste = $this->has_prerequisite($question->id);
+        $question->options = $this->fetch_question_options($question->id);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Question Prerequisite successfully set',
             'data' => $question
         ], 200);
     }
