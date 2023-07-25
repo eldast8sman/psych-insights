@@ -72,6 +72,7 @@ Route::prefix('admin')->group(function(){
             Route::post('/basic-questions', 'store')->name('admin.basicQuestion.store');
             Route::get('/basic-questions/{question}', 'show')->name('admin.basicQuestion.show');
             Route::put('/basic-questions/{question}', 'update')->name('admin.basicQuestion.update');
+            Route::put('/basic-questions/{question}/set-prerequisite', 'give_prerequisite')->name('admin.basicQuestion.setPrerequisite');
             Route::delete('/basic-question-special-options/{option}', 'delete_special_option')->name('admin.basicQuestionSpeciaOption.delete');
             Route::delete('/basic-questions/{question}', 'destroy')->name('admin.basicQuestion.delete');
         });

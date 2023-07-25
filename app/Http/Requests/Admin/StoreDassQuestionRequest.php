@@ -4,14 +4,14 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBasicQuestionOptionsRequest extends FormRequest
+class StoreDassQuestionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,9 +22,7 @@ class StoreBasicQuestionOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'options' => 'required|array',
-            'options.*.option' => 'required|string|unique:basic_question_options,option',
-            'options.*.value' => 'required|integer|min:1'
+            //
         ];
     }
 }

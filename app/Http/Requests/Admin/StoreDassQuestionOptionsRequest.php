@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBasicQuestionOptionsRequest extends FormRequest
+class StoreDassQuestionOptionsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class StoreBasicQuestionOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'options' => 'required|array',
-            'options.*.option' => 'required|string|unique:basic_question_options,option',
+            'options' => 'required_array',
+            'options.*.option' => 'required|string|unique:dass_question_options,option',
             'options.*.value' => 'required|integer|min:1'
         ];
     }

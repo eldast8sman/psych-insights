@@ -267,6 +267,7 @@ class BasicQuestionController extends Controller
         $option->delete();
         $question = BasicQuestion::find($option->basic_question_id);
         $question->categories = $this->categories($question->id);
+        $question->has_prerequisite = $this->has_prerequisite($question->id);
         $question->options = $this->fetch_question_options($question->id);
 
         return response([
