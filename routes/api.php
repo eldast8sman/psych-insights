@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
+use App\Http\Controllers\Admin\DassQuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +76,18 @@ Route::prefix('admin')->group(function(){
             Route::put('/basic-questions/{question}/set-prerequisite', 'give_prerequisite')->name('admin.basicQuestion.setPrerequisite');
             Route::delete('/basic-question-special-options/{option}', 'delete_special_option')->name('admin.basicQuestionSpeciaOption.delete');
             Route::delete('/basic-questions/{question}', 'destroy')->name('admin.basicQuestion.delete');
+        });
+
+        Route::controller(DassQuestionController::class)->group(function(){
+            Route::post('/dass-question-options', 'add_options')->name('admin.dassQuestionOption.store');
+            Route::get('/dass-question-options', 'fetch_options')->name('admin.dassQuestionOption.index');
+            Route::put('/dass-question-options', 'update_options')->name('admin.dassQuestionOption.update');
+            Route::delete('/dass-question-options/{option}', 'remove_option')->name('admin.dassQuestionOption.delete');
+            Route::get('/dass-questions', 'index')->name('admin.dassQuestion.index');
+            Route::post('/dass-questions', 'store')->name('admin.dassQuestion.store');
+            Route::get('/dass-questions/{question}', 'show')->name('admin.dassQuestion.show');
+            Route::put('/dass-questions/{question}', 'update')->name('admin.dassQuestion.update');
+            Route::delete('/dass-questions/{question}', 'destroy')->name('admin.dassQuestion.delete');
         });
     });
 });
