@@ -49,10 +49,14 @@ jobs:
           script_stop: true
           script: |
             cd /home/psycsboi
-            git clone --single-branch --branch development https://github.com/eldast8sman/psych-insights.git backend_dev
             cd backend_dev
+            git pull origin development
             php -r "file_exists('.env') || copy('.env.example', '.env');"
-            composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+            php artisan storage:link
+            php artisan key:generate
+            php artisan jwt:secret
+            php artisan migrate
 #            git pull origin main
 #            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 #            php artisan migrate
@@ -62,4 +66,4 @@ jobs:
 #            php artisan storage:link
 #            php artisan key:generate
 #            php artisan jwt:secret
-#            git clone https://oauth2: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@github.com/eldast8sman/schoolar-app.git schoolar_app
+#            git clone --single-branch --branch development https://github.com/eldast8sman/psych-insights.git backend_dev
