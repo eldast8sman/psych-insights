@@ -49,7 +49,7 @@ jobs:
           script_stop: true
           script: |
             cd /home/psycsboi
-            git clone --single-branch --development https://github.com/eldast8sman/psych-insights.git backend_dev
+            git clone --single-branch --branch development https://github.com/eldast8sman/psych-insights.git backend_dev
             cd backend_dev
             php -r "file_exists('.env') || copy('.env.example', '.env');"
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
