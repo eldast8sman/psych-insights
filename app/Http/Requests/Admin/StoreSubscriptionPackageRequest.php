@@ -28,7 +28,7 @@ class StoreSubscriptionPackageRequest extends FormRequest
             'article_limit' => 'required|integer|min:-1',
             'audio_limit' => 'required|integer|min:-1',
             'video_limit' => 'required|integer|min:-1',
-            'first_time_promo' => 'required|numeric|min:0',
+            'first_time_promo' => 'required|numeric|min:0|max:100',
             'payment_plans' => 'required|array',
             'payment_plans.*.amount' => 'required|numeric|min:1',
             'payment_plans.*.duration_type' => 'required|string',

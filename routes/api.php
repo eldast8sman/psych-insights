@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\DassQuestionController;
+use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -103,6 +104,15 @@ Route::prefix('admin')->group(function(){
             Route::delete('/free-trials', 'destroy_free_package')->name('admin.freeTrial.delete');
             Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
             Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
+        });
+
+        Route::controller(PromoCodeController::class)->group(function(){
+            Route::get('/promo-codes', 'index')->name('admin.promoCode.index');
+            Route::post('/promo-codes', 'store')->name('admin.promoCode.store');
+            Route::get('/promo-codes/{code}', 'show')->name('admin.promoCode.show');
+            Route::put('/promo-codes/{code}', 'update')->name('admin.promoCode.update');
+            Route::get('/promo-codes/{code}/activation', 'activation')->name('admin.promoCode.activation');
+            Route::delete('/promo-codes/{code}', 'destroy')->name('admin.promoCode.delete');
         });
     });
 });
