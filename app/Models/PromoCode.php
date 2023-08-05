@@ -13,6 +13,7 @@ class PromoCode extends Model
         'promo_code',
         'scope',
         'percentage_off',
+        'usage_limit',
         'status'
     ];
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StorePromoCodeRequest;
 use App\Http\Requests\Admin\UpdatePromoCodeRequest;
 use App\Models\PromoCode;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class PromoCodeController extends Controller
 
         $codes = PromoCode::orderBy('promo_code', 'asc');
         if(!empty($search)){
-            $codes = $codes->where('promo_code', '%'.$search.'%');
+            $codes = $codes->where('promo_code', 'like', '%'.$search.'%');
         }
         if($status !== NULL){
             $codes = $codes->where('status', $status);
@@ -57,12 +58,13 @@ class PromoCodeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePromoCodeRequest $request)
     {
         $code = PromoCode::create([
             'promo_code' => $request->promo_code,
             'scope' => (isset($request->scope) && !empty($request->scope)) ? join(',', $request->scope) : '',
             'percentage_off' => $request->percentage_off,
+            'usage_limit' => $request->usage_limit,
             'status' => 1
         ]);
 
@@ -97,6 +99,7 @@ class PromoCodeController extends Controller
         $code->promo_code = $request->promo_code;
         $code->scope = (isset($request->scope) && !empty($request->scope)) ? join(',', $request->scope) : '';
         $code->percentage_off = $request->percentage_off;
+        $code->usage_limit = $request->usage_limit;
         $code->save();
 
         $code->scope = explode(',', $code->scope);

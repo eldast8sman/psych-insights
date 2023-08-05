@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('promo_code')->unique();
             $table->string('scope')->default('all');
             $table->double('percentage_off');
+            $table->integer('usage_limit')->default(1);
             $table->integer('status')->default(1);
             $table->timestamps();
         });
