@@ -98,9 +98,11 @@ Route::prefix('admin')->group(function(){
             Route::put('/subscription-packages/{package}', 'update')->name('admin.subscriptionPackage.update');
             Route::delete('/subscription-packages/payment-plans/{plan}', 'destroy_payment_plan')->name('admin.subscriptionPackage.paymentPlan.delete');
             Route::delete('/subscription-packages/{package}', 'destroy')->name('admin.subscriptionPackage.delete');
-            Route::post('/free-package', 'add_free_package')->name('admin.freePackage.add');
-            Route::get('/free-package', 'fetch_free_package')->name('admin.freePackage.fetch');
-            Route::delete('/free-package', 'destroy_free_package')->name('admin.freePackage.delete');
+            Route::post('/free-trials', 'add_free_package')->name('admin.freeTrial.add');
+            Route::get('/free-trials', 'fetch_free_package')->name('admin.freeTrial.fetch');
+            Route::delete('/free-trials', 'destroy_free_package')->name('admin.freeTrial.delete');
+            Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
+            Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
         });
     });
 });

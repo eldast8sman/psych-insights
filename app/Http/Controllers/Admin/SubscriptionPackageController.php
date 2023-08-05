@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BasicPackageRequest;
 use App\Http\Requests\Admin\FreePackageRequest;
 use App\Http\Requests\Admin\StoreSubscriptionPackageRequest;
 use App\Http\Requests\Admin\UpdateSubscriptionPackageRequest;
@@ -26,7 +27,7 @@ class SubscriptionPackageController extends Controller
      */
     public function index()
     {
-        $packages = SubscriptionPackage::where('free_trial', 0)->where('free_trial', 0)->orderBy('level', 'asc');
+        $packages = SubscriptionPackage::where('free_trial', 0)->where('free_package', 0)->orderBy('level', 'asc');
         if($packages->count() < 1){
             return response([
                 'status' => 'failed',
@@ -255,6 +256,44 @@ class SubscriptionPackageController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Subscription Package deleted successfully'
+        ], 200);
+    }
+
+    public function add_basic_package(BasicPackageRequest $request){
+        $package = SubscriptionPackage::where('free_package', 1)->first();
+        if(empty($package)){
+            SubscriptionPackage::create([
+                'package' => 'Free Package',
+                'level' => 0,
+                'podcast_limit' => $request->podcast_limit,
+                'article_limit' => $request->article_limit,
+                'audio_limit' => $request->audio_limit,
+                'video_limit' => $request->video_limit,
+                'free_trial' => 0,
+                'first_time_promo' => 0,
+                'subsequent_promo' => 0,
+                'free_package' => 1
+            ]);
+        } else {
+            $package->update($request->all());
+        }
+
+        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit']);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Free Package Settings set up successfully',
+            'data' => $package
+        ], 200);
+    }
+
+    public function fetch_basic_package(){
+        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit']);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Free Package successfully fetched',
+            'data' => $package
         ], 200);
     }
 }
