@@ -26,7 +26,7 @@ class SubscriptionPackageController extends Controller
      */
     public function index()
     {
-        $packages = SubscriptionPackage::where('status', 1)->where('free_trial', 0)->where('free_trial', 0)->orderBy('level', 'asc');
+        $packages = SubscriptionPackage::where('free_trial', 0)->where('free_trial', 0)->orderBy('level', 'asc');
         if($packages->count() < 1){
             return response([
                 'status' => 'failed',
@@ -37,7 +37,7 @@ class SubscriptionPackageController extends Controller
 
         $packages = $packages->get();
         foreach($packages as $package){
-            $package->payment_plans = self::package($package);
+            $package = self::package($package);
         }
 
         return response([
@@ -57,7 +57,8 @@ class SubscriptionPackageController extends Controller
                 'article_limit' => -1,
                 'audio_limit' => -1,
                 'video_limit' => -1,
-                'free_trial' => 1
+                'free_trial' => 1,
+                'first_time_promo' => 0
             ]);
         }
 
@@ -244,7 +245,7 @@ class SubscriptionPackageController extends Controller
     public function destroy(SubscriptionPackage $package)
     {
         $package->delete();
-        $plans = PaymentPlan::where('subscription_package__id', $package->id);
+        $plans = PaymentPlan::where('subscription_package_id', $package->id);
         if($plans->count() > 0){
             foreach($plans->get() as $plan){
                 $plan->delete();
@@ -253,7 +254,7 @@ class SubscriptionPackageController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Subscription Packae deleted successfully'
+            'message' => 'Subscription Package deleted successfully'
         ], 200);
     }
 }

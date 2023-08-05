@@ -21,7 +21,14 @@ class SubscriptionPackage extends Model
         'audio_limit',
         'video_limit',
         'free_trial',
-        'first_time_promo'
+        'first_time_promo',
+        'subsequent_promo',
+        'free_package'
+    ];
+
+    protected $hidden = [
+        'free_trial',
+        'free_package'
     ];
 
     public function getSlugOptions(): SlugOptions

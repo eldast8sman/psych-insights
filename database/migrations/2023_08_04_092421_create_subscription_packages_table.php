@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('subscription_packages', function (Blueprint $table) {
             $table->id();
             $table->string('package')->unique();
+            $table->string('slug');
             $table->integer('level');
             $table->text('description')->nullable();
             $table->string('podcast_limit')->default(0);
