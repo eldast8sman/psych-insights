@@ -23,7 +23,7 @@ class BasicPackageRequest extends FormRequest
     {
         return [
             'podcast_limit' => 'required|integer|min:0',
-            'article_limi' => 'required|integer|min:0',
+            'article_limit' => 'required|integer|min:0',
             'audio_limit' => 'required|integer|min:0',
             'video_limit' => 'required|integer|min:0'
         ];
