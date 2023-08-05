@@ -13,11 +13,11 @@ jobs:
       - uses: actions/checkout@v2
         with: 
           node-version: 16
-      - uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql database: schoolar_app
-          mysql user: schoolar_app
-          mysql password: password
+#      - uses: mirromutth/mysql-action@v1.1
+#        with:
+#          mysql database: schoolar_app
+#          mysql user: schoolar_app
+#          mysql password: password
       - name: Copy .env
         run: cp .env.example .env
       - name: Install composer Dependencies
@@ -50,7 +50,7 @@ jobs:
           script: |
             cd /home/psycsboi
             cd backend_dev
-            git pull --force origin development
+            git pull origin development --rebase
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
             php artisan migrate
             php artisan config:clear
