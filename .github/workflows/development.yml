@@ -50,7 +50,7 @@ jobs:
           script: |
             cd /home/psycsboi
             cd backend_dev
-            git pull --force origin development
+            git pull origin development --rebase
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
             php artisan migrate
             php artisan config:clear
