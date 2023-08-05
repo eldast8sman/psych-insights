@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\DassQuestionController;
+use App\Http\Controllers\Admin\SubscriptionPackageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,20 @@ Route::prefix('admin')->group(function(){
             Route::get('/dass-questions/{question}', 'show')->name('admin.dassQuestion.show');
             Route::put('/dass-questions/{question}', 'update')->name('admin.dassQuestion.update');
             Route::delete('/dass-questions/{question}', 'destroy')->name('admin.dassQuestion.delete');
+        });
+
+        Route::controller(SubscriptionPackageController::class)->group(function(){
+            Route::get('/subscription-packages', 'index')->name('admin.subscriptionPackae.index');
+            Route::post('/subscription-packages', 'store')->name('admin.subscriptionPackages.store');
+            Route::get('/subscription-packages/{package}', 'show')->name('admin.subscriptionPackages.show');
+            Route::put('/subscription-packages/{package}', 'update')->name('admin.subscriptionPackage.update');
+            Route::delete('/subscription-packages/payment-plans/{plan}', 'destroy_payment_plan')->name('admin.subscriptionPackage.paymentPlan.delete');
+            Route::delete('/subscription-packages/{package}', 'destroy')->name('admin.subscriptionPackage.delete');
+            Route::post('/free-trials', 'add_free_package')->name('admin.freeTrial.add');
+            Route::get('/free-trials', 'fetch_free_package')->name('admin.freeTrial.fetch');
+            Route::delete('/free-trials', 'destroy_free_package')->name('admin.freeTrial.delete');
+            Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
+            Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
         });
     });
 });

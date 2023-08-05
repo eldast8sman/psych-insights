@@ -51,18 +51,17 @@ jobs:
             cd /home/psycsboi
             cd backend_dev
             git pull origin development
-            php -r "file_exists('.env') || copy('.env.example', '.env');"
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-            php artisan storage:link
-            php artisan key:generate
-            php artisan jwt:secret
             php artisan migrate
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan view:clear
 #            git pull origin main
 #            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 #            php artisan migrate
 #            php artisan config:clear
 #            php artisan cache:clear
-#            php arttisan view:clear
+#            php artisan view:clear
 #            php artisan storage:link
 #            php artisan key:generate
 #            php artisan jwt:secret
