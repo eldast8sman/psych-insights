@@ -25,7 +25,8 @@ class BasicPackageRequest extends FormRequest
             'podcast_limit' => 'required|integer|min:0',
             'article_limit' => 'required|integer|min:0',
             'audio_limit' => 'required|integer|min:0',
-            'video_limit' => 'required|integer|min:0'
+            'video_limit' => 'required|integer|min:0',
+            'book_limit' => 'required|integer|min:0'
         ];
     }
 }

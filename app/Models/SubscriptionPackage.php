@@ -20,6 +20,7 @@ class SubscriptionPackage extends Model
         'article_limit',
         'audio_limit',
         'video_limit',
+        'book_limit',
         'free_trial',
         'first_time_promo',
         'subsequent_promo',
