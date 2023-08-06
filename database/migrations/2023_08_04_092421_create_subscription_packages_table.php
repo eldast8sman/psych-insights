@@ -17,10 +17,11 @@ return new class extends Migration
             $table->string('slug');
             $table->integer('level');
             $table->text('description')->nullable();
-            $table->string('podcast_limit')->default(0);
-            $table->string('article_limit')->default(0);
-            $table->string('audio_limit')->default(0);
-            $table->string('video_limit')->default(0);
+            $table->integer('podcast_limit')->default(0);
+            $table->integer('article_limit')->default(0);
+            $table->integer('audio_limit')->default(0);
+            $table->integer('video_limit')->default(0);
+            $table->integer('book_limit')->default(0);
             $table->boolean('free_trial')->default(0);
             $table->double('first_time_promo')->nullable(0);
             $table->double('subsequent_promo')->default(0);
