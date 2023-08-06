@@ -50,12 +50,13 @@ jobs:
           script: |
             cd /home/psycsboi
             cd backend_dev
+            git pull origin development
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
             php artisan migrate
             php artisan config:clear
             php artisan cache:clear
             php artisan view:clear
-            php artisan storage:link
+#            php artisan storage:link
 #            git pull origin main
 #            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 #            php artisan storage:link
