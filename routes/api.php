@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BasicQuestionController;
+use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\DassQuestionController;
@@ -114,5 +115,14 @@ Route::prefix('admin')->group(function(){
             Route::get('/promo-codes/{code}/activation', 'activation')->name('admin.promoCode.activation');
             Route::delete('/promo-codes/{code}', 'destroy')->name('admin.promoCode.delete');
         });
+
+        Route::controller(BookController::class)->group(function(){
+            Route::get('/books', 'index')->name('admin.book.index');
+            Route::post('/books', 'store')->name('admin.book.store');
+            Route::get('/books/{book}', 'show')->name('admin.book.show');
+            Route::post('/books/{book}', 'update')->name('admin.book.update');
+            Route::get('/books/{book}/activation', 'activation')->admin('admin.book.activation');
+            Route::delete('/books/{book}', 'destroy')->name('admin.book.delete');
+        })
     });
 });
