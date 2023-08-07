@@ -26,7 +26,7 @@ class FileManagerController extends Controller
             return false;
         }
 
-        $extension = $file->getClientOriginalExtension();
+        $extension = strtolower($file->getClientOriginalExtension());
         $filename = Str::random(20).time().'.'.$extension;
         if(($extension == 'jpg') || ($extension == 'jpeg') || ($extension == 'png') || ($extension == 'gif')){
             $path = 'images';

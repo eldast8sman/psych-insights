@@ -121,8 +121,8 @@ Route::prefix('admin')->group(function(){
             Route::post('/books', 'store')->name('admin.book.store');
             Route::get('/books/{book}', 'show')->name('admin.book.show');
             Route::post('/books/{book}', 'update')->name('admin.book.update');
-            Route::get('/books/{book}/activation', 'activation')->admin('admin.book.activation');
+            Route::get('/books/{book}/activation', 'activation')->name('admin.book.activation');
             Route::delete('/books/{book}', 'destroy')->name('admin.book.delete');
-        })
+        });
     });
 });

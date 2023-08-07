@@ -158,7 +158,7 @@ class BookController extends Controller
             $all['book_cover'] = $upload->id;
         }
         $categories = [];
-        foreach(explode(',', $request->categories) as $cat_id){
+        foreach($request->categories as $cat_id){
             $category = Category::where('id', trim($cat_id))->orWhere('category', trim($cat_id))->first();
             if(!empty($category)){
                 if(!in_array($category->id, $categories)){
