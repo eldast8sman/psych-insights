@@ -28,9 +28,10 @@ class StoreBookRequest extends FormRequest
             'author' => 'required|string',
             'summary' => 'string|nullable',
             'price' => 'numeric|nullable',
-            'publication_year' => 'integer|nullable',
+            'publication_year' => 'integer|nullable|max:9999',
             'subscription_level' => 'integer|min:0',
-            'book_cover' => 'file|mimes:png,jpg|max:200|nullable'
+            'book_cover' => 'file|mimes:png,jpg|max:200|nullable',
+            'purchase_link' => 'required|string'
         ];
     }
 }

@@ -21,6 +21,7 @@ class Book extends Model
         'publication_year',
         'subscription_level',
         'book_cover',
+        'purchase_link',
         'status'
     ];
 
