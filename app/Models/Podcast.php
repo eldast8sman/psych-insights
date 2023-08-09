@@ -2,26 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Sluggable\HasSlug;
 
-class Book extends Model
+class Podcast extends Model
 {
     use HasFactory, HasSlug;
 
     protected $fillable = [
         'title',
-        'categories',
         'slug',
         'author',
+        'categories',
         'summary',
-        'price',
-        'publication_year',
+        'release_date',
         'subscription_level',
-        'book_cover',
-        'purchase_link',
+        'cover_art',
+        'podcast_link',
         'status'
     ];
 

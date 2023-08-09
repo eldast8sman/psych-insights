@@ -4,14 +4,14 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBookRequest extends FormRequest
+class UpdatePodcastRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -23,15 +23,13 @@ class StoreBookRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'categories' => 'required|array',
-            'categories.*' => 'required|integer|exists:categories,id',
             'author' => 'required|string',
+            'categories' => 'required|array',
             'summary' => 'string|nullable',
-            'price' => 'numeric|nullable',
-            'publication_year' => 'integer|nullable|max:9999',
-            'subscription_level' => 'integer|min:0',
-            'book_cover' => 'file|mimes:png,jpg|max:200|nullable',
-            'purchase_link' => 'required|string|url'
+            'release_date' => 'required|date',
+            'subscription_level' => 'required|integer',
+            'cover_art' => 'file|mimes:png,jpg,jpeg,gif|max:200|nullable',
+            'podcast_link' => 'required|url'
         ];
     }
 }
