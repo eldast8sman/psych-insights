@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\DassQuestionController;
+use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use Illuminate\Http\Request;
@@ -123,6 +124,15 @@ Route::prefix('admin')->group(function(){
             Route::post('/books/{book}', 'update')->name('admin.book.update');
             Route::get('/books/{book}/activation', 'activation')->name('admin.book.activation');
             Route::delete('/books/{book}', 'destroy')->name('admin.book.delete');
+        });
+
+        Route::controller(PodcastController::class)->group(function(){
+            Route::get('/podcasts', 'index')->name('admin.podcast.index');
+            Route::post('/podcasts', 'store')->name('admin.podcast.store');
+            Route::get('/podcasts/{podcast}', 'show')->name('admin.podcast.show');
+            Route::post('/podcasts/{podcast}', 'update')->name('admin.podcast.update');
+            Route::get('/books/{podcast}/activation', 'activation')->name('admin.podcast.activation');
+            Route::delete('/podcasts/{podcast}', 'destroy')->name('admin.podcast.delete');
         });
     });
 });
