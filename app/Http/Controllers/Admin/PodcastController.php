@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\StorePodcastRequest;
+use App\Http\Requests\Admin\UpdatePodcastRequest;
 
 class PodcastController extends Controller
 {
@@ -142,7 +143,7 @@ class PodcastController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Podcast $podcast)
+    public function update(UpdatePodcastRequest $request, Podcast $podcast)
     {
         $old_cover = $podcast->cover_art;
         $all = $request->except(['categories', 'cover_art']);
