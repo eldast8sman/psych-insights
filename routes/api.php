@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\BookController;
@@ -133,6 +134,15 @@ Route::prefix('admin')->group(function(){
             Route::post('/podcasts/{podcast}', 'update')->name('admin.podcast.update');
             Route::get('/books/{podcast}/activation', 'activation')->name('admin.podcast.activation');
             Route::delete('/podcasts/{podcast}', 'destroy')->name('admin.podcast.delete');
+        });
+
+        Route::controller(ArticleController::class)->group(function(){
+            Route::get('/articles', 'index')->name('admin.article.index');
+            Route::post('/articles', 'store')->name('admin.article.store');
+            Route::get('/articles/{article}', 'show')->name('admin.article.show');
+            Route::post('/articles/{article}', 'update')->name('admin.article.update');
+            Route::get('/articles/{article}/activation', 'activation')->name('admin.article.activation');
+            Route::delete('/articles/{article}', 'destroy')->name('admin.article.delete');
         });
     });
 });
