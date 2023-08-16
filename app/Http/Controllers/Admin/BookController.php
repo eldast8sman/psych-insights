@@ -113,6 +113,9 @@ class BookController extends Controller
         }
         $all['categories'] = join(',', $request->categories);
         if(!$book = Book::create($all)){
+            if(isset($all['book_cover']) && !empty($all['book_cover'])){
+                FileManagerController::delete($all['book_cover']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Book upload failed'
@@ -168,6 +171,9 @@ class BookController extends Controller
         }
         $all['categories'] = join(',', $categories);
         if(!$book->update($all)){
+            if(isset($all['book_cover']) && !empty($all['book_cover'])){
+                FileManagerController::delete($all['book_cover']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Book Update failed'
