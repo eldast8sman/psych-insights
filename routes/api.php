@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\BookController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
+use App\Http\Controllers\Admin\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -143,6 +145,24 @@ Route::prefix('admin')->group(function(){
             Route::post('/articles/{article}', 'update')->name('admin.article.update');
             Route::get('/articles/{article}/activation', 'activation')->name('admin.article.activation');
             Route::delete('/articles/{article}', 'destroy')->name('admin.article.delete');
+        });
+
+        Route::controller(VideoController::class)->group(function(){
+            Route::get('/videos', 'index')->name('admin.video.index');
+            Route::post('/videos', 'store')->name('admin.video.store');
+            Route::get('/videos/{video}', 'show')->name('admin.video.show');
+            Route::post('/videos/{video}', 'update')->name('admin.video.update');
+            Route::get('/videos/{video}/activation', 'activation');
+            Route::delete('/videos/{video}', 'destroy')->name('admin.video.delete');
+        });
+
+        Route::controller(AudioController::class)->group(function(){
+            Route::get('/audios', 'index')->name('admin.audio.index');
+            Route::post('/audios', 'store')->name('admin.audio.store');
+            Route::get('/audios/{audio}', 'show')->name('admin.audio.show');
+            Route::post('/audios/{audio}', 'update')->name('admin.audio.update');
+            Route::get('/audios/{audio}/activation', 'activation')->name('admin.audio.activation');
+            Route::delete('/audios/{audio}', 'destroy')->name('admin.audio.delete');
         });
     });
 });

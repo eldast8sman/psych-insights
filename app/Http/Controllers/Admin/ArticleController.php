@@ -114,6 +114,9 @@ class ArticleController extends Controller
         $all['status'] = 1;
 
         if(!$article = Article::create($all)){
+            if(isset($all['photo']) && !empty($all['photo'])){
+                FileManagerController::delete($all['photo']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Article upload failed'
@@ -172,6 +175,9 @@ class ArticleController extends Controller
         }
         $all['categories'] = join(',', $categories);
         if(!$article->update($all)){
+            if(isset($all['photo']) && !empty($all['photo'])){
+                FileManagerController::delete($all['photo']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Article Update failed'

@@ -113,6 +113,9 @@ class PodcastController extends Controller
         }
         $all['categories'] = join(',', $request->categories);
         if(!$podcast = Podcast::create($all)){
+            if(isset($all['cover_art']) && !empty($all['cover_art'])){
+                FileManagerController::delete($all['cover_art']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Podcast upload failed'
@@ -168,6 +171,9 @@ class PodcastController extends Controller
         }
         $all['categories'] = join(',', $categories);
         if(!$podcast->update($all)){
+            if(isset($all['cover_art']) && !empty($all['cover_art'])){
+                FileManagerController::delete($all['cover_art']);
+            }
             return response([
                 'status' => 'failed',
                 'message' => 'Podcast Update failed'
