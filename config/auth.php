@@ -43,6 +43,10 @@ return [
         'admin-api' => [
             'driver' => 'jwt',
             'provider' => 'admins'
+        ],
+        'user-api' => [
+            'driver' => 'jwt',
+            'provider' => 'users'
         ]
     ],
 
