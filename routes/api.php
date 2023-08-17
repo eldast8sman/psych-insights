@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\AuthController as ControllersAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -165,4 +166,14 @@ Route::prefix('admin')->group(function(){
             Route::delete('/audios/{audio}', 'destroy')->name('admin.audio.delete');
         });
     });
+});
+
+Route::controller(ControllersAuthController::class)->group(function(){
+    Route::post('/signup', 'store')->name('signup');
+    Route::post('/login', 'login')->name('login');
+    Route::get('/me', 'me')->name('me');
+    Route::post('/forgot-password', 'forgot_password')->name('forgot_password');
+    Route::post('/reset-password', 'reset_password')->name('reset_password');
+    Route::get('/initiate-google-login', 'initiate_google_login')->name('initiate_google_login');
+    Route::post('/google-login', 'google_login')->name('google_login');
 });
