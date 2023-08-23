@@ -48,6 +48,8 @@ class AuthController extends Controller
         $user = self::user_details($user);
         $user->authorization = $login;
 
+        self::log_activity($user->id, "signup");
+
         return response([
             'status' => 'success',
             'message' => 'Signup successful',
@@ -116,6 +118,8 @@ class AuthController extends Controller
         $user = self::user_details($user);
         $user->authorization = $auth;
 
+        self::log_activity($user->id, "login");
+
         return response([
             'status' => 'success',
             'message' => 'Login successful',
@@ -142,6 +146,8 @@ class AuthController extends Controller
 
         Mail::to($user)->send(new ForgotPasswordMail($user->name, $user->token));
 
+        self::log_activity($user->id, "forgot_password");
+
         return response([
             'status' => 'success',
             'message' => 'Password reset link sent to '.$request->email
@@ -163,6 +169,8 @@ class AuthController extends Controller
         $user->token = null;
         $user->token_expiry = null;
         $user->save();
+
+        self::log_activity($user->id, "reset_password");
 
         return response([
             'status' => 'success',
@@ -219,6 +227,8 @@ class AuthController extends Controller
 
         $user = self::user_details($user);
         $user->authorization = $auth;
+
+        self::log_activity($user->id, "google_login");
 
         return response([
             'status' => 'success',
