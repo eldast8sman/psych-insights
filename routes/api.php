@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
+use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +85,11 @@ Route::prefix('admin')->group(function(){
             Route::put('/basic-questions/{question}/set-prerequisite', 'give_prerequisite')->name('admin.basicQuestion.setPrerequisite');
             Route::delete('/basic-question-special-options/{option}', 'delete_special_option')->name('admin.basicQuestionSpeciaOption.delete');
             Route::delete('/basic-questions/{question}', 'destroy')->name('admin.basicQuestion.delete');
+            Route::post('/basic-question-score-ranges', 'store_score_range')->name('admin.basicQuestionScoreRange.store');
+            Route::get('/basic-question-score-ranges', 'fetch_score_ranges')->name('admin.basicQuestionScoreRange.index');
+            Route::get('/basic-question-score-ranges/{range}', 'show_score_range')->name('admin.basicQuestionScoreRange.show');
+            Route::put('/basic-question-score-ranges/{range}', 'update_score_range')->name('admin.basicQuestionScoreRange.update');
+            Route::delete('/basic-question-score-ranges/{range}', 'destroy_score_range')->name('admin.basicQuestionScoreRange.delete');
         });
 
         Route::controller(DassQuestionController::class)->group(function(){
@@ -96,6 +102,11 @@ Route::prefix('admin')->group(function(){
             Route::get('/dass-questions/{question}', 'show')->name('admin.dassQuestion.show');
             Route::put('/dass-questions/{question}', 'update')->name('admin.dassQuestion.update');
             Route::delete('/dass-questions/{question}', 'destroy')->name('admin.dassQuestion.delete');
+            Route::post('/dass-question-score-ranges', 'store_score_range')->name('admin.dassQuestionScoreRange.store');
+            Route::get('/dass-question-score-ranges', 'fetch_score_ranges')->name('admin.dassQuestionScoreRange.index');
+            Route::get('/dass-question-score-ranges/{range}', 'show_score_range')->name('admin.dassQuestionScoreRange.show');
+            Route::put('/dass-question-score-ranges/{range}', 'update_score_range')->name('admin.dassQuestionScoreRange.update');
+            Route::delete('/dass-question-score-ranges/{range}', 'destroy_score_range')->name('admin.dassQuestionScoreRange.delete');
         });
 
         Route::controller(SubscriptionPackageController::class)->group(function(){
@@ -176,4 +187,10 @@ Route::controller(ControllersAuthController::class)->group(function(){
     Route::post('/reset-password', 'reset_password')->name('reset_password');
     Route::get('/initiate-google-login', 'initiate_google_login')->name('initiate_google_login');
     Route::post('/google-login', 'google_login')->name('google_login');
+});
+
+Route::middleware('auth:user-api')->group(function(){
+    Route::controller(ControllersBasicQuestionController::class)->group(function(){
+        Route::get('/basic-questions', 'fetch_questions')->name('basicQuestion.fetch');
+    });
 });
