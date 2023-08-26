@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
-use App\Http\Requests\Admin\ForgotPasswordRequest;
+use App\Http\Requests\ForgotPasswordRequest;
 
 class AuthController extends Controller
 {
