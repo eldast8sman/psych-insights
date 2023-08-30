@@ -203,5 +203,6 @@ Route::middleware('auth:user-api')->group(function(){
 
     Route::controller(ControllersDailyQuestionController::class)->group(function(){
         Route::get('/daily-questions', 'fetch_questions')->name('dailyQuestion.fetch');
+        Route::post('/daily-questions/answer', 'answer_questions')->name('dailyQuestion.answer');
     });
 });

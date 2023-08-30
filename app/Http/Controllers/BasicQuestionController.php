@@ -232,6 +232,8 @@ class BasicQuestionController extends Controller
         $answer_summary->highest_category_id = $highest_category_id;
         $answer_summary->highest_category = $highest_category;
 
+        self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
+
         return response([
             'status' => 'success',
             'message' => 'Basic Question answered',
