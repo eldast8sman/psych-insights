@@ -307,6 +307,13 @@ class BasicQuestionController extends Controller
             ]);
         }
 
+        if($request->min > $request->max){
+            return response([
+                'status' => 'failed',
+                'message' => 'Min cannot be higher than Max'
+            ], 409);
+        }
+
         $all = $request->all();
         $all['question_type'] = 'basic_question';
 
@@ -357,6 +364,13 @@ class BasicQuestionController extends Controller
                 'status' => 'failed',
                 'message' => 'A Score range CANNOT overlap another score range'
             ]);
+        }
+
+        if($request->min > $request->max){
+            return response([
+                'status' => 'failed',
+                'message' => 'Min cannot be higher than Max'
+            ], 409);
         }
 
         if(!$range->update($request->all())){

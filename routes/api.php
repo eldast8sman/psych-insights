@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\PodcastController;
+use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\VideoController;
@@ -102,11 +103,6 @@ Route::prefix('admin')->group(function(){
             Route::get('/dass-questions/{question}', 'show')->name('admin.dassQuestion.show');
             Route::put('/dass-questions/{question}', 'update')->name('admin.dassQuestion.update');
             Route::delete('/dass-questions/{question}', 'destroy')->name('admin.dassQuestion.delete');
-            Route::post('/dass-question-score-ranges', 'store_score_range')->name('admin.dassQuestionScoreRange.store');
-            Route::get('/dass-question-score-ranges', 'fetch_score_ranges')->name('admin.dassQuestionScoreRange.index');
-            Route::get('/dass-question-score-ranges/{range}', 'show_score_range')->name('admin.dassQuestionScoreRange.show');
-            Route::put('/dass-question-score-ranges/{range}', 'update_score_range')->name('admin.dassQuestionScoreRange.update');
-            Route::delete('/dass-question-score-ranges/{range}', 'destroy_score_range')->name('admin.dassQuestionScoreRange.delete');
         });
 
         Route::controller(SubscriptionPackageController::class)->group(function(){
@@ -175,6 +171,15 @@ Route::prefix('admin')->group(function(){
             Route::post('/audios/{audio}', 'update')->name('admin.audio.update');
             Route::get('/audios/{audio}/activation', 'activation')->name('admin.audio.activation');
             Route::delete('/audios/{audio}', 'destroy')->name('admin.audio.delete');
+        });
+
+        Route::controller(PremiumCategoryScoreRangeController::class)->group(function(){
+            Route::get('/premium-score-ranges', 'index')->name('admin.premiumScoreRange.index');
+            Route::post('/premium-score-ranges', 'store')->name('admin.premiumScoreRange.store');
+            Route::get('/premium-score-ranges/{range}', 'show')->name('admin.premiumScoreRange.show');
+            Route::get('/premium-score-ranges/by-category/{category}', 'fetch_by_category');
+            Route::put('/premium-score-ranges/{range}', 'update')->name('admin.premiumScoreRange.update');
+            Route::delete('/premium-score-ranges/{range}', 'destroy')->name('admin.premiumScoreRange.delete');
         });
     });
 });
