@@ -12,19 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('question_answer_summaries', function (Blueprint $table) {
+        Schema::create('daily_question_answers', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class, 'user_id');
-            $table->string('question_type');
+            $table->date('answer_date');
             $table->text('answers');
-            $table->integer('k10_scores')->default(0);
-            $table->integer('total_score')->default(0);
-            $table->string('distress_level')->nullable();
-            $table->text('premium_scores');
             $table->text('category_scores');
-            $table->string('highest_category_id');
-            $table->string('highest_category');
-            $table->date('next_question');
+            $table->boolean('computed')->default(0);
             $table->timestamp('created_at');
         });
     }
@@ -34,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('question_answer_summaries');
+        Schema::dropIfExists('daily_question_answers');
     }
 };

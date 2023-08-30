@@ -5,22 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QuestionAnswerSummary extends Model
+class DailyQuestionAnswer extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'question_type',
+        'answer_date',
         'answers',
-        'k10_scores',
-        'total_score',
-        'distress_level',
-        'premium_scores',
         'category_scores',
-        'highest_category_id',
-        'highest_category',
-        'next_question'
+        'computed'
     ];
 
     const UPDATED_AT = NULL;

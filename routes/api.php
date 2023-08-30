@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
+use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -197,5 +198,10 @@ Route::controller(ControllersAuthController::class)->group(function(){
 Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
         Route::get('/basic-questions', 'fetch_questions')->name('basicQuestion.fetch');
+        Route::post('/basic-questions/answer', 'answer_basic_question')->name('basicQuestion.answer');
+    });
+
+    Route::controller(ControllersDailyQuestionController::class)->group(function(){
+        Route::get('/daily-questions', 'fetch_questions')->name('dailyQuestion.fetch');
     });
 });
