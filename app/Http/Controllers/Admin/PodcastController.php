@@ -179,6 +179,7 @@ class PodcastController extends Controller
                 'message' => 'Podcast Update failed'
             ], 500);
         }
+        $podcast->update_dependencies();
         if(!empty($old_cover)){
             FileManagerController::delete($old_cover);
         }

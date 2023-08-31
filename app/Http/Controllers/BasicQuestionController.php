@@ -7,6 +7,7 @@ use App\Models\BasicQuestion;
 use App\Models\BasicQuestionOption;
 use App\Models\BasicQuestionSpecialOption;
 use App\Models\Category;
+use App\Models\DailyQuestionAnswer;
 use App\Models\DistressScoreRange;
 use App\Models\PremiumCategoryScoreRange;
 use App\Models\PrerequisiteQuestion;
@@ -225,6 +226,8 @@ class BasicQuestionController extends Controller
             'highest_category' => join(',', $highest_category),
             'next_question' => $next_question
         ]);
+
+        $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
 
         $answer_summary->answers = $answers;
         $answer_summary->premium_scores = $prem_scores;

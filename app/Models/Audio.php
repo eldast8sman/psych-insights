@@ -29,4 +29,14 @@ class Audio extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $audios = RecommendedAudio::where('audio_id', $this->id);
+        if($audios->count() > 0){
+            foreach($audios->get() as $audio){
+                $audio->slug = $this->slug;
+                $audio->save();
+            }
+        }
+    }
 }

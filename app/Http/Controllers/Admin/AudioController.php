@@ -183,6 +183,7 @@ class AudioController extends Controller
                 'message' => 'Audio update failed'
             ], 500);
         }
+        $audio->update_dependencies();
         if(!empty($old_audio)){
             FileManagerController::delete($old_audio);
         }

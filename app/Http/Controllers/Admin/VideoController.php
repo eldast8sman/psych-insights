@@ -222,7 +222,7 @@ class VideoController extends Controller
         if(!empty($old_photo)){
             FileManagerController::delete($old_photo);
         }
-
+        $video->update_dependencies();
         return response([
             'status' => 'success',
             'message' => 'Video updated successfully',
