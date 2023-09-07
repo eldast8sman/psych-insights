@@ -140,7 +140,7 @@ class AuthController extends Controller
 
     public function forgot_password(ForgotPasswordRequest $request){
         $user = User::where('email', $request->email)->first();
-        $user->token = Str::random(20).time();
+        $user->token = Str::random(10);
         $user->token_expiry = date('Y-m-d H:i:s', time() + (60 * 10));
         $user->save();
 

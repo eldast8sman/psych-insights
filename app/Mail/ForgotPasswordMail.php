@@ -14,7 +14,7 @@ class ForgotPasswordMail extends Mailable
     use Queueable, SerializesModels;
 
     public $name;
-    public $link;
+    public $token;
 
     /**
      * Create a new message instance.
@@ -22,7 +22,7 @@ class ForgotPasswordMail extends Mailable
     public function __construct($name, $token)
     {
         $this->name = $name;
-        $this->link = env('FRONTEND_URL').'/reset-password/'.$token;
+        $this->token = $token;
     }
 
     /**

@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AnswerBasicQuestionRequest;
-use App\Models\BasicQuestion;
-use App\Models\BasicQuestionOption;
-use App\Models\BasicQuestionSpecialOption;
+use App\Models\Book;
+use App\Models\Article;
+use App\Models\Podcast;
 use App\Models\Category;
-use App\Models\DailyQuestionAnswer;
+use Illuminate\Http\Request;
+use App\Models\BasicQuestion;
+use App\Models\OpenedResources;
+use App\Models\RecommendedBook;
 use App\Models\DistressScoreRange;
-use App\Models\PremiumCategoryScoreRange;
+use App\Models\RecommendedArticle;
+use App\Models\RecommendedPodcast;
+use App\Models\BasicQuestionOption;
+use App\Models\CurrentSubscription;
+use App\Models\DailyQuestionAnswer;
+use App\Models\SubscriptionPackage;
 use App\Models\PrerequisiteQuestion;
 use App\Models\QuestionAnswerSummary;
-use Illuminate\Http\Request;
+use App\Models\PremiumCategoryScoreRange;
+use App\Models\BasicQuestionSpecialOption;
+use App\Http\Requests\AnswerBasicQuestionRequest;
 
 class BasicQuestionController extends Controller
 {
@@ -183,23 +192,28 @@ class BasicQuestionController extends Controller
                 'category' => $category->category,
                 'value' => $value
             ];
+        }
+
+        $distress_level = DistressScoreRange::where('question_type', 'basic_question')->where('min', '<=', $k10_score)->where('max', '>=', $k10_score)->first()->verdict;
+
+        $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
+        if($uncomputeds->count() > 0){
+            foreach($uncomputeds->get() as $uncomputed){
+                $scores = json_decode($uncomputed->category_scores, true);
+                foreach($scores as $score){
+                    $category_scores[$score['category_id']] += $score['value'];
+                }
+                $uncomputed->computed = 1;
+                $uncomputed->save();
+            }
+        }
+
+        foreach($category_scores as $key=>$value){
             if(!isset($score_list[$value])){
                 $score_list[$value] = [];
             }
             $score_list[$value][] = $key;
         }
-        // foreach($premium_scores as $key=>$value){
-        //     $category = Category::find($key);
-        //     $range = PremiumCategoryScoreRange::where('category_id', $category->id)->where('min', '<=', $value)->where('max', '>=', $value)->first();
-        //     $prem_scores[] = [
-        //         'category_id' => $category->id,
-        //         'category' => $category->category,
-        //         'value' => $value,
-        //         'distress_level' => $range->verdict
-        //     ];
-        // }
-
-        $distress_level = DistressScoreRange::where('question_type', 'basic_question')->where('min', '<=', $k10_score)->where('max', '>=', $k10_score)->first()->verdict;
 
         krsort($score_list);
 
@@ -210,6 +224,9 @@ class BasicQuestionController extends Controller
             $category = Category::find($high);
             $highest_category[] = $category->category;
         }
+
+        $highest_cat_id = array_shift($highest_category_id);
+        $highest_cat = array_shift($highest_category);
 
         $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
 
@@ -222,18 +239,29 @@ class BasicQuestionController extends Controller
             'distress_level' => $distress_level,
             'premium_scores' => json_encode($prem_scores),
             'category_scores' => json_encode($categ_scores),
-            'highest_category_id' => join(',', $highest_category_id),
-            'highest_category' => join(',', $highest_category),
+            'highest_category_id' => $highest_cat_id,
+            'highest_category' => $highest_cat,
             'next_question' => $next_question
         ]);
-
-        $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
 
         $answer_summary->answers = $answers;
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
         $answer_summary->highest_category_id = $highest_category_id;
         $answer_summary->highest_category = $highest_category;
+
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(!empty($current_subscription)){
+            $package = SubscriptionPackage::find($current_subscription->subscription_package_id);
+        } else {
+            $package = SubscriptionPackage::where('free_package', 1)->first();
+        }
+
+        BookController::recommend_books($package->book_limit, $this->user->id, $highest_cat_id);
+        PodcastController::recommend_podcasts($package->podcast_limit, $this->user->id, $highest_cat_id);
+        ArticleController::recommend_articles($package->audio_limit, $this->user->id, $highest_cat_id);
+        AudioController::recommend_audios($package->audio_limit, $this->user->id, $highest_cat_id);
+        VideoController::recommend_videos($package->video_limit, $this->user->id, $highest_cat_id);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 
