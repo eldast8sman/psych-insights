@@ -30,4 +30,14 @@ class Podcast extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $podcasts = RecommendedPodcast::where('podcast_id', $this->id);
+        if($podcasts->count() > 0){
+            foreach($podcasts->get() as $podcast){
+                $podcast->slug = $this->slug;
+                $podcast->save();
+            }
+        }
+    }
 }

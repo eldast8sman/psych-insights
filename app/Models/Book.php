@@ -31,4 +31,14 @@ class Book extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $books = RecommendedBook::where('book_id', $this->id);
+        if($books->count() > 0){
+            foreach($books->get() as $book){
+                $book->slug = $this->slug;
+                $book->save();
+            }
+        }
+    }
 }

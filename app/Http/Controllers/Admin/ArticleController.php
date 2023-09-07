@@ -183,6 +183,7 @@ class ArticleController extends Controller
                 'message' => 'Article Update failed'
             ], 500);
         }
+        $article->update_dependencies();
         if(!empty($old_photo)){
             FileManagerController::delete($old_photo);
         }

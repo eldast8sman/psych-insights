@@ -30,4 +30,14 @@ class Video extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $videos = RecommendedVideo::where('video_id', $this->id);
+        if($videos->count() > 0){
+            foreach($videos->get() as $video){
+                $video->slug = $this->slug;
+                $video->save();
+            }
+        }
+    }
 }

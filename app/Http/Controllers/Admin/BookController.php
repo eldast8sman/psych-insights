@@ -179,6 +179,7 @@ class BookController extends Controller
                 'message' => 'Book Update failed'
             ], 500);
         }
+        $book->update_dependencies();
         if(!empty($old_cover)){
             FileManagerController::delete($old_cover);
         }

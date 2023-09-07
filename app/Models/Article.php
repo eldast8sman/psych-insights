@@ -31,4 +31,14 @@ class Article extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $articles = RecommendedArticle::where('article_id', $this->id);
+        if($articles->count() > 0){
+            foreach($articles->get() as $article){
+                $article->slug = $this->slug;
+                $article->save();
+            }
+        }
+    }
 }
