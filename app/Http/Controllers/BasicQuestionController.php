@@ -247,8 +247,6 @@ class BasicQuestionController extends Controller
         $answer_summary->answers = $answers;
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
-        $answer_summary->highest_category_id = $highest_category_id;
-        $answer_summary->highest_category = $highest_category;
 
         $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(!empty($current_subscription)){
