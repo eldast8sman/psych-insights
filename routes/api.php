@@ -196,6 +196,11 @@ Route::controller(ControllersAuthController::class)->group(function(){
 });
 
 Route::middleware('auth:user-api')->group(function(){
+    Route::controller(ControllersAuthController::class)->group(function(){
+        Route::post('/verify-email', 'verify_email')->name('verifyEmail.verify');
+        Route::get('/resend-email-verification-token', 'resend_email_verification_link')->name('veryfyEmail.resend');
+    });
+
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
         Route::get('/basic-questions', 'fetch_questions')->name('basicQuestion.fetch');
         Route::post('/basic-questions/answer', 'answer_basic_question')->name('basicQuestion.answer');

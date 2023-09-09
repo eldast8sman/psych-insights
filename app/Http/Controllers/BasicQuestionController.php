@@ -2,24 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
-use App\Models\Article;
-use App\Models\Podcast;
 use App\Models\Category;
-use Illuminate\Http\Request;
 use App\Models\BasicQuestion;
-use App\Models\OpenedResources;
-use App\Models\RecommendedBook;
 use App\Models\DistressScoreRange;
-use App\Models\RecommendedArticle;
-use App\Models\RecommendedPodcast;
 use App\Models\BasicQuestionOption;
 use App\Models\CurrentSubscription;
 use App\Models\DailyQuestionAnswer;
 use App\Models\SubscriptionPackage;
 use App\Models\PrerequisiteQuestion;
 use App\Models\QuestionAnswerSummary;
-use App\Models\PremiumCategoryScoreRange;
 use App\Models\BasicQuestionSpecialOption;
 use App\Http\Requests\AnswerBasicQuestionRequest;
 

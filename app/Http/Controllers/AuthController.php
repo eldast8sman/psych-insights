@@ -8,12 +8,15 @@ use Illuminate\Http\Request;
 use App\Mail\ForgotPasswordMail;
 use App\Models\GoogleLoginToken;
 use App\Http\Requests\LoginRequest;
+use App\Mail\EmailVerificationMail;
 use App\Models\CurrentSubscription;
 use App\Models\SubscriptionPackage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\GoogleLoginRequest;
+use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 
@@ -38,6 +41,17 @@ class AuthController extends Controller
             ], 409);
         }
 
+        $token = Str::random(10);
+
+        $user->verification_token = $token;
+        $user->verification_token_expiry = date('Y-m-d H:i:s', time() + (60 * 10));
+        $user->email_verified = 0;
+        $user->save();
+
+        $names = explode(' ', $user->name);
+        $first_name = $names[0];
+        Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+
         if(!$login = $this->user_login($request->email, $request->password)){
             return response([
                 'status' => 'failed',
@@ -54,6 +68,72 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Signup successful',
             'data' => $user
+        ], 200);
+    }
+
+    public function verify_email(VerifyEmailRequest $request){
+        $user = User::find(self::user()->id);
+        if($user->email_verified == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'Email already Verified'
+            ], 409);
+        }
+        if($user->verification_token_expiry < date('Y-m-d H:i:s')){
+            $user->verification_token = null;
+            $user->verification_token_expiry = date('Y-m-d H:i:s', 0);
+            $user->save();
+            return response([
+                'status' => 'failed',
+                'message' => 'Expired Token'
+            ], 409);
+        }
+
+        if($user->verification_token != $request->token){
+            $user->verification_token = null;
+            $user->verification_token_expiry = date('Y-m-d H:i:s', 0);
+            $user->save();
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong Token'
+            ], 409);   
+        }
+
+        $user->verification_token = null;
+        $user->verification_token_expiry = date('Y-m-d H:i:s', 0);
+        $user->email_verified = 1;
+        $user->save();
+
+        self::log_activity($user->id, 'activate_email');
+
+        return response([
+            'status' => 'success',
+            'message' => 'Email Verified Successfully'
+        ], 200);
+    }
+
+    public function resend_email_verification_link(){
+        $user = User::find(self::user()->id);
+        if($user->email_verified == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'Email already Verified'
+            ], 409);
+        }
+
+        $token = Str::random(10);
+
+        $user->verification_token = $token;
+        $user->verification_token_expiry = date('Y-m-d H:i:s', time() + (60 * 10));
+        $user->save();
+
+        $names = explode(' ', $user->name);
+        $first_name = $names[0];
+        Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+
+        return response([
+            'status' => 'success',
+            'message' => 'Email Verification Token sent to '.$user->email
         ], 200);
     }
 
