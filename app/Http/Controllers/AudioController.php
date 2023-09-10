@@ -18,10 +18,10 @@ class AudioController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_audios($limit, $user_id, $cat_id, $level=0){
+    public function recommend_audios($limit, $user_id, $cat_id, $level=0){
         $rec_audios = RecommendedAudio::where('user_id', $user_id);
         if($rec_audios->count() > 0){
-            foreach($rec_audios as $rec_audio){
+            foreach($rec_audios->get() as $rec_audio){
                 $rec_audio->delete();
             }
         }

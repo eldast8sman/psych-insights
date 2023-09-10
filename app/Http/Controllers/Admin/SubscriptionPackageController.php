@@ -49,18 +49,23 @@ class SubscriptionPackageController extends Controller
     }
 
     public function add_free_package(FreePackageRequest $request){
+        $mirror_package = SubscriptionPackage::orderBy('level', 'desc')->first();
+        $data = [
+            'package' => 'Free Trial',
+            'level' => !empty($mirror_package) ? $mirror_package->level : 100,
+            'podcast_limit' => !empty($mirror_package) ? $mirror_package->podcast_limit : -1,
+            'article_limit' => !empty($mirror_package) ? $mirror_package->article_limit : -1,
+            'audio_limit' => !empty($mirror_package) ? $mirror_package->audio_limit : -1,
+            'video_limit' => !empty($mirror_package) ? $mirror_package->video_limit : -1,
+            'book_limit' => !empty($mirror_package) ? $mirror_package->book_limit : -1,
+            'free_trial' => 1,
+            'first_time_promo' => 0
+        ];
         $package = SubscriptionPackage::where('free_trial', 1)->first();
         if(empty($package)){
-            $package = SubscriptionPackage::create([
-                'package' => 'Free Trial',
-                'level' => 100,
-                'podcast_limit' => -1,
-                'article_limit' => -1,
-                'audio_limit' => -1,
-                'video_limit' => -1,
-                'free_trial' => 1,
-                'first_time_promo' => 0
-            ]);
+            $package = SubscriptionPackage::create($data);
+        } else {
+            $package->update($data);
         }
 
         $plan = PaymentPlan::where('subscription_package_id', $package->id)->first();
@@ -153,6 +158,37 @@ class SubscriptionPackageController extends Controller
         return $package;
     }
 
+    private function free_trial_settings(){
+        $mirror_package = SubscriptionPackage::orderBy('level', 'desc')->first();
+        $data = [
+            'package' => 'Free Trial',
+            'level' => !empty($mirror_package) ? $mirror_package->level : 100,
+            'podcast_limit' => !empty($mirror_package) ? $mirror_package->podcast_limit : -1,
+            'article_limit' => !empty($mirror_package) ? $mirror_package->article_limit : -1,
+            'audio_limit' => !empty($mirror_package) ? $mirror_package->audio_limit : -1,
+            'video_limit' => !empty($mirror_package) ? $mirror_package->video_limit : -1,
+            'book_limit' => !empty($mirror_package) ? $mirror_package->book_limit : -1,
+            'free_trial' => 1,
+            'first_time_promo' => 0
+        ];
+        $package = SubscriptionPackage::where('free_trial', 1)->first();
+        if(empty($package)){
+            $package = SubscriptionPackage::create($data);
+        } else {
+            $package->update($data);
+        }
+
+        $plan = PaymentPlan::where('subscription_package_id', $package->id)->first();
+        if(empty($plan)){
+            $plan = PaymentPlan::create([
+                'subscription_package_id' => $package->id,
+                'amount' => 0,
+                'duration_type' => 'week',
+                'duration' => 1
+            ]);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -174,6 +210,8 @@ class SubscriptionPackageController extends Controller
                 'duration' => $plan['duration']
             ]);
         }
+
+        $this->free_trial_settings();
 
         return response([
             'status' => 'success',
@@ -221,8 +259,10 @@ class SubscriptionPackageController extends Controller
             }
         }
 
+        $this->free_trial_settings();
+
         return response([
-            'status' => 'failed',
+            'status' => 'success',
             'message' => 'Subscription Package Updated successfully',
             'data' => self::package($package)
         ], 200);

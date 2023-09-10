@@ -18,10 +18,10 @@ class BookController extends Controller
         $this->user = AuthController::user();
     }
 
-    public function recommend_books($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_books($limit, $user_id, $cat_id, $level=0){
         $rec_books = RecommendedBook::where('user_id', $user_id);
         if($rec_books->count() > 0){
-            foreach($rec_books as $rec_book){
+            foreach($rec_books->get() as $rec_book){
                 $rec_book->delete();
             }
         }
