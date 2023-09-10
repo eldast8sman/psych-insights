@@ -18,7 +18,7 @@ class PodcastController extends Controller
         $this->user = AuthController::user();
     }
     
-    public static function recommend_podcasts($limit, $user_id, $cat_id){
+    public static function recommend_podcasts($limit, $user_id, $cat_id, $level=0){
         $rec_podcasts = RecommendedPodcast::where('user_id', $user_id);
         if($rec_podcasts->count() > 0){
             foreach($rec_podcasts as $rec_podcast){
@@ -41,7 +41,7 @@ class PodcastController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $podcasts = Podcast::where('status', 1)->orderBy('created_at', 'asc')->get(['id', 'slug']);
+            $podcasts = Podcast::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($podcasts as $podcast){
                 if(count($podcasts_id) < $first_limit){
                     $categories = explode(',', $podcast->categories);
@@ -58,7 +58,7 @@ class PodcastController extends Controller
                 foreach($opened_podcasts as $opened_podcast){
                     if(count($podcasts_id) < $first_limit){
                         $podcast = Podcast::find($opened_podcast);
-                        if(!empty($podcast) && ($podcast->status == 1)){
+                        if(!empty($podcast) && ($podcast->status == 1) && ($podcast->subscription_level <= $level)){
                             $categories = explode(',', $podcast->categories);
                             if(in_array($cat_id, $categories)){
                                 $podcasts_id[] = $podcast;
@@ -72,8 +72,8 @@ class PodcastController extends Controller
             }
 
             $counted = count($podcasts_id);
-            if(($counted < $limit) && (Podcast::where('status', 1)->count() >= $limit)){
-                $other_podcasts = Podcast::where('status', 1);
+            if(($counted < $limit) && (Podcast::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+                $other_podcasts = Podcast::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($podcasts_id)){
                     foreach($podcasts_id as $podcast_id){
                         $other_podcasts = $other_podcasts->where('id', '<>', $podcast_id->id);

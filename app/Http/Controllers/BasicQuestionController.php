@@ -247,11 +247,11 @@ class BasicQuestionController extends Controller
             $package = SubscriptionPackage::where('free_package', 1)->first();
         }
 
-        BookController::recommend_books($package->book_limit, $this->user->id, $highest_cat_id);
-        PodcastController::recommend_podcasts($package->podcast_limit, $this->user->id, $highest_cat_id);
-        ArticleController::recommend_articles($package->audio_limit, $this->user->id, $highest_cat_id);
-        AudioController::recommend_audios($package->audio_limit, $this->user->id, $highest_cat_id);
-        VideoController::recommend_videos($package->video_limit, $this->user->id, $highest_cat_id);
+        BookController::recommend_books($package->book_limit, $this->user->id, $highest_cat_id, $package->level);
+        PodcastController::recommend_podcasts($package->podcast_limit, $this->user->id, $highest_cat_id, $package->level);
+        ArticleController::recommend_articles($package->audio_limit, $this->user->id, $highest_cat_id, $package->level);
+        AudioController::recommend_audios($package->audio_limit, $this->user->id, $highest_cat_id, $package->level);
+        VideoController::recommend_videos($package->video_limit, $this->user->id, $highest_cat_id, $package->level);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 

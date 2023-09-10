@@ -269,6 +269,7 @@ class SubscriptionPackageController extends Controller
                 'article_limit' => $request->article_limit,
                 'audio_limit' => $request->audio_limit,
                 'video_limit' => $request->video_limit,
+                'book_limit' => $request->book_limit,
                 'free_trial' => 0,
                 'first_time_promo' => 0,
                 'subsequent_promo' => 0,

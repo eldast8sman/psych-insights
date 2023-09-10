@@ -1,24 +1,26 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\ArticleController;
-use App\Http\Controllers\Admin\AudioController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\BasicQuestionController;
-use App\Http\Controllers\Admin\BookController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DailyQuestionController;
-use App\Http\Controllers\Admin\DassQuestionController;
-use App\Http\Controllers\Admin\PodcastController;
-use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
-use App\Http\Controllers\Admin\PromoCodeController;
-use App\Http\Controllers\Admin\SubscriptionPackageController;
-use App\Http\Controllers\Admin\VideoController;
-use App\Http\Controllers\AuthController as ControllersAuthController;
-use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
-use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AudioController;
+use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\PodcastController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\PromoCodeController;
+use App\Http\Controllers\Admin\DassQuestionController;
+use App\Http\Controllers\Admin\BasicQuestionController;
+use App\Http\Controllers\Admin\DailyQuestionController;
+use App\Http\Controllers\Admin\SubscriptionPackageController;
+use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
+use App\Http\Controllers\AuthController as ControllersAuthController;
+use App\Http\Controllers\ArticleController as ControllerArticleController;
+use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
+use App\Http\Controllers\BookController as ControllersBookController;
+use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,8 @@ Route::prefix('admin')->group(function(){
         Route::post('/forgot-password', 'forgot_password')->name('admin.forgotPassword');
         Route::post('/reset-password', 'reset_password')->name('admin.resetPassword');
     });
+
+
 
     Route::middleware('auth:admin-api')->group(function(){
         Route::controller(AuthController::class)->group(function(){
@@ -194,6 +198,8 @@ Route::controller(ControllersAuthController::class)->group(function(){
     Route::get('/initiate-google-login', 'initiate_google_login')->name('initiate_google_login');
     Route::post('/google-login', 'google_login')->name('google_login');
 });
+
+Route::get('/recommend-books/{limit}/{user_id}/{cat_id}/{level}', [ControllersBookController::class, 'recommend_books']);
 
 Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersAuthController::class)->group(function(){

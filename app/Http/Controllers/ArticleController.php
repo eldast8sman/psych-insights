@@ -14,11 +14,11 @@ class ArticleController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:user-api');
+        $this->middleware('auth:user-api', ['except' => ['recommend_articles']]);
         $this->user = AuthController::user();
     }
 
-    public static function recommend_articles($limit, $user_id, $cat_id){
+    public static function recommend_articles($limit, $user_id, $cat_id, $level=0){
         $rec_articles = RecommendedArticle::where('user_id', $user_id);
         if($rec_articles->count() > 0){
             foreach($rec_articles->get() as $rec_article){
@@ -41,11 +41,11 @@ class ArticleController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $articles = Article::where('status', 1)->orderBy('created_at', 'asc')->get(['id', 'slug']);
+            $articles = Article::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($articles as $article){
                 if(count($articles_id) < $first_limit){
                     $categories = explode(',', $article->categories);
-                    if(in_array($cat_id, $categories) and !in_array($articles->id, $opened_articles)){
+                    if(in_array($cat_id, $categories) and !in_array($article->id, $opened_articles)){
                         $articles_id[] = $article;
                         $ids[] = $article->id;
                     }
@@ -60,7 +60,7 @@ class ArticleController extends Controller
                 foreach($opened_articles as $opened_article){
                     if(count($articles_id) < $first_limit){
                         $article = Article::find($opened_article);
-                        if(!empty($article) && ($article->status == 1)){
+                        if(!empty($article) && ($article->status == 1) && ($article->subscription_level <= $level)){
                             $categories = explode(',', $article->categories);
                             if(in_array($cat_id, $categories)){
                                 $articles_id[] = $article;
@@ -74,8 +74,8 @@ class ArticleController extends Controller
             }
 
             $counted = count($articles_id);
-            if(($counted < $limit) && (Article::where('status', 1)->count() >= $limit)){
-                $other_articles = Article::where('status', 1);
+            if(($counted < $limit) && (Article::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+                $other_articles = Article::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($articles_id)){
                     foreach($articles_id as $article_id){
                         $other_articles = $other_articles->where('id', '<>', $article_id->id);
