@@ -18,7 +18,7 @@ class VideoController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_videos($limit, $user_id, $cat_id){
+    public static function recommend_videos($limit, $user_id, $cat_id, $level=0){
         $rec_videos = RecommendedVideo::where('user_id', $user_id);
         if($rec_videos->count() > 0){
             foreach($rec_videos as $rec_video){
@@ -41,7 +41,7 @@ class VideoController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $videos = Video::where('status', 1)->orderBy('created_at', 'asc')->get(['id', 'slug']);
+            $videos = Video::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($videos as $video){
                 if(count($videos_id) < $first_limit){
                     $categories = explode(',', $video->categories);
@@ -72,8 +72,8 @@ class VideoController extends Controller
             }
 
             $counted = count($videos_id);
-            if(($counted < $limit) && (Video::where('status', 1)->count() >= $limit)){
-                $other_videos = Video::where('status', 1);
+            if(($counted < $limit) && (Video::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+                $other_videos = Video::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($videos_id)){
                     foreach($videos_id as $video_id){
                         $other_videos = $other_videos->where('id', '<>', $video_id->id);

@@ -14,11 +14,11 @@ class BookController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:user-api');
+        $this->middleware('auth:user-api', ['except' => ['recommend_books']]);
         $this->user = AuthController::user();
     }
 
-    public static function recommend_books($limit, $user_id, $cat_id){
+    public function recommend_books($limit, $user_id, $cat_id, $level=0){
         $rec_books = RecommendedBook::where('user_id', $user_id);
         if($rec_books->count() > 0){
             foreach($rec_books as $rec_book){
@@ -41,7 +41,7 @@ class BookController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $books = Book::where('status', 1)->orderBy('created_at', 'asc')->get(['id', 'slug']);
+            $books = Book::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($books as $book){
                 if(count($books_id) < $first_limit){
                     $categories = explode(',', $book->categories);
@@ -54,11 +54,12 @@ class BookController extends Controller
                 }
             }
 
+
             if(count($books_id) < $first_limit){
                 foreach($opened_books as $opened_book){
                     if(count($books_id) < $first_limit){
                         $book = Book::find($opened_book);
-                        if(!empty($book) && ($book->status == 1)){
+                        if(!empty($book) && ($book->status == 1) && ($book->subscription_level <= $level)){
                             $categories = explode(',', $book->categories);
                             if(in_array($cat_id, $categories)){
                                 $books_id[] = $book;
@@ -72,8 +73,8 @@ class BookController extends Controller
             }
 
             $counted = count($books_id);
-            if(($counted < $limit) && (Book::where('status', 1)->count() >= $limit)){
-                $other_books = Book::where('status', 1);
+            if(($counted < $limit) && (Book::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+                $other_books = Book::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($books_id)){
                     foreach($books_id as $book_id){
                         $other_books = $other_books->where('id', '<>', $book_id->id);

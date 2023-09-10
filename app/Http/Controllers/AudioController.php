@@ -18,7 +18,7 @@ class AudioController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_audios($limit, $user_id, $cat_id){
+    public static function recommend_audios($limit, $user_id, $cat_id, $level=0){
         $rec_audios = RecommendedAudio::where('user_id', $user_id);
         if($rec_audios->count() > 0){
             foreach($rec_audios as $rec_audio){
@@ -41,7 +41,7 @@ class AudioController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $audios = Audio::where('status', 1)->orderBy('created_at', 'asc')->get(['id', 'slug']);
+            $audios = Audio::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($audios as $audio){
                 if(count($audios_id) < $first_limit){
                     $categories = explode(',', $audio->categories);
@@ -58,7 +58,7 @@ class AudioController extends Controller
                 foreach($opened_audios as $opened_audio){
                     if(count($audios_id) < $first_limit){
                         $audio = Audio::find($opened_audio);
-                        if(!empty($audio) && ($audio->status == 1)){
+                        if(!empty($audio) && ($audio->status == 1) && ($audio->subscription_level <= $level)){
                             $categories = explode(',', $audio->categories);
                             if(in_array($cat_id, $categories)){
                                 $audios_id[] = $audio;
@@ -72,8 +72,8 @@ class AudioController extends Controller
             }
 
             $counted = count($audios_id);
-            if(($counted < $limit) && (Audio::where('status', 1)->count() >= $limit)){
-                $other_audios = Audio::where('status', 1);
+            if(($counted < $limit) && (Audio::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+                $other_audios = Audio::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($audios_id)){
                     foreach($audios_id as $audio_id){
                         $other_audios = $other_audios->where('id', '<>', $audio_id->id);

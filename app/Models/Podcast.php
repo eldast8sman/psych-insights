@@ -13,6 +13,7 @@ class Podcast extends Model
 
     protected $fillable = [
         'title',
+        'episode',
         'slug',
         'author',
         'categories',
@@ -27,7 +28,7 @@ class Podcast extends Model
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-            ->generateSlugsFrom('title')
+            ->generateSlugsFrom(['title', 'episode'])
             ->saveSlugsTo('slug');
     }
 
