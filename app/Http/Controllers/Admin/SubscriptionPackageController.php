@@ -293,6 +293,8 @@ class SubscriptionPackageController extends Controller
             }
         }
 
+        $this->free_trial_settings();
+
         return response([
             'status' => 'success',
             'message' => 'Subscription Package deleted successfully'
