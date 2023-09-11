@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PaymentPlan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\ForgotPasswordMail;
@@ -10,6 +11,7 @@ use App\Models\GoogleLoginToken;
 use App\Http\Requests\LoginRequest;
 use App\Mail\EmailVerificationMail;
 use App\Models\CurrentSubscription;
+use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -57,6 +59,12 @@ class AuthController extends Controller
                 'status' => 'failed',
                 'message' => $this->errors
             ], 409);
+        }
+
+        $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+        if(!empty($free_trial)){
+            $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
+            SubscriptionController::subscribe($user->id, $free_trial->id, $plan->id, 0);
         }
 
         $user = self::user_details($user);
