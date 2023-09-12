@@ -280,7 +280,7 @@ class VideoController extends Controller
                 'message' => 'Unauthorized Access'
             ], 409);
         }
-        
+
         $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
         $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
         $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -349,6 +349,14 @@ class VideoController extends Controller
     }
 
     public function opened_video($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+        
         $video = Video::where('slug', $slug)->first();
         if(empty($video) or ($video->status != 1)){
             return response([

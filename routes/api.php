@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
+use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
@@ -224,5 +225,13 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/videos/{slug}/mark-as-opened', 'mark_as_opened')->name('video.markAsOpened');
         Route::get('/opened-videos', 'opened_videos')->name('openedVideo.fetch');
         Route::get('/opened-videos/{slug}', 'opened_video')->name('openedVideo.show');
+    });
+
+    Route::controller(ControllersAudioController::class)->group(function(){
+        Route::get('/recommended-audios', 'recommended_audios')->name('recommendedAudio.fetch');
+        Route::get('/recommended-audios/{slug}', 'recommended_audio')->name('recommendedAudio.show');
+        Route::get('/audios/{slug}/mark-as-opened', 'mark_as_opened')->name('audio.markAsOpened');
+        Route::get('/opened-audios', 'opened_audios')->name('openedAudio.fetch');
+        Route::get('/opened-audios/{slug}', 'opened_audio')->name('openedAudio.show');
     });
 });

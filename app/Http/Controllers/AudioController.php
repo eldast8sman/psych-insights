@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Audio;
+use App\Models\Category;
 use App\Models\OpenedAudio;
 use Illuminate\Http\Request;
 use App\Models\OpenedResources;
 use App\Models\RecommendedAudio;
+use App\Models\CurrentSubscription;
 
 class AudioController extends Controller
 {
@@ -119,5 +121,257 @@ class AudioController extends Controller
         }
 
         return true;
+    }
+
+    public function fetch_audio(Audio $audio) : Audio
+    {
+        if(!empty($audio->audio)){
+            $audio->audio = FileManagerController::fetch_file($audio->audio);
+        }
+
+        if(!empty($audio->categories)){
+            $categories = [];
+
+            $categs = explode(',', $audio->categories);
+            foreach($categs as $categ){
+                $category = Category::find(trim($categ));
+                if(!empty($category)){
+                    $categories[] = $category->category;
+                }
+            }
+
+            $audio->categories = $categories;
+        }
+
+        unset($audio->created_at);
+        unset($audio->updated_at);
+        unset($audio->id);
+
+        return $audio;
+    }
+
+    public function recommended_audios(){
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $rec_audios = RecommendedAudio::where('user_id', $this->user->id);
+        if($rec_audios->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Recommended Video',
+                'data' => []
+            ], 200);
+        }
+
+        $audios = [];
+        $rec_audios = $rec_audios->get();
+        if(empty($search)){
+            foreach($rec_audios as $rec_audio){
+                $audio = Audio::find($rec_audio->audio_id);
+                if(!empty($audio) && ($audio->status == 1)){
+                    $audios[] = $this->fetch_audio($audio);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($rec_audios as $rec_audio){
+                $audio = Audio::find($rec_audio->audio_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($audio->title, $word) !== FALSE) or (strpos($audio->description, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$audio->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $audio = Audio::find($key);
+                    if(!empty($audio) and ($audio->status == 1)){
+                        $audios[] = $this->fetch_audio($audio);
+                    }
+                }
+            }
+        }
+
+        if(empty($audios)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio fetched successfully',
+            'data' => self::paginate_array($audios, $limit, $page)
+        ], 200);
+    }
+
+    public function recommended_audio($slug){
+        $rec_audio = RecommendedAudio::where('user_id', $this->user->id)->where('slug', $slug)->first();
+        if(empty($rec_audio)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was fetched'
+            ], 404);
+        }
+
+        $audio = Audio::find($rec_audio->audio_id);
+        if(empty($audio) or ($audio->status != 1)){
+            return response([
+                'ststus' => 'failed',
+                'message' => 'No Audio was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio fetched successfully',
+            'data' => $this->fetch_audio($audio)
+        ], 200);
+    }
+
+    public function mark_as_opened($slug){
+        $audio = Audio::where('slug', $slug)->first();
+        if(empty($audio)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedAudio::where('user_id', $this->user->id)->where('audio_id', $audio->id)->first();
+        if(empty($opened)){
+            OpenedAudio::create([
+                'user_id' => $this->user->id,
+                'audio_id' => $audio->id,
+                'frequency' => 1
+            ]);
+        } else {
+            $opened->frequency += 1;
+            $opened->save();
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Marked as Opened'
+        ], 200);
+    }
+
+    public function opened_audios(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+        
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $opened_audios = OpenedAudio::where('user_id', $this->user->id);
+        if($opened_audios->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Recommended Audio',
+                'data' => []
+            ], 200);
+        }
+
+        $audios = [];
+        $opened_audios = $opened_audios->get();
+        if(empty($search)){
+            foreach($opened_audios as $opened_audio){
+                $audio = Audio::find($opened_audio->audio_id);
+                if(!empty($audio) && ($audio->status == 1)){
+                    $audios[] = $this->fetch_audio($audio);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($opened_audios as $opened_audio){
+                $audio = Audio::find($opened_audio->audio_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($audio->title, $word) !== FALSE) or (strpos($audio->description, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$audio->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $audio = Audio::find($key);
+                    if(!empty($audio) and ($audio->status == 1)){
+                        $audios[] = $this->fetch_audio($audio);
+                    }
+                }
+            }
+        }
+
+        if(empty($audios)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audios fetched successfully',
+            'data' => self::paginate_array($audios, $limit, $page)
+        ], 200);
+    }
+
+    public function opened_audio($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $audio = Audio::where('slug', $slug)->first();
+        if(empty($audio) or ($audio->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedAudio::where('audio_id', $audio->id)->where('user_id', $this->user->id)->first();
+        if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio fetched successfully',
+            'data' => $this->fetch_audio($audio)
+        ], 200);
     }
 }
