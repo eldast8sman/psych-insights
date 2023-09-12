@@ -144,6 +144,10 @@ class BookController extends Controller
             $book->categories = $categories;
         }
 
+        unset($book->id);
+        unset($book->created_at);
+        unset($book->updated_at);
+
         return $book;
     }
 

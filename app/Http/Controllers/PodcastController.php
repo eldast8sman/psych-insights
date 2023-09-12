@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OpenedPodcast;
 use App\Models\Podcast;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\OpenedPodcast;
 use App\Models\OpenedResources;
 use App\Models\RecommendedPodcast;
+use App\Models\CurrentSubscription;
 
 class PodcastController extends Controller
 {
@@ -119,5 +121,258 @@ class PodcastController extends Controller
         }
 
         return true;
+    }
+
+    public static function fetch_podcast(Podcast $podcast) : Podcast
+    {
+        if(!empty($podcast->cover_art)){
+            $podcast->cover_art = FileManagerController::fetch_file($podcast->cover_art);
+        }
+
+        if(!empty($podcast->categories)){
+            $categories = [];
+
+            $categs = explode(',', $podcast->categories);
+            foreach($categs as $categ){
+                $category = Category::find(trim($categ));
+                if(!empty($category)){
+                    $categories[] = $category->category;
+                }
+            }
+
+            $podcast->categories = $categories;
+        }
+
+        unset($podcast->id);
+        unset($podcast->created_at);
+        unset($podcast->updated_at);
+
+        return $podcast;
+    }
+
+    public function recommended_podcasts(){
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $rec_podcasts = RecommendedPodcast::where('user_id', $this->user->id);
+        if($rec_podcasts->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Recommended Podcast',
+                'data' => []
+            ], 200);
+        }
+
+        $podcasts = [];
+        $rec_podcasts = $rec_podcasts->get();
+        if(empty($search)){
+            foreach($rec_podcasts as $rec_podcast){
+                $podcast = Podcast::find($rec_podcast->podcast_id);
+                if(!empty($podcast) && ($podcast->status == 1)){
+                    $podcasts[] = $this->fetch_podcast($podcast);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($rec_podcasts as $rec_podcast){
+                $podcast = Podcast::find($rec_podcast->podcast_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($podcast->title, $word) !== FALSE) or (strpos($podcast->summary, $word) !== FALSE) or (strpos($podcast->summary, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$podcast->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $podcast = Podcast::find($key);
+                    if(!empty($podcast) and ($podcast->status == 1)){
+                        $podcasts[] = $this->fetch_podcast($podcast);
+                    }
+                }
+            }
+        }
+
+        if(empty($podcasts)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Podcasts fetched successfully',
+            'data' => self::paginate_array($podcasts, $limit, $page)
+        ], 200);
+    }
+
+    public function recommended_podcast($slug){
+        $rec_podcast = RecommendedPodcast::where('user_id', $this->user->id)->where('slug', $slug)->first();
+        if(empty($rec_podcast)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was fetched'
+            ], 404);
+        }
+
+        $podcast = Podcast::find($rec_podcast->podcast_id);
+        if(empty($podcast) or ($podcast->status != 1)){
+            return response([
+                'ststus' => 'failed',
+                'message' => 'No Podcast was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Podcast fetched successfully',
+            'data' => $this->fetch_podcast($podcast)
+        ], 200);
+    }
+
+    public function mark_as_opened($slug){
+        $podcast = Podcast::where('slug', $slug)->first();
+        if(empty($podcast)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedPodcast::where('user_id', $this->user->id)->where('podcast_id', $podcast->id)->first();
+        if(empty($opened)){
+            OpenedPodcast::create([
+                'user_id' => $this->user->id,
+                'podcast_id' => $podcast->id,
+                'frequency' => 1
+            ]);
+        } else {
+            $opened->frequency += 1;
+            $opened->save();
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Marked as Opened'
+        ], 200);
+    }
+
+    public function opened_podcasts(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+        
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $opened_podcasts = OpenedPodcast::where('user_id', $this->user->id);
+        if($opened_podcasts->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Opened Podcast',
+                'data' => []
+            ], 200);
+        }
+
+        $books = [];
+        $opened_podcasts = $opened_podcasts->get();
+        if(empty($search)){
+            foreach($opened_podcasts as $opened_podcast){
+                $podcast = Podcast::find($opened_podcast->podcast_id);
+                if(!empty($podcast) && ($podcast->status == 1)){
+                    $podcasts[] = $this->fetch_podcast($podcast);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($opened_podcasts as $opened_podcast){
+                $podcast = Podcast::find($opened_podcast->podcast_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($podcast->title, $word) !== FALSE) or (strpos($podcast->summary, $word) !== FALSE) or (strpos($podcast->summary, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$podcast->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $podcast = Podcast::find($key);
+                    if(!empty($podcast) and ($podcast->status == 1)){
+                        $podcasts[] = $this->fetch_podcast($podcast);
+                    }
+                }
+            }
+        }
+
+
+        if(empty($podcasts)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Podcasts fetched successfully',
+            'data' => self::paginate_array($podcasts, $limit, $page)
+        ], 200);
+    }
+
+    public function opened_podcast($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $podcast = Podcast::where('slug', $slug)->first();
+        if(empty($podcast) or ($podcast->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedPodcast::where('podcast_id', $podcast->id)->where('user_id', $this->user->id)->first();
+        if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Podcast was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Podcast fetched successfully',
+            'data' => $this->fetch_podcast($podcast)
+        ], 200);
     }
 }
