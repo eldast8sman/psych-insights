@@ -289,7 +289,7 @@ class VideoController extends Controller
         if($opened_videos->count() < 1){
             return response([
                 'status' => 'failed',
-                'message' => 'No Recommended Video',
+                'message' => 'No Opened Video',
                 'data' => []
             ], 200);
         }
@@ -356,7 +356,7 @@ class VideoController extends Controller
                 'message' => 'Unauthorized Access'
             ], 409);
         }
-        
+
         $video = Video::where('slug', $slug)->first();
         if(empty($video) or ($video->status != 1)){
             return response([

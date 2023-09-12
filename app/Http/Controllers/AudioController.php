@@ -159,7 +159,7 @@ class AudioController extends Controller
         if($rec_audios->count() < 1){
             return response([
                 'status' => 'failed',
-                'message' => 'No Recommended Video',
+                'message' => 'No Recommended Audio',
                 'data' => []
             ], 200);
         }
@@ -285,7 +285,7 @@ class AudioController extends Controller
         if($opened_audios->count() < 1){
             return response([
                 'status' => 'failed',
-                'message' => 'No Recommended Audio',
+                'message' => 'No Opened Audio',
                 'data' => []
             ], 200);
         }

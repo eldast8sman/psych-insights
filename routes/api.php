@@ -20,7 +20,6 @@ use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
-use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
 
@@ -201,8 +200,6 @@ Route::controller(ControllersAuthController::class)->group(function(){
     Route::post('/google-login', 'google_login')->name('google_login');
 });
 
-Route::get('/recommend-books/{limit}/{user_id}/{cat_id}/{level}', [ControllersBookController::class, 'recommend_books']);
-
 Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersAuthController::class)->group(function(){
         Route::post('/verify-email', 'verify_email')->name('verifyEmail.verify');
@@ -233,5 +230,13 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/audios/{slug}/mark-as-opened', 'mark_as_opened')->name('audio.markAsOpened');
         Route::get('/opened-audios', 'opened_audios')->name('openedAudio.fetch');
         Route::get('/opened-audios/{slug}', 'opened_audio')->name('openedAudio.show');
+    });
+
+    Route::controller(ControllerArticleController::class)->group(function(){
+        Route::get('/recommended-articles', 'recommended_articles')->name('recommendedArticle.fetch');
+        Route::get('/recommended-articles/{slug}', 'recommended_article')->name('recommendedArticle.show');
+        Route::get('/articles/{slug}/mark-as-opened', 'mark_as_opened')->name('article.markAsOpened');
+        Route::get('/opened-articles', 'opened_articles')->name('openedArticle.fetch');
+        Route::get('/opened-articles/{slug}', 'opened_article')->name('openedArticle.show');
     });
 });
