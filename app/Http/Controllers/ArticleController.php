@@ -152,7 +152,6 @@ class ArticleController extends Controller
         return $article;
     }
 
-
     public function recommended_articles(){
         $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
         $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
@@ -225,7 +224,7 @@ class ArticleController extends Controller
         if(empty($rec_article)){
             return response([
                 'status' => 'failed',
-                'message' => 'No Audio was fetched'
+                'message' => 'No Book was fetched'
             ], 404);
         }
 

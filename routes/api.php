@@ -20,6 +20,7 @@ use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
+use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
 
@@ -238,5 +239,13 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/articles/{slug}/mark-as-opened', 'mark_as_opened')->name('article.markAsOpened');
         Route::get('/opened-articles', 'opened_articles')->name('openedArticle.fetch');
         Route::get('/opened-articles/{slug}', 'opened_article')->name('openedArticle.show');
+    });
+
+    Route::controller(ControllersBookController::class)->group(function(){
+        Route::get('/recommended-books', 'recommended_books')->name('recommendedBook.fetch');
+        Route::get('/recommended-books/{slug}', 'recommended_book')->name('recommendedBook.show');
+        Route::get('/books/{slug}/mark-as-opened', 'mark_as_opened')->name('book.markAsOpened');
+        Route::get('/opened-books', 'opened_books')->name('openedBook.fetch');
+        Route::get('/opened-books/{slug}', 'opened_book')->name('openedBook.show');
     });
 });
