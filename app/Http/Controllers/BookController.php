@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use App\Models\OpenedBook;
 use Illuminate\Http\Request;
 use App\Models\OpenedResources;
 use App\Models\RecommendedBook;
+use App\Models\CurrentSubscription;
 
 class BookController extends Controller
 {
@@ -18,10 +20,10 @@ class BookController extends Controller
         $this->user = AuthController::user();
     }
 
-    public function recommend_books($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_books($limit, $user_id, $cat_id, $level=0){
         $rec_books = RecommendedBook::where('user_id', $user_id);
         if($rec_books->count() > 0){
-            foreach($rec_books as $rec_book){
+            foreach($rec_books->get() as $rec_book){
                 $rec_book->delete();
             }
         }
@@ -120,5 +122,257 @@ class BookController extends Controller
         }
 
         return true;
+    }
+
+    public static function fetch_book(Book $book) : Book
+    {
+        if(!empty($book->book_cover)){
+            $book->book_cover = FileManagerController::fetch_file($book->book_cover);
+        }
+
+        if(!empty($book->categories)){
+            $categories = [];
+
+            $categs = explode(',', $book->categories);
+            foreach($categs as $categ){
+                $category = Category::find(trim($categ));
+                if(!empty($category)){
+                    $categories[] = $category->category;
+                }
+            }
+
+            $book->categories = $categories;
+        }
+
+        unset($book->id);
+        unset($book->created_at);
+        unset($book->updated_at);
+
+        return $book;
+    }
+
+    public function recommended_books(){
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $rec_books = RecommendedBook::where('user_id', $this->user->id);
+        if($rec_books->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Recommended Book',
+                'data' => []
+            ], 200);
+        }
+
+        $books = [];
+        $rec_books = $rec_books->get();
+        if(empty($search)){
+            foreach($rec_books as $rec_book){
+                $book = Book::find($rec_book->book_id);
+                if(!empty($book) && ($book->status == 1)){
+                    $books[] = $this->fetch_book($book);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($rec_books as $rec_book){
+                $book = Book::find($rec_book->book_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($book->title, $word) !== FALSE) or (strpos($book->summary, $word) !== FALSE) or (strpos($book->author, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$book->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $book = Book::find($key);
+                    if(!empty($book) and ($book->status == 1)){
+                        $books[] = $this->fetch_book($book);
+                    }
+                }
+            }
+        }
+
+        if(empty($books)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Books fetched successfully',
+            'data' => self::paginate_array($books, $limit, $page)
+        ], 200);
+    }
+
+    public function recommended_book($slug){
+        $rec_book = RecommendedBook::where('user_id', $this->user->id)->where('slug', $slug)->first();
+        if(empty($rec_book)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was fetched'
+            ], 404);
+        }
+
+        $book = Book::find($rec_book->book_id);
+        if(empty($book) or ($book->status != 1)){
+            return response([
+                'ststus' => 'failed',
+                'message' => 'No Book was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Book fetched successfully',
+            'data' => $this->fetch_book($book)
+        ], 200);
+    }
+
+    public function mark_as_opened($slug){
+        $book = Book::where('slug', $slug)->first();
+        if(empty($book)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedBook::where('user_id', $this->user->id)->where('book_id', $book->id)->first();
+        if(empty($opened)){
+            OpenedBook::create([
+                'user_id' => $this->user->id,
+                'book_id' => $book->id,
+                'frequency' => 1
+            ]);
+        } else {
+            $opened->frequency += 1;
+            $opened->save();
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Marked as Opened'
+        ], 200);
+    }
+
+    public function opened_books(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+        
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $opened_books = OpenedBook::where('user_id', $this->user->id);
+        if($opened_books->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Opened Book',
+                'data' => []
+            ], 200);
+        }
+
+        $books = [];
+        $opened_books = $opened_books->get();
+        if(empty($search)){
+            foreach($opened_books as $opened_book){
+                $book = Book::find($opened_book->book_id);
+                if(!empty($book) && ($book->status == 1)){
+                    $books[] = $this->fetch_book($book);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($opened_books as $opened_book){
+                $book = Book::find($opened_book->book_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($book->title, $word) !== FALSE) or (strpos($book->summary, $word) !== FALSE) or (strpos($book->author, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$book->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $book = Book::find($key);
+                    if(!empty($book) and ($book->status == 1)){
+                        $books[] = $this->fetch_book($book);
+                    }
+                }
+            }
+        }
+
+        if(empty($books)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Books fetched successfully',
+            'data' => self::paginate_array($books, $limit, $page)
+        ], 200);
+    }
+
+    public function opened_book($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $book = Book::where('slug', $slug)->first();
+        if(empty($book) or ($book->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was fetched'
+            ], 404);
+        }
+
+        $opened = OpenedBook::where('book_id', $book->id)->where('user_id', $this->user->id)->first();
+        if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Book fetched successfully',
+            'data' => $this->fetch_book($book)
+        ], 200);
     }
 }

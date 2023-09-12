@@ -25,7 +25,7 @@ class BasicQuestionController extends Controller
     }
 
     public function fetch_questions(){
-        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id);
+        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         $fetch = false;
         if($last_answer->count() < 1){
             $fetch = true;
@@ -36,7 +36,7 @@ class BasicQuestionController extends Controller
             if($today >= $last_answer->next_question){
                 $fetch = true;
             }
-        }
+        } 
 
         if(!$fetch){
             return response([
@@ -73,7 +73,7 @@ class BasicQuestionController extends Controller
     }
 
     public function answer_basic_question(AnswerBasicQuestionRequest $request){
-        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id);
+        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         $fetch = false;
         if($last_answer->count() < 1){
             $fetch = true;
@@ -247,11 +247,17 @@ class BasicQuestionController extends Controller
             $package = SubscriptionPackage::where('free_package', 1)->first();
         }
 
-        BookController::recommend_books($package->book_limit, $this->user->id, $highest_cat_id, $package->level);
-        PodcastController::recommend_podcasts($package->podcast_limit, $this->user->id, $highest_cat_id, $package->level);
-        ArticleController::recommend_articles($package->audio_limit, $this->user->id, $highest_cat_id, $package->level);
-        AudioController::recommend_audios($package->audio_limit, $this->user->id, $highest_cat_id, $package->level);
-        VideoController::recommend_videos($package->video_limit, $this->user->id, $highest_cat_id, $package->level);
+        $book_limit = ($package->book_limit >= 0) ? $package->book_limit : 1000000000;
+        $podcast_limit = ($package->podcast_limit >= 0) ? $package->podcast_limit : 1000000000;
+        $article_limit = ($package->article_limit >= 0) ? $package->article_limit : 1000000000;
+        $audio_limit = ($package->audio_limit >= 0) ? $package->audio_limit : 1000000000;
+        $video_limit = ($package->video_limit >= 0) ? $package->video_limit : 1000000000;
+
+        BookController::recommend_books($book_limit, $this->user->id, $highest_cat_id, $package->level);
+        PodcastController::recommend_podcasts($podcast_limit, $this->user->id, $highest_cat_id, $package->level);
+        ArticleController::recommend_articles($audio_limit, $this->user->id, $highest_cat_id, $package->level);
+        AudioController::recommend_audios($audio_limit, $this->user->id, $highest_cat_id, $package->level);
+        VideoController::recommend_videos($video_limit, $this->user->id, $highest_cat_id, $package->level);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 

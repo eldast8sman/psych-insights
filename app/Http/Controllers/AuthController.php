@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PaymentPlan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\ForgotPasswordMail;
@@ -10,6 +11,7 @@ use App\Models\GoogleLoginToken;
 use App\Http\Requests\LoginRequest;
 use App\Mail\EmailVerificationMail;
 use App\Models\CurrentSubscription;
+use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -19,6 +21,7 @@ use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
+use App\Models\QuestionAnswerSummary;
 
 class AuthController extends Controller
 {
@@ -50,13 +53,19 @@ class AuthController extends Controller
 
         $names = explode(' ', $user->name);
         $first_name = $names[0];
-        Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+        // Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
 
         if(!$login = $this->user_login($request->email, $request->password)){
             return response([
                 'status' => 'failed',
                 'message' => $this->errors
             ], 409);
+        }
+
+        $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+        if(!empty($free_trial)){
+            $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
+            SubscriptionController::subscribe($user->id, $free_trial->id, $plan->id, 0);
         }
 
         $user = self::user_details($user);
@@ -177,11 +186,21 @@ class AuthController extends Controller
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
-            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit']);
+           
+            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'free_trial']);
+             if($user->subscription_package->free_trial != 1){
+                $user->question_type = "Dass21 Questions";
+            } else {
+                $user->question_type = "Basic Questions";
+            }
         } else {
             $user->current_subscription = [];
+            $user->question_type = "Basic Questions";
             $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit']);
         }
+
+        $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
+        $user->next_question_date = !empty($last_answet) ? $last_answer->next_question : date('Y-m-d');
 
         return $user;
     }

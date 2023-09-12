@@ -18,9 +18,12 @@ use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
+use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
+use App\Http\Controllers\PodcastController as ControllersPodcastController;
+use App\Http\Controllers\VideoController as ControllersVideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -199,8 +202,6 @@ Route::controller(ControllersAuthController::class)->group(function(){
     Route::post('/google-login', 'google_login')->name('google_login');
 });
 
-Route::get('/recommend-books/{limit}/{user_id}/{cat_id}/{level}', [ControllersBookController::class, 'recommend_books']);
-
 Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersAuthController::class)->group(function(){
         Route::post('/verify-email', 'verify_email')->name('verifyEmail.verify');
@@ -215,5 +216,45 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersDailyQuestionController::class)->group(function(){
         Route::get('/daily-questions', 'fetch_questions')->name('dailyQuestion.fetch');
         Route::post('/daily-questions/answer', 'answer_questions')->name('dailyQuestion.answer');
+    });
+
+    Route::controller(ControllersVideoController::class)->group(function(){
+        Route::get('/recommended-videos', 'recommended_videos')->name('recommendedVideo.fetch');
+        Route::get('/recommended-videos/{slug}', 'recommended_video')->name('recommendedVideo.show');
+        Route::get('/videos/{slug}/mark-as-opened', 'mark_as_opened')->name('video.markAsOpened');
+        Route::get('/opened-videos', 'opened_videos')->name('openedVideo.fetch');
+        Route::get('/opened-videos/{slug}', 'opened_video')->name('openedVideo.show');
+    });
+
+    Route::controller(ControllersAudioController::class)->group(function(){
+        Route::get('/recommended-audios', 'recommended_audios')->name('recommendedAudio.fetch');
+        Route::get('/recommended-audios/{slug}', 'recommended_audio')->name('recommendedAudio.show');
+        Route::get('/audios/{slug}/mark-as-opened', 'mark_as_opened')->name('audio.markAsOpened');
+        Route::get('/opened-audios', 'opened_audios')->name('openedAudio.fetch');
+        Route::get('/opened-audios/{slug}', 'opened_audio')->name('openedAudio.show');
+    });
+
+    Route::controller(ControllerArticleController::class)->group(function(){
+        Route::get('/recommended-articles', 'recommended_articles')->name('recommendedArticle.fetch');
+        Route::get('/recommended-articles/{slug}', 'recommended_article')->name('recommendedArticle.show');
+        Route::get('/articles/{slug}/mark-as-opened', 'mark_as_opened')->name('article.markAsOpened');
+        Route::get('/opened-articles', 'opened_articles')->name('openedArticle.fetch');
+        Route::get('/opened-articles/{slug}', 'opened_article')->name('openedArticle.show');
+    });
+
+    Route::controller(ControllersBookController::class)->group(function(){
+        Route::get('/recommended-books', 'recommended_books')->name('recommendedBook.fetch');
+        Route::get('/recommended-books/{slug}', 'recommended_book')->name('recommendedBook.show');
+        Route::get('/books/{slug}/mark-as-opened', 'mark_as_opened')->name('book.markAsOpened');
+        Route::get('/opened-books', 'opened_books')->name('openedBook.fetch');
+        Route::get('/opened-books/{slug}', 'opened_book')->name('openedBook.show');
+    });
+
+    Route::controller(ControllersPodcastController::class)->group(function(){
+        Route::get('/recommended-podcasts', 'recommended_podcasts')->name('recommendedPodcast.fetch');
+        Route::get('/recommended-podcasts/{slug}', 'recommended_podcast')->name('recommendedPodcast.show');
+        Route::get('/podcasts/{slug}/mark-as-opened', 'mark_as_opened')->name('podcast.markAsOpened');
+        Route::get('/opened-podcasts', 'opened_podcasts')->name('openedPodcast.fetch');
+        Route::get('/opened-podcasts/{slug}', 'opened_podcast')->name('openedPodcast.show');
     });
 });
