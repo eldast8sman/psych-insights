@@ -186,19 +186,21 @@ class AuthController extends Controller
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
-            if($current_subscription->free_trial != 1){
+           
+            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'free_trial']);
+             if($user->subscription_package->free_trial != 1){
                 $user->question_type = "Dass21 Questions";
             } else {
                 $user->question_type = "Basic Questions";
             }
-            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit']);
         } else {
             $user->current_subscription = [];
             $user->question_type = "Basic Questions";
             $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit']);
         }
 
-        $last_answer = QuestionAnswerSummary::where('user_id', $user->id);
+        $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
+        $user->next_question_date = !empty($last_answet) ? $last_answer->next_question : date('Y-m-d');
 
         return $user;
     }

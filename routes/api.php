@@ -21,6 +21,7 @@ use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
+use App\Http\Controllers\VideoController as ControllersVideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -215,5 +216,13 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersDailyQuestionController::class)->group(function(){
         Route::get('/daily-questions', 'fetch_questions')->name('dailyQuestion.fetch');
         Route::post('/daily-questions/answer', 'answer_questions')->name('dailyQuestion.answer');
+    });
+
+    Route::controller(ControllersVideoController::class)->group(function(){
+        Route::get('/recommended-videos', 'recommended_videos')->name('recommendedVideo.fetch');
+        Route::get('/recommended-videos/{slug}', 'recommended_video')->name('recommendedVideo.show');
+        Route::get('/videos/{slug}/mark-as-opened', 'mark_as_opened')->name('video.markAsOpened');
+        Route::get('/opened-videos', 'opened_videos')->name('openedVideo.fetch');
+        Route::get('/opened-videos/{slug}', 'opened_video')->name('openedVideo.show');
     });
 });

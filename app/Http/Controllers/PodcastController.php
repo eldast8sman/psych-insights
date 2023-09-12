@@ -21,7 +21,7 @@ class PodcastController extends Controller
     public static function recommend_podcasts($limit, $user_id, $cat_id, $level=0){
         $rec_podcasts = RecommendedPodcast::where('user_id', $user_id);
         if($rec_podcasts->count() > 0){
-            foreach($rec_podcasts as $rec_podcast){
+            foreach($rec_podcasts->get() as $rec_podcast){
                 $rec_podcast->delete();
             }
         }
@@ -110,7 +110,7 @@ class PodcastController extends Controller
                 foreach($podcasts_id as $podcast){
                     RecommendedPodcast::create([
                         'user_id' => $user_id,
-                        'book_id' => $podcast->id,
+                        'podcast_id' => $podcast->id,
                         'slug' => $podcast->slug,
                         'opened' => 0
                     ]);
