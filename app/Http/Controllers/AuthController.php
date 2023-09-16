@@ -53,7 +53,7 @@ class AuthController extends Controller
 
         $names = explode(' ', $user->name);
         $first_name = $names[0];
-        // Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+        Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
 
         if(!$login = $this->user_login($request->email, $request->password)){
             return response([
