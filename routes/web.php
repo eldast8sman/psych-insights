@@ -16,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test-stripe-payment', function(){
+    return view('initiate_stripe_payment');
+});
+
+Route::get('/confirm-payment', function(){
+    return view('confirm_stripe_payment');
+});

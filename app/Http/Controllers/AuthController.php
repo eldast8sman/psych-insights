@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\PaymentPlan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\StripeCustomer;
 use App\Mail\ForgotPasswordMail;
 use App\Models\GoogleLoginToken;
 use App\Http\Requests\LoginRequest;
@@ -15,13 +16,13 @@ use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Models\QuestionAnswerSummary;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
-use App\Models\QuestionAnswerSummary;
 
 class AuthController extends Controller
 {
@@ -51,6 +52,15 @@ class AuthController extends Controller
         $user->email_verified = 0;
         $user->save();
 
+        $stripe = new StripeController();
+        if($customer = $stripe->create_customer($user->name, $user->email)){
+            StripeCustomer::create([
+                'user_id' => $user->id,
+                'customer_id' => $customer->id,
+                'customer_data' => json_encode($customer)
+            ]);
+        }
+
         $names = explode(' ', $user->name);
         $first_name = $names[0];
         Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
@@ -65,7 +75,8 @@ class AuthController extends Controller
         $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
         if(!empty($free_trial)){
             $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
-            SubscriptionController::subscribe($user->id, $free_trial->id, $plan->id, 0);
+            $sub = new SubscriptionController();
+            $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
         }
 
         $user = self::user_details($user);
@@ -183,7 +194,7 @@ class AuthController extends Controller
 
     public static function user_details(User $user) : User
     {
-        $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
            
@@ -310,13 +321,23 @@ class AuthController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make(Str::random(30))
+                'password' => Hash::make(Str::random(30)),
+                'email_verified' => 1
             ]);
         }
         $token = auth('user-api')->login($user);
         $user->prev_login = !empty($user->last_login) ? $user->last_login : date('Y-m-d H:i:s');
         $user->last_login = date('Y-m-d H:i:s');
         $user->save();
+
+        $stripe = new StripeController();
+        if($customer = $stripe->create_customer($user->name, $user->email)){
+            StripeCustomer::create([
+                'user_id' => $user->id,
+                'customer_id' => $customer->id,
+                'customer_data' => json_encode($customer)
+            ]);
+        }
 
         $auth = [
             'token' => $token,

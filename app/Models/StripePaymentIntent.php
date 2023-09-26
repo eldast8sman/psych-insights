@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CurrentSubscription extends Model
+class StripePaymentIntent extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'internal_ref',
         'user_id',
-        'subscription_package_id',
-        'payment_plan_id',
-        'amount_paid',
-        'start_date',
-        'end_date',
-        'grace_end',
+        'client_secret',
+        'amount',
+        'intent_id',
+        'intent_data',
+        'purpose',
+        'purpose_id',
         'auto_renew',
-        'status'
+        'value_given'
     ];
 }
