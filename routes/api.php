@@ -2,11 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -17,13 +19,13 @@ use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
-use App\Http\Controllers\ArticleController as ControllerArticleController;
-use App\Http\Controllers\AudioController as ControllersAudioController;
-use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\BookController as ControllersBookController;
-use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
-use App\Http\Controllers\PodcastController as ControllersPodcastController;
+use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
+use App\Http\Controllers\ArticleController as ControllerArticleController;
+use App\Http\Controllers\PodcastController as ControllersPodcastController;
+use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
+use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -257,4 +259,17 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/opened-podcasts', 'opened_podcasts')->name('openedPodcast.fetch');
         Route::get('/opened-podcasts/{slug}', 'opened_podcast')->name('openedPodcast.show');
     });
+
+    Route::controller(SubscriptionController::class)->group(function(){
+        Route::get('/subscription-packages', 'subscription_packages')->name('subscriptionPackage.index');
+        Route::get('/promo-codes/{promo_code}', 'fetch_promo_code')->name('promoCode.show');
+        Route::post('/subscriptions/calculate-amount', 'fetch_calculated_amount')->name('subscription.calculateAmount');
+        Route::post('/subscriptions/initiate', 'initiate_subscription')->name('subscription.initiate');
+        Route::post('/subscriptions/complete', 'complete_subscription')->name('subscription.complete');
+        Route::get('/subscription-attempts', 'subscription_attempts')->name('subscriptionAttempts.index');
+        Route::get('/subscription-attempts/{internal_ref}', 'subscription_attempt')->name('subscriptionAttempt.show');
+    });
 });
+
+Route::get('/test-token/{card}/{year}/{month}/{cvv}', [StripeController::class, 'create_token']);
+Route::get('/test-customer/{name}/{email}', [StripeController::class, 'create_customer']);
