@@ -24,6 +24,7 @@ use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\PodcastController as ControllersPodcastController;
+use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 
@@ -213,6 +214,11 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
         Route::get('/basic-questions', 'fetch_questions')->name('basicQuestion.fetch');
         Route::post('/basic-questions/answer', 'answer_basic_question')->name('basicQuestion.answer');
+    });
+
+    Route::controller(ControllerDassQuestionController::class)->group(function(){
+        Route::get('/dass-questions', 'fetch_questions')->name('dassQuestion.fetch');
+        Route::post('/dass-questions/answer', 'answer_dass_questions')->name('dassQuestion.answer');
     });
 
     Route::controller(ControllersDailyQuestionController::class)->group(function(){

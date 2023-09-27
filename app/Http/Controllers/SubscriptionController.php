@@ -387,18 +387,20 @@ class SubscriptionController extends Controller
             }
         }
 
-        SubscriptionPaymentAttempt::create([
+        $attempt = SubscriptionPaymentAttempt::create([
             'user_id' => $this->user->id,
             'internal_ref' => $internal_ref,
             'payment_plan_id' => $payment_plan->id,
             'subscription_amount' => $amount_array['original_amount'],
             'amount_paid' => $amount_array['calculated_amount'],
-            'promo_percentage' => $amount_array['package_promo_percent'],
+            'promo_percentage' => isset($amount_array['package_promo_percent']) ? $amount_array['package_promo_percent'] : 0,
             'promo_code_id' => isset($used_promo_id) ? $used_promo_id : null,
             'promo_code' => isset($amount_array['promo_code']) ? $amount_array['promo_code'] : null,
             'promo_code_percentage' => isset($amount_array['promo_code_percent']) ? $amount_array['promo_code_percent'] : 0,
             'status' => 0
         ]);
+
+        self::log_activity($this->user->id, "initiate_subscription", "subscription_payment_attempts", $attempt->id);
 
         return response([
             'status' => 'success',
@@ -496,6 +498,8 @@ class SubscriptionController extends Controller
         $intent->save();
 
         $user = AuthController::user_details($this->user);
+
+        self::log_activity($this->user->id, "complete_subscription", "subscription_payment_attempts", $attempt->id);
 
         return response([
             'status' => 'success',

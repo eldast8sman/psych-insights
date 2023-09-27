@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AnswerDassQuestionRequest;
 use App\Models\Category;
-use App\Models\BasicQuestion;
-use App\Models\DistressScoreRange;
-use App\Models\BasicQuestionOption;
 use App\Models\CurrentSubscription;
 use App\Models\DailyQuestionAnswer;
-use App\Models\SubscriptionPackage;
-use App\Models\PrerequisiteQuestion;
+use App\Models\DassQuestion;
+use App\Models\DassQuestionOption;
+use App\Models\PremiumCategoryScoreRange;
+use Illuminate\Http\Request;
 use App\Models\QuestionAnswerSummary;
-use App\Models\BasicQuestionSpecialOption;
-use App\Http\Requests\AnswerBasicQuestionRequest;
+use App\Models\SubscriptionPackage;
 
-class BasicQuestionController extends Controller
+class DassQuestionController extends Controller
 {
     private $user;
 
@@ -24,7 +23,27 @@ class BasicQuestionController extends Controller
         $this->user = AuthController::user();
     }
 
+    private function check_validity(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return false;
+        }
+
+        $package = SubscriptionPackage::find($current_subscription->subscription_package_id);
+        if(empty($package) or ($package->free_trial == 1)){
+            return false;
+        }
+
+        return true;
+    }
+
     public function fetch_questions(){
+        if(!$this->check_validity()){
+            return response([
+                'status' => 'failed',
+                'message' => 'Not Authorised'
+            ], 409);
+        }
         $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         $fetch = false;
         if($last_answer->count() < 1){
@@ -45,7 +64,7 @@ class BasicQuestionController extends Controller
             ], 409);
         }
 
-        $questions = BasicQuestion::orderBy('created_at', 'asc');
+        $questions = DassQuestion::orderBy('created_at', 'asc');
         if($questions->count() < 1){
             return response([
                 'status' => 'failed',
@@ -53,31 +72,29 @@ class BasicQuestionController extends Controller
             ], 404);
         }
 
-        $questions = $questions->get(['id', 'question', 'special_options']);
+        $questions = $questions->get(['id', 'question']);
         foreach($questions as $question){
-            $question->has_prerequisiste = PrerequisiteQuestion::where('basic_question_id', $question->id)->first(['prerequisite_id', 'prerequisite_value', 'action', 'default_value']);
-            if($question->special_options == 1){
-                $options = BasicQuestionSpecialOption::where('basic_question_id', $question->id)->orderBy('value', 'desc')->get(['id', 'option', 'value']);
-            } else {
-                $options = BasicQuestionOption::orderBy('value', 'desc')->get(['id', 'option', 'value']);
-            }
-            $question->options = $options;
-            unset($question->special_options);
+            $question->option = DassQuestionOption::orderBy('value', 'asc')->get();
         }
 
         return response([
             'status' => 'success',
-            'message' => 'Questions successfuly fetched',
+            'message' => 'Questions fetched successfully',
             'data' => $questions
         ], 200);
     }
 
-    public function answer_basic_question(AnswerBasicQuestionRequest $request){
+    public function answer_dass_questions(AnswerDassQuestionRequest $request){
+        if(!$this->check_validity()){
+            return response([
+                'status' => 'failed',
+                'message' => 'Not Authorised'
+            ], 409);
+        }
         $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         $fetch = false;
         if($last_answer->count() < 1){
             $fetch = true;
-            $new = true;
         } else {
             $last_answer = $last_answer->first();
             $today = date('Y-m-d');
@@ -85,8 +102,7 @@ class BasicQuestionController extends Controller
             if($today >= $last_answer->next_question){
                 $fetch = true;
             }
-            $new = false;
-        }
+        } 
 
         if(!$fetch){
             return response([
@@ -102,47 +118,15 @@ class BasicQuestionController extends Controller
         $answers = [];
 
         foreach($request->answers as $answer){
-            $question = BasicQuestion::find($answer['question_id']);
-            if($question->special_options == 1){
-                $option = BasicQuestionSpecialOption::find($answer['option_id']);
-            } else {
-                $option = BasicQuestionOption::find($answer['option_id']);
-            }
+            $question = DassQuestion::find($answer['question_id']);
+            $option = DassQuestionOption::find($answer['option_id']);
 
             $ans = [
                 'question_id' => $question->id,
-                'question' => $question->question
+                'question' => $question
             ];
 
-            if($question->has_prerequisiste){
-                $prerequisite = PrerequisiteQuestion::where('basic_question_id', $question->id)->first();
-                
-                foreach($request->answers as $t_answer){
-                    if($t_answer['question_id'] == $prerequisite->prerequisite_id){
-                        $t_question = BasicQuestion::find($t_answer['question_id']);
-                        if($t_question->special_options == 1){
-                            $t_option = BasicQuestionSpecialOption::find($t_answer['option_id']);
-                        } else {
-                            $t_option = BasicQuestionOption::find($t_answer['option_id']);
-                        }
-                        if($t_option->prerequisite_value == $t_option->value){
-                            if($prerequisite->action == 'skip'){
-                                if($question->special_options == 1){
-                                    $option = BasicQuestionSpecialOption::where('basic_question_id', $question->id)->where('value', $prerequisite->default_value)->first();
-                                } else {
-                                    $option = BasicQuestionOption::where('value', $prerequisite->default_value)->first();
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-
             $total_score += $option->value;
-            if($question->is_k10){
-                $k10_score += $option->value;
-            }
 
             $categories = explode(',', $question->categories);
             foreach($categories as $id){
@@ -166,8 +150,6 @@ class BasicQuestionController extends Controller
 
             $ans['answer'] = $option->option;
             $ans['value'] = $option->value;
-
-            $answers[] = $ans;
         }
 
         $categ_scores = [];
@@ -185,7 +167,16 @@ class BasicQuestionController extends Controller
             ];
         }
 
-        $distress_level = DistressScoreRange::where('question_type', 'basic_question')->where('min', '<=', $k10_score)->where('max', '>=', $k10_score)->first()->verdict;
+        foreach($premium_scores as $key=>$value){
+            $category = Category::find($key);            
+            $verdict = PremiumCategoryScoreRange::where('category', $category->id)->where('min', '<=', $value)->where('max', '>=', $value)->first()->verdict;
+            $prem_scores[] = [
+                'category_id' => $category->id,
+                'category' => $category->category,
+                'value' => $value,
+                'verdict' => $verdict
+            ];
+        }
 
         $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
         if($uncomputeds->count() > 0){
@@ -203,7 +194,7 @@ class BasicQuestionController extends Controller
             if(!isset($score_list[$value])){
                 $score_list[$value] = [];
             }
-            $score_list[$value][] = $key;
+            $score_list[$value] = $key;
         }
 
         krsort($score_list);
@@ -219,16 +210,16 @@ class BasicQuestionController extends Controller
         $highest_cat_id = array_shift($highest_category_id);
         $highest_cat = array_shift($highest_category);
 
-        // $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        // $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 7));
         $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
             'user_id' => $this->user->id,
-            'question_type' => 'basic_question',
+            'question_type' => 'dass_question',
             'answers' => json_encode($answers),
             'k10_scores' => $k10_score,
             'total_score' => $total_score,
-            'distress_level' => $distress_level,
+            'distress_level' => '',
             'premium_scores' => json_encode($prem_scores),
             'category_scores' => json_encode($categ_scores),
             'highest_category_id' => $highest_cat_id,
@@ -259,7 +250,7 @@ class BasicQuestionController extends Controller
         AudioController::recommend_audios($audio_limit, $this->user->id, $highest_cat_id, $package->level);
         VideoController::recommend_videos($video_limit, $this->user->id, $highest_cat_id, $package->level);
 
-        self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
+        self::log_activity($this->user->id, "answered_dass21_question", "question_answer_summaries", $answer_summary->id);
 
         return response([
             'status' => 'success',
