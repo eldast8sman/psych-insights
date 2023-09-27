@@ -198,7 +198,7 @@ class AuthController extends Controller
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
            
-            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'free_trial']);
+            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'audio_limit', 'free_trial']);
              if($user->subscription_package->free_trial != 1){
                 $user->question_type = "Dass21 Questions";
             } else {
