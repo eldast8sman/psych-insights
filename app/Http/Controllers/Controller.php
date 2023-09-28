@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\FavouriteResource;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -32,5 +33,21 @@ class Controller extends BaseController
         $items = $array instanceof Collection ? $array : Collection::make($array);
         $results = $items->slice(($page - 1) * $per_page, $per_page)->values();
         return new LengthAwarePaginator($results, $items->count(), $per_page, $page, $options);
+    }
+
+    public static function favourite_resource($type, $user_id, $resource_id){
+        $resource = FavouriteResource::where('type', $type)->where('user_id', $user_id)->where('resource_id', $resource_id)->first();
+        if(empty($resource)){
+            FavouriteResource::create([
+                'user_id' => $user_id,
+                'type' => $type,
+                'resource_id' => $resource_id
+            ]);
+
+            return "saved";
+        } else {
+            $resource->delete();
+            return "deleted";
+        }
     }
 }

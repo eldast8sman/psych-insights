@@ -194,7 +194,7 @@ class AuthController extends Controller
 
     public static function user_details(User $user) : User
     {
-        $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
            

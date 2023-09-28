@@ -150,6 +150,8 @@ class DassQuestionController extends Controller
 
             $ans['answer'] = $option->option;
             $ans['value'] = $option->value;
+
+            $answers[] = $ans;
         }
 
         $categ_scores = [];
@@ -169,7 +171,7 @@ class DassQuestionController extends Controller
 
         foreach($premium_scores as $key=>$value){
             $category = Category::find($key);            
-            $verdict = PremiumCategoryScoreRange::where('category', $category->id)->where('min', '<=', $value)->where('max', '>=', $value)->first()->verdict;
+            $verdict = PremiumCategoryScoreRange::where('category_id', $category->id)->where('min', '<=', $value)->where('max', '>=', $value)->first()->verdict;
             $prem_scores[] = [
                 'category_id' => $category->id,
                 'category' => $category->category,
@@ -194,7 +196,7 @@ class DassQuestionController extends Controller
             if(!isset($score_list[$value])){
                 $score_list[$value] = [];
             }
-            $score_list[$value] = $key;
+            $score_list[$value][] = $key;
         }
 
         krsort($score_list);
@@ -231,7 +233,7 @@ class DassQuestionController extends Controller
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
 
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $package = SubscriptionPackage::find($current_subscription->subscription_package_id);
         } else {

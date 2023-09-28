@@ -8,6 +8,7 @@ use App\Models\OpenedAudio;
 use Illuminate\Http\Request;
 use App\Models\OpenedResources;
 use App\Models\RecommendedAudio;
+use App\Models\FavouriteResource;
 use App\Models\CurrentSubscription;
 
 class AudioController extends Controller
@@ -74,7 +75,7 @@ class AudioController extends Controller
             }
 
             $counted = count($audios_id);
-            if(($counted < $limit) && (Audio::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+            if(($counted < $limit) && (Audio::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
                 $other_audios = Audio::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($audios_id)){
                     foreach($audios_id as $audio_id){
@@ -269,7 +270,7 @@ class AudioController extends Controller
     }
 
     public function opened_audios(){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -344,7 +345,7 @@ class AudioController extends Controller
     }
 
     public function opened_audio($slug){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -362,6 +363,131 @@ class AudioController extends Controller
 
         $opened = OpenedAudio::where('audio_id', $audio->id)->where('user_id', $this->user->id)->first();
         if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio fetched successfully',
+            'data' => $this->fetch_audio($audio)
+        ], 200);
+    }
+
+    public function audio_favourite($slug){
+        $audio = Audio::where('slug', $slug)->first();
+        if(empty($audio)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was fetched'
+            ], 404);
+        }
+
+        $action = self::favourite_resource('audio', $this->user->id, $audio->id);
+        $message = ($action == 'saved') ? 'Audio added to Favourites' : 'Audio removed from Favourites';
+
+        return response([
+            'status' => 'success',
+            'message' => $message
+        ], 200);
+    }
+
+    public function favourite_audios(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $fav_audios = FavouriteResource::where('type', 'audio')->where('user_id', $this->user->id);
+        if($fav_audios->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Favourite Audio',
+                'data' => []
+            ], 200);
+        }
+
+        $audios = [];
+        $fav_audios = $fav_audios->get();
+        if(empty($search)){
+            foreach($fav_audios as $fav_audio){
+                $audio = Audio::find($fav_audio->resource_id);
+                if(!empty($audio) && ($audio->status == 1)){
+                    $audios[] = $this->fetch_audio($audio);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($fav_audios as $fav_audio){
+                $audio = Audio::find($fav_audio->resource_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($audio->title, $word) !== FALSE) or (strpos($audio->description, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$audio->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $audio = Audio::find($key);
+                    if(!empty($audio) and ($audio->status == 1)){
+                        $audios[] = $this->fetch_audio($audio);
+                    }
+                }
+            }
+        }
+
+        if(empty($audios)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio fetched successfully',
+            'data' => self::paginate_array($audios, $limit, $page)
+        ], 200);
+    }
+
+    public function favourite_audio($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $audio = Audio::where('slug', $slug)->first();
+        if(empty($audio) or ($audio->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Audio was fetched'
+            ], 404);
+        }
+
+        $fav_audio = FavouriteResource::where('resource_id', $audio->id)->where('user_id', $this->user->id)->where('type', 'audio')->first();
+        if(empty($fav_audio)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Audio was found'

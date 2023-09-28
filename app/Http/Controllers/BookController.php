@@ -8,6 +8,7 @@ use App\Models\OpenedBook;
 use Illuminate\Http\Request;
 use App\Models\OpenedResources;
 use App\Models\RecommendedBook;
+use App\Models\FavouriteResource;
 use App\Models\CurrentSubscription;
 
 class BookController extends Controller
@@ -75,7 +76,7 @@ class BookController extends Controller
             }
 
             $counted = count($books_id);
-            if(($counted < $limit) && (Book::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+            if(($counted < $limit) && (Book::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
                 $other_books = Book::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($books_id)){
                     foreach($books_id as $book_id){
@@ -270,7 +271,7 @@ class BookController extends Controller
     }
 
     public function opened_books(){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -345,7 +346,7 @@ class BookController extends Controller
     }
 
     public function opened_book($slug){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -363,6 +364,131 @@ class BookController extends Controller
 
         $opened = OpenedBook::where('book_id', $book->id)->where('user_id', $this->user->id)->first();
         if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Book fetched successfully',
+            'data' => $this->fetch_book($book)
+        ], 200);
+    }
+
+    public function book_favourite($slug){
+        $book = Book::where('slug', $slug)->first();
+        if(empty($book)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was fetched'
+            ], 404);
+        }
+
+        $action = self::favourite_resource('book', $this->user->id, $book->id);
+        $message = ($action == 'saved') ? 'Book added to Favourites' : 'Book removed from Favourites';
+
+        return response([
+            'status' => 'success',
+            'message' => $message
+        ], 200);
+    }
+
+    public function favourite_books(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $fav_books = FavouriteResource::where('type', 'book')->where('user_id', $this->user->id);
+        if($fav_books->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Favourite Book',
+                'data' => []
+            ], 200);
+        }
+
+        $books = [];
+        $fav_books = $fav_books->get();
+        if(empty($search)){
+            foreach($fav_books as $fav_book){
+                $book = Book::find($fav_book->resource_id);
+                if(!empty($book) && ($book->status == 1)){
+                    $books[] = $this->fetch_book($book);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($fav_books as $fav_book){
+                $book = Book::find($fav_book->resource_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($book->title, $word) !== FALSE) or (strpos($book->summary, $word) !== FALSE) or (strpos($book->author, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$book->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $book = Book::find($key);
+                    if(!empty($book) and ($book->status == 1)){
+                        $books[] = $this->fetch_book($book);
+                    }
+                }
+            }
+        }
+
+        if(empty($books)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Books fetched successfully',
+            'data' => self::paginate_array($books, $limit, $page)
+        ], 200);
+    }
+
+    public function favourite_book($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $book = Book::where('slug', $slug)->first();
+        if(empty($book) or ($book->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Book was fetched'
+            ], 404);
+        }
+
+        $fav_book = FavouriteResource::where('resource_id', $book->id)->where('user_id', $this->user->id)->where('type', 'book')->first();
+        if(empty($fav_book)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Book was found'

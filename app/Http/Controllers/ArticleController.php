@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\OpenedArticle;
 use App\Models\OpenedResources;
+use App\Models\FavouriteResource;
 use App\Models\RecommendedArticle;
 use App\Models\CurrentSubscription;
 
@@ -76,7 +77,7 @@ class ArticleController extends Controller
             }
 
             $counted = count($articles_id);
-            if(($counted < $limit) && (Article::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+            if(($counted < $limit) && (Article::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
                 $other_articles = Article::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($articles_id)){
                     foreach($articles_id as $article_id){
@@ -271,7 +272,7 @@ class ArticleController extends Controller
     }
 
     public function opened_articles(){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -346,7 +347,7 @@ class ArticleController extends Controller
     }
 
     public function opened_article($slug){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -372,7 +373,132 @@ class ArticleController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Audio fetched successfully',
+            'message' => 'Article fetched successfully',
+            'data' => $this->fetch_article($article)
+        ], 200);
+    }
+
+    public function article_favourite($slug){
+        $article = Article::where('slug', $slug)->first();
+        if(empty($article)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Article was fetched'
+            ], 404);
+        }
+
+        $action = self::favourite_resource('article', $this->user->id, $article->id);
+        $message = ($action == 'saved') ? 'Article added to Favourites' : 'Article removed from Favourites';
+
+        return response([
+            'status' => 'success',
+            'message' => $message
+        ], 200);
+    }
+
+    public function favourite_articles(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $fav_articles = FavouriteResource::where('type', 'article')->where('user_id', $this->user->id);
+        if($fav_articles->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Favourite Article',
+                'data' => []
+            ], 200);
+        }
+
+        $articles = [];
+        $fav_articles = $fav_articles->get();
+        if(empty($search)){
+            foreach($fav_articles as $fav_article){
+                $article = Article::find($fav_article->resource_id);
+                if(!empty($article) && ($article->status == 1)){
+                    $articles[] = $this->fetch_article($article);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($fav_articles as $fav_article){
+                $article = Article::find($fav_article->resource_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($article->title, $word) !== FALSE) or (strpos($article->summary, $word) !== FALSE) or (strpos($article->author, $word) !== FALSE)){
+                        $count += 1;
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$article->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $article = Article::find($key);
+                    if(!empty($article) and ($article->status == 1)){
+                        $articles[] = $this->fetch_article($article);
+                    }
+                }
+            }
+        }
+
+        if(empty($articles)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Article was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Articles fetched successfully',
+            'data' => self::paginate_array($articles, $limit, $page)
+        ], 200);
+    }
+
+    public function favourite_article($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $article = Article::where('slug', $slug)->first();
+        if(empty($article) or ($article->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Article was fetched'
+            ], 404);
+        }
+
+        $fav_article = FavouriteResource::where('resource_id', $article->id)->where('user_id', $this->user->id)->where('type', 'article')->first();
+        if(empty($fav_article)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Article was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Article fetched successfully',
             'data' => $this->fetch_article($article)
         ], 200);
     }
