@@ -232,6 +232,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/videos/{slug}/mark-as-opened', 'mark_as_opened')->name('video.markAsOpened');
         Route::get('/opened-videos', 'opened_videos')->name('openedVideo.fetch');
         Route::get('/opened-videos/{slug}', 'opened_video')->name('openedVideo.show');
+        Route::get('/videos/{slug}/favourite', 'video_favourite')->name('videoFavourite.addOrRemove');
+        Route::get('/favourite-videos', 'favourite_videos')->name('favouriteVideo.fetch');
+        Route::get('/favourite-videos/{slug}', 'favourite_video')->name('favouriteVideo.show');
     });
 
     Route::controller(ControllersAudioController::class)->group(function(){
@@ -240,6 +243,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/audios/{slug}/mark-as-opened', 'mark_as_opened')->name('audio.markAsOpened');
         Route::get('/opened-audios', 'opened_audios')->name('openedAudio.fetch');
         Route::get('/opened-audios/{slug}', 'opened_audio')->name('openedAudio.show');
+        Route::get('/audios/{slug}/favourite', 'audio_favourite')->name('audioFavourite.addOrRemove');
+        Route::get('/favourite-audios', 'favourite_audios')->name('favouriteAudio.fetch');
+        Route::get('/favourite-audios/{slug}', 'favourite_audio')->name('favouriteAudio.show');
     });
 
     Route::controller(ControllerArticleController::class)->group(function(){
@@ -248,6 +254,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/articles/{slug}/mark-as-opened', 'mark_as_opened')->name('article.markAsOpened');
         Route::get('/opened-articles', 'opened_articles')->name('openedArticle.fetch');
         Route::get('/opened-articles/{slug}', 'opened_article')->name('openedArticle.show');
+        Route::get('/articles/{slug}/favourite', 'article_favourite')->name('articleFavourite.addOrRemove');
+        Route::get('/favourite-articles', 'favourite_articles')->name('favouriteArticle.fetch');
+        Route::get('/favourite-articles/{slug}', 'favourite_article')->name('favouriteArticle.show');
     });
 
     Route::controller(ControllersBookController::class)->group(function(){
@@ -256,6 +265,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/books/{slug}/mark-as-opened', 'mark_as_opened')->name('book.markAsOpened');
         Route::get('/opened-books', 'opened_books')->name('openedBook.fetch');
         Route::get('/opened-books/{slug}', 'opened_book')->name('openedBook.show');
+        Route::get('/books/{slug}/favourite', 'book_favourite')->name('bookFavourite.addOrRemove');
+        Route::get('/favourite-books', 'favourite_books')->name('favouriteBook.fetch');
+        Route::get('/favourite-books/{slug}', 'favourite_book')->name('favouriteBook.show');
     });
 
     Route::controller(ControllersPodcastController::class)->group(function(){
@@ -264,6 +276,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/podcasts/{slug}/mark-as-opened', 'mark_as_opened')->name('podcast.markAsOpened');
         Route::get('/opened-podcasts', 'opened_podcasts')->name('openedPodcast.fetch');
         Route::get('/opened-podcasts/{slug}', 'opened_podcast')->name('openedPodcast.show');
+        Route::get('/podcasts/{slug}/favourite', 'podcast_favourite')->name('podcastFavourite.addOrRemove');
+        Route::get('/favourite-podcasts', 'favourite_podcasts')->name('favouritePodcast.fetch');
+        Route::get('/favourite-podcasts/{slug}', 'favourite_podcast')->name('favouritePodcast.show');
     });
 
     Route::controller(SubscriptionController::class)->group(function(){

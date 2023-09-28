@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Video;
 use App\Models\Category;
-use App\Models\CurrentSubscription;
 use App\Models\OpenedVideo;
 use Illuminate\Http\Request;
 use App\Models\OpenedResources;
 use App\Models\RecommendedVideo;
+use App\Models\FavouriteResource;
+use App\Models\CurrentSubscription;
 
 class VideoController extends Controller
 {
@@ -74,7 +75,7 @@ class VideoController extends Controller
             }
 
             $counted = count($videos_id);
-            if(($counted < $limit) && (Video::where('status', 1)->where('subscription_level', '<=', $level)->count() >= $limit)){
+            if(($counted < $limit) && (Video::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
                 $other_videos = Video::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($videos_id)){
                     foreach($videos_id as $video_id){
@@ -273,7 +274,7 @@ class VideoController extends Controller
     }
 
     public function opened_videos(){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -349,7 +350,7 @@ class VideoController extends Controller
     }
 
     public function opened_video($slug){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return response([
                 'status' => 'failed',
@@ -367,6 +368,132 @@ class VideoController extends Controller
 
         $opened = OpenedVideo::where('video_id', $video->id)->where('user_id', $this->user->id)->first();
         if(empty($opened)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Video was found'
+            ], 404);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Video fetched successfully',
+            'data' => $this->fetch_video($video)
+        ], 200);
+    }
+
+    public function video_favourite($slug){
+        $video = Video::where('slug', $slug)->first();
+        if(empty($video)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Video was fetched'
+            ], 404);
+        }
+
+        $action = self::favourite_resource('video', $this->user->id, $video->id);
+        $message = ($action == 'saved') ? 'Video added to Favourites' : 'Video removed from Favourites';
+
+        return response([
+            'status' => 'success',
+            'message' => $message
+        ], 200);
+    }
+
+    public function favourite_videos(){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $search = !empty($_GET['search']) ? (string)$_GET['search'] : "";
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
+
+        $fav_videos = FavouriteResource::where('type', 'video')->where('user_id', $this->user->id);
+        if($fav_videos->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Favourite Video',
+                'data' => []
+            ], 200);
+        }
+
+        $videos = [];
+        $fav_videos = $fav_videos->get();
+        if(empty($search)){
+            foreach($fav_videos as $fav_video){
+                $video = Video::find($fav_video->resource_id);
+                if(!empty($video) && ($video->status == 1)){
+                    $videos[] = $this->fetch_video($video);
+                }
+            }
+        } else {
+            $recommendeds = [];
+            $search_array = explode(' ', $search);
+            foreach($fav_videos as $fav_video){
+                $video = Video::find($fav_video->resource_id);
+                $count = 0;
+                foreach($search_array as $word){
+                    if((strpos($video->title, $word) !== FALSE) or (strpos($video->description, $word) !== FALSE)){
+                        $count += 1;
+
+                    }
+                }
+                if($count > 0){
+                    $recommendeds[$video->id] = $count;
+                }
+            }
+            if(!empty($recommendeds)){
+                arsort($recommendeds);
+
+                $keys = array_keys($recommendeds);
+
+                foreach($keys as $key){
+                    $video = Video::find($key);
+                    if(!empty($video) and ($video->status == 1)){
+                        $videos[] = $this->fetch_video($video);
+                    }
+                }
+            }
+        }
+
+        if(empty($videos)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Video was found',
+                'data' => []
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Videos fetched successfully',
+            'data' => self::paginate_array(array_values($videos), $limit, $page)
+        ], 200);
+    }
+
+    public function favourite_video($slug){
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        if(empty($current_subscription)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Unauthorized Access'
+            ], 409);
+        }
+
+        $video = Video::where('slug', $slug)->first();
+        if(empty($video) or ($video->status != 1)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Video was fetched'
+            ], 404);
+        }
+
+        $fav_video = FavouriteResource::where('resource_id', $video->id)->where('user_id', $this->user->id)->where('type', 'video')->first();
+        if(empty($fav_video)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Video was found'
