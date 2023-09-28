@@ -27,6 +27,7 @@ use App\Http\Controllers\PodcastController as ControllersPodcastController;
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
+use App\Http\Controllers\JournalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -289,6 +290,14 @@ Route::middleware('auth:user-api')->group(function(){
         Route::post('/subscriptions/complete', 'complete_subscription')->name('subscription.complete');
         Route::get('/subscription-attempts', 'subscription_attempts')->name('subscriptionAttempts.index');
         Route::get('/subscription-attempts/{internal_ref}', 'subscription_attempt')->name('subscriptionAttempt.show');
+    });
+
+    Route::controller(JournalController::class)->group(function(){
+        Route::get('/journals', 'index')->name('journal.index');
+        Route::post('/journals', 'store')->name('journal.store');
+        Route::get('/journals/{journal}', 'show')->name('journal.show');
+        Route::put('/journals/{journal}', 'update')->name('journal.update');
+        Route::delete('/journals/{journal}', 'destroy')->name('journal.delete');
     });
 });
 
