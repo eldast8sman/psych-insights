@@ -265,6 +265,10 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function dashboard(){
+        
+    }
+
     public function logout(){
         auth('admin-api')->logout();
 

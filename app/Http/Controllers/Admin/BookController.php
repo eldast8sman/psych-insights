@@ -75,7 +75,8 @@ class BookController extends Controller
     public static function book(Book $book) : Book
     {
         if(!empty($book->book_cover)){
-            $book->book_cover = FileManagerController::fetch_file($book->book_cover);
+            $book->photo = FileManagerController::fetch_file($book->book_cover);
+            unset($book->book_cover);
         }
 
         if(!empty($book->categories)){
