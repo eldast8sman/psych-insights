@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use stdClass;
+use App\Models\User;
+use App\Models\PaymentPlan;
+use Illuminate\Http\Request;
+use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\BasicPackageRequest;
 use App\Http\Requests\Admin\FreePackageRequest;
+use App\Http\Requests\Admin\BasicPackageRequest;
 use App\Http\Requests\Admin\StoreSubscriptionPackageRequest;
 use App\Http\Requests\Admin\UpdateSubscriptionPackageRequest;
-use App\Models\PaymentPlan;
-use App\Models\SubscriptionPackage;
-use Illuminate\Http\Request;
-use stdClass;
 
 class SubscriptionPackageController extends Controller
 {
@@ -20,6 +21,12 @@ class SubscriptionPackageController extends Controller
     {
         $this->middleware('auth:admin-api');
         $this->user = AuthController::user();
+    }
+
+    public function summary(){
+        $total_users = User::count();
+
+        var_dump($total_users);
     }
 
     /**

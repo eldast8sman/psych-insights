@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AudioController;
 use App\Http\Controllers\Admin\VideoController;
@@ -27,7 +29,6 @@ use App\Http\Controllers\PodcastController as ControllersPodcastController;
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
-use App\Http\Controllers\JournalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +130,7 @@ Route::prefix('admin')->group(function(){
             Route::delete('/free-trials', 'destroy_free_package')->name('admin.freeTrial.delete');
             Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
             Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
+            Route::get('/subscription-summary', 'summary')->name('admin.subscriptionSummary');
         });
 
         Route::controller(PromoCodeController::class)->group(function(){
@@ -192,6 +194,13 @@ Route::prefix('admin')->group(function(){
             Route::get('/premium-score-ranges/by-category/{category}', 'fetch_by_category');
             Route::put('/premium-score-ranges/{range}', 'update')->name('admin.premiumScoreRange.update');
             Route::delete('/premium-score-ranges/{range}', 'destroy')->name('admin.premiumScoreRange.delete');
+        });
+
+        Route::controller(UserController::class)->group(function(){
+            Route::get('/user-summary', 'summary')->name('admin.user.summary');
+            Route::get('/users', 'index')->name('admin.user.index');
+            Route::get('/users/{user}', 'show')->name('admin.user.show');
+            Route::get('/users/{user}/activation', 'user_activation')->name('admin.user.activation');
         });
     });
 });

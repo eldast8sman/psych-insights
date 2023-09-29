@@ -25,7 +25,8 @@ class PodcastController extends Controller
     public static function podcast(Podcast $podcast) : Podcast
     {
         if(!empty($podcast->cover_art)){
-            $podcast->cover_art = FileManagerController::fetch_file($podcast->cover_art);
+            $podcast->photo = FileManagerController::fetch_file($podcast->cover_art);
+            unset($podcast->cover_art);
         }
 
         if(!empty($podcast->categories)){
