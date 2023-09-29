@@ -14,6 +14,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\InterestController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
@@ -201,6 +202,14 @@ Route::prefix('admin')->group(function(){
             Route::get('/users', 'index')->name('admin.user.index');
             Route::get('/users/{user}', 'show')->name('admin.user.show');
             Route::get('/users/{user}/activation', 'user_activation')->name('admin.user.activation');
+        });
+
+        Route::controller(InterestController::class)->group(function(){
+            Route::get('/interests', 'index')->name('admin.interest.index');
+            Route::post('/interests', 'store')->name('admin.interest.store');
+            Route::get('/interests/{interest}', 'show')->name('admin.interest.show');
+            Route::put('/interests/{interest}', 'update')->name('admin.interest.update');
+            Route::delete('/interests/{interest}', 'destroy')->name('admin.interest.delete');
         });
     });
 });
