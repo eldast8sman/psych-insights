@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\User;
+use App\Models\Interest;
 use App\Models\Admin\Admin;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ActivateAccountRequest;
-use App\Http\Requests\Admin\ChangePasswordRequest;
-use App\Http\Requests\Admin\ForgotPasswordRequest;
-use App\Http\Requests\Admin\LoginRequest;
-use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Mail\Admin\AddAdminMail;
-use App\Mail\Admin\ForgotPasswordMail;
+use App\Models\CurrentSubscription;
+use App\Models\StripePaymentIntent;
+use App\Models\SubscriptionPackage;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\Admin\ForgotPasswordMail;
+use App\Http\Requests\Admin\LoginRequest;
+use App\Http\Requests\Admin\StoreAdminRequest;
+use App\Http\Requests\Admin\ChangePasswordRequest;
+use App\Http\Requests\Admin\ForgotPasswordRequest;
+use App\Http\Requests\Admin\ActivateAccountRequest;
 
 class AuthController extends Controller
 {
@@ -266,7 +271,52 @@ class AuthController extends Controller
     }
 
     public function dashboard(){
-        
+        $total_revenue = StripePaymentIntent::where('value_given', 1)->get()->sum('amount');
+        $total_users = User::count();
+        $premium_users = CurrentSubscription::where('status', 1)->where('end_date', '>=', date('Y-m-d'))->count();
+        $basic_users = $total_users - $premium_users;
+
+        $interest_summary = [];
+        $interests = Interest::orderBy('interest', 'asc');
+        if($interests->count() > 0){
+            foreach($interests->get() as $interest){
+                $interest_summary[] = [
+                    'interest' => $interest->interest,
+                    'percentage' => ($interest->total_users / $total_users) * 100
+                ];
+            }
+        }
+
+        $recent_signups = [];
+        $recent_users = User::orderBy('created_at', 'desc')->limit(5);
+        if($recent_users->count() > 0){
+            foreach($recent_users->get() as $user){
+                $current = CurrentSubscription::where('user_id', $user->id)->where('status', 1)->where('end_date', '>=', date('Y-m-d'))->first();
+                if(empty($current)){
+                    $status = 'Basic';
+                } else {
+                    $status = SubscriptionPackage::find($current->subscription_package_id)->package;
+                }
+                $recent_signups[] = [
+                    'user' => $user->name,
+                    'date_joined' => $user->created_at,
+                    'status' => $status
+                ];
+            }
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Dashboard loaded successfully',
+            'data' => [
+                'total_revenue' => number_format($total_revenue, 2),
+                'total_users' => $total_users,
+                'premium_users' => $premium_users,
+                'basic_users' => $basic_users,
+                'interest_summary' => $interest_summary,
+                'recent_signups' => $recent_signups
+            ]
+        ], 200);
     }
 
     public function logout(){

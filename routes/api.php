@@ -58,6 +58,7 @@ Route::prefix('admin')->group(function(){
         Route::controller(AuthController::class)->group(function(){
             Route::get('/me', 'me')->name('admin.me');
             Route::post('/change-password', 'change_password')->name('admin.changePassword');
+            Route::get('/dashboard', 'dashboard');
         });
 
         Route::controller(AdminController::class)->group(function(){
