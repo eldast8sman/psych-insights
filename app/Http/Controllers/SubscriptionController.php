@@ -122,7 +122,10 @@ class SubscriptionController extends Controller
             'promo_code' => (isset($promo) and !empty($promo)) ? $promo->promo_code : null,
             'promo_code_percentage' => $promo_percent,
             'start_date' => $start_date,
-            'end_date' => $end_date
+            'end_date' => $end_date,
+            'grace_end' => $grace_end,
+            'auto_renew' => $auto_renew,
+            'status' => 1
         ]);
 
         $current = CurrentSubscription::where('user_id', $user_id)->first();

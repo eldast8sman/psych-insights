@@ -20,7 +20,7 @@
 
     <script>
         const stripe = Stripe('pk_test_51NpMgVLmDhaafYBlK4DyGBCHxDV5Z5Txdmjqp1aiEbDnR9Ku7RL3DSj3X7o9SPKiykT0MjSlu4RgGfVyKIGLCHKP00kFY14bLI');
-        const ClientSecret = "pi_3Nuj6nLmDhaafYBl0cWLvMTg_secret_wX4wsg99hEWdLk0Rl0ZxcB6T1";
+        const ClientSecret = "pi_3Nw93JLmDhaafYBl1KMGWUbl_secret_8q9fFPTAIpRsWp25QTtqYAO2N";
 
         const options = {
             clientSecret: ClientSecret,

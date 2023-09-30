@@ -133,6 +133,7 @@ Route::prefix('admin')->group(function(){
             Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
             Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
             Route::get('/subscription-summary', 'summary')->name('admin.subscriptionSummary');
+            Route::get('/subscribers', 'subscribers')->name('admin.subscriber');
         });
 
         Route::controller(PromoCodeController::class)->group(function(){

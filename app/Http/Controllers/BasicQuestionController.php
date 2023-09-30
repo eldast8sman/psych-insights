@@ -242,7 +242,7 @@ class BasicQuestionController extends Controller
         $answer_summary->answers = $answers;
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
-
+        
         $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $package = SubscriptionPackage::find($current_subscription->subscription_package_id);

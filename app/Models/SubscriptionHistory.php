@@ -20,6 +20,9 @@ class SubscriptionHistory extends Model
         'promo_code',
         'promo_code_percentage',
         'start_date',
-        'end_date'
+        'end_date',
+        'grace_end',
+        'auto_renew',
+        'status'
     ];
 }

@@ -6,6 +6,8 @@ use stdClass;
 use App\Models\User;
 use App\Models\PaymentPlan;
 use Illuminate\Http\Request;
+use App\Models\CurrentSubscription;
+use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\FreePackageRequest;
@@ -23,10 +25,73 @@ class SubscriptionPackageController extends Controller
         $this->user = AuthController::user();
     }
 
+    public function subscribers(){
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+
+        $sub_history = SubscriptionHistory::where('status', 1)->where('grace_end', '>=', date('Y-m-d'))->orderBy('start_date', 'asc')->orderBy('end_date', 'asc');
+        if($sub_history->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Current Subscribers',
+                'data' => []
+            ], 200);
+        }
+
+        $subscribers = $sub_history->paginate($limit);
+        foreach($subscribers as $subscriber){
+            $user = User::find($subscriber->user_id);
+            $subscriber->subscriber = $user->name;
+            $subscriber->subscription_package = SubscriptionPackage::find($subscriber->subscription_package_id);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscribers fetched successfully',
+            'data' => $subscribers
+        ], 200);
+    }
+
     public function summary(){
         $total_users = User::count();
 
-        var_dump($total_users);
+        $subscription_summary = [];
+        $percent_total = 0;
+        $packages = SubscriptionPackage::where('free_package', '<>', 1);
+        if($packages->count() > 0){
+            foreach($packages->get() as $package){
+                $subs = CurrentSubscription::where('subscription_package_id', $package->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->count();
+                $percentage = ($subs / $total_users) * 100;
+                $percent_total += $percentage;
+                $subscription_summary[] = [
+                    'package' => $package->package,
+                    'percentage' => $percentage
+                ];
+            }
+        }
+
+        $subscription_summary[] = [
+            'package' => 'Basic',
+            'percentage' => 100 - $percent_total
+        ];
+
+        $recent_subscribers = CurrentSubscription::orderBy('updated_at', 'desc')->get();
+        if(!empty($recent_subscribers)){
+            foreach($recent_subscribers as $subscriber){
+                $subscriber->subscriber = User::find($subscriber->user_id)->name;
+                $subscriber->payment_plan = PaymentPlan::find($subscriber->payment_plan_id);
+                $subscriber->subscription_time = $subscriber->updated_at;
+            }
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Summaries fetched successfully',
+            'data' => [
+                'total_users' => $total_users,
+                'subscription_summary' => $subscription_summary,
+                'recent_subscribers' => $recent_subscribers
+            ]
+        ], 200);
     }
 
     /**
