@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
 use App\Models\Category;
 use App\Models\OpenedBook;
 use Illuminate\Http\Request;
-use App\Models\OpenedResources;
 use App\Models\RecommendedBook;
 use App\Models\FavouriteResource;
 use App\Models\CurrentSubscription;
