@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Category;
+use App\Models\Interest;
 use App\Models\BasicQuestion;
 use App\Models\DistressScoreRange;
 use App\Models\BasicQuestionOption;
@@ -11,6 +13,7 @@ use App\Models\DailyQuestionAnswer;
 use App\Models\SubscriptionPackage;
 use App\Models\PrerequisiteQuestion;
 use App\Models\QuestionAnswerSummary;
+use App\Http\Requests\SetInterestRequest;
 use App\Models\BasicQuestionSpecialOption;
 use App\Http\Requests\AnswerBasicQuestionRequest;
 
@@ -265,6 +268,40 @@ class BasicQuestionController extends Controller
             'status' => 'success',
             'message' => 'Basic Question answered',
             'data' => $answer_summary
+        ], 200);
+    }
+
+    public function fetch_interests(){
+        $interests = Interest::orderBy('interest', 'asc')->get(['interest']);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Interests fetched successfully',
+            'data' => $interests
+        ], 200);
+    }
+
+    public function set_interests(SetInterestRequest $request){
+        $user = User::find($this->user->id);
+        if(!empty($user->interests)){
+            return response([
+                'status' => 'failed',
+                'messaage' => 'User Interest already set'
+            ], 409);
+        }
+        
+        $user->interests = join(',', $request->interests);
+        $user->save();
+        
+        foreach($request->interests as $interest){
+            $int = Interest::where('interest', $interest)->first();
+            $int->total_users += 1;
+            $int->save();
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Interest set successfully'
         ], 200);
     }
 }

@@ -233,6 +233,8 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
         Route::get('/basic-questions', 'fetch_questions')->name('basicQuestion.fetch');
         Route::post('/basic-questions/answer', 'answer_basic_question')->name('basicQuestion.answer');
+        Route::get('/interests', 'fetch_interests')->name('interest.fetch');
+        Route::post('/interests', 'set_interests')->name('interest.set');
     });
 
     Route::controller(ControllerDassQuestionController::class)->group(function(){
