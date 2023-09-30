@@ -58,6 +58,7 @@ Route::prefix('admin')->group(function(){
         Route::controller(AuthController::class)->group(function(){
             Route::get('/me', 'me')->name('admin.me');
             Route::post('/change-password', 'change_password')->name('admin.changePassword');
+            Route::get('/dashboard', 'dashboard');
         });
 
         Route::controller(AdminController::class)->group(function(){
@@ -132,6 +133,7 @@ Route::prefix('admin')->group(function(){
             Route::post('/free-package', 'add_basic_package')->name('admin.freePackage.upload');
             Route::get('/free-package', 'fetch_basic_package')->name('admin.freePackage.show');
             Route::get('/subscription-summary', 'summary')->name('admin.subscriptionSummary');
+            Route::get('/subscribers', 'subscribers')->name('admin.subscriber');
         });
 
         Route::controller(PromoCodeController::class)->group(function(){
