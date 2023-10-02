@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\FileManager;
+use App\Models\SubscriptionPackage;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -92,6 +93,16 @@ class BookController extends Controller
 
             $book->categories = $categories;
         }
+
+        $sub_level = $book->subscription_level;
+        if($sub_level > 0){
+            $package = SubscriptionPackage::where('level', $sub_level)->first();
+            $subscription_level = $package->package;
+        } else {
+            $subscription_level = "Basic";
+        }
+
+        $book->subscription_level = $subscription_level;
 
         return $book;
     }

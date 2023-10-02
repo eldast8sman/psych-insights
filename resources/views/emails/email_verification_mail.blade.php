@@ -27,7 +27,7 @@
             </p>
 
             <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.svg"
+              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
               alt="checked-icon"
               width="50px"
             />
