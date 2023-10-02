@@ -230,6 +230,10 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllersAuthController::class)->group(function(){    
         Route::get('/me', 'me')->name('me');    
         Route::get('/resend-email-verification-token', 'resend_email_verification_link')->name('veryfyEmail.resend');
+        Route::post('/change-password', 'change_password')->name('changePassword');
+        Route::post('/change-name', 'change_name')->name('changeName');
+        Route::post('/change-email', 'change_email')->name('changeEmail');
+        Route::post('/upload-profile-photo', 'upload_profile_photo')->name('uploadProfilePhoto');
     });
 
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
