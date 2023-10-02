@@ -252,11 +252,13 @@ class AuthController extends Controller
 
     public function forgot_password(ForgotPasswordRequest $request){
         $user = User::where('email', $request->email)->first();
-        $user->token = Str::random(10);
+        $user->token = Str::random(20).time();
         $user->token_expiry = date('Y-m-d H:i:s', time() + (60 * 10));
         $user->save();
 
-        Mail::to($user)->send(new ForgotPasswordMail($user->name, $user->token));
+        $names = explode(' ', $user->name);
+        $first_name = $names[0];
+        Mail::to($user)->send(new ForgotPasswordMail($first_name, $user->token));
 
         self::log_activity($user->id, "forgot_password");
 
