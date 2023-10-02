@@ -263,6 +263,8 @@ class BookController extends Controller
             $opened->frequency += 1;
             $opened->save();
         }
+        $book->opened_count += 1;
+        $book->save();
 
         return response([
             'status' => 'success',
@@ -387,6 +389,12 @@ class BookController extends Controller
         }
 
         $action = self::favourite_resource('book', $this->user->id, $book->id);
+        if($action == 'saved'){
+            $book->favourite_count += 1;
+        } else {
+            $book->favourite_count -= 1;
+        }
+        $book->save();
         $message = ($action == 'saved') ? 'Book added to Favourites' : 'Book removed from Favourites';
 
         return response([

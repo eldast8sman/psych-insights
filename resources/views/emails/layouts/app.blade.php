@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -66,13 +66,13 @@
                       title="PsychInsights"
                     >
                       <img
-                        src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo.svg"
+                        src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo+(1).png"
                         alt="Psych-logo"
                       />
                       <h2>PsychInsights</h2>
                     </a>
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.svg"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.png"
                       alt="line"
                     />
                   </div>
@@ -99,18 +99,18 @@
                 >
                   <a href="#">
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/Facebook.svg"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/facebook.png"
                       alt="Facebook"
                     />
                   </a>
                   <a href="#" style="margin: 0px 15px">
                     <img
-                    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/twitter.svg"
-                    alt=/twitter.svg" />
+                    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/twitter.png"
+                    alt="twitter.svg" />
                   </a>
                   <a href="#">
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/Facebook.svg"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/facebook.png"
                       alt="Facebook"
                     />
                   </a>

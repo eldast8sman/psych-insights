@@ -22,6 +22,8 @@ class Book extends Model
         'subscription_level',
         'book_cover',
         'purchase_link',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 
