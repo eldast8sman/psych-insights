@@ -74,7 +74,7 @@
       <tr>
         <td style="text-align: center">
           <a
-            href="{{ env('FRONTEND_URL') }}/email-verified/{{ $token }}"
+            href="{{ env('FRONTEND_URL') }}/verify-email?token={{ $token }}"
             style="
               color: #ffffff;
               padding: 15px 55px;

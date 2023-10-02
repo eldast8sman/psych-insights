@@ -18,16 +18,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Models\QuestionAnswerSummary;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\EmailVerificationToken;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\ChangeNameRequest;
+use App\Http\Requests\ChangeEmailRequest;
 use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
-use App\Models\EmailVerificationToken;
+use App\Http\Requests\UploadProfilePhotoRequest;
 
 class AuthController extends Controller
 {
     private $errors;
+    private $file_disk = 'public';
 
     public function store(StoreUserRequest $request){
         if(!$request->terms){
@@ -212,6 +217,10 @@ class AuthController extends Controller
             $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit']);
         }
 
+        if(!empty($user->profile_photo)){
+            $user->profile_photo = FileManagerController::fetch_file($user->profile_photo);
+        }
+
         $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
         $user->next_question_date = !empty($last_answet) ? $last_answer->next_question : date('Y-m-d');
 
@@ -358,6 +367,93 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Login successful',
             'data' => $user
+        ], 200);
+    }
+
+    public function change_password(ChangePasswordRequest $request){
+        $user = User::find(self::user()->id);
+
+        if(!$this->user_login($user->email, $request->old_password)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Incorrect Password'
+            ], 409);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Password successfully changed'
+        ], 200);
+    }
+
+    public function change_name(ChangeNameRequest $request){
+        $user = User::find(self::user()->id);
+        $user->name = $request->name;
+
+        $user->save();
+
+        $user = self::user_details($user);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Name changed successfully',
+            'data' => $user
+        ], 200);
+    }
+
+    public function change_email(ChangeEmailRequest $request){
+        $user = User::find(self::user()->id);
+
+        if(!$login = $this->user_login($user->email, $request->password)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong Password'
+            ], 409);
+        }
+
+        $user->email = $request->email;
+        $user->email_verified = 0;
+        $user->save();
+
+        $user = self::user_details($user);
+        $user->authorization = $login;
+
+        return response([
+            'status' => 'success',
+            'message' => 'Email successfully changed',
+            'data' => $user
+        ], 200);
+    }
+
+    public function upload_profile_photo(UploadProfilePhotoRequest $request){
+        $user = User::find(self::user()->id);
+
+        $old_photo = "";
+        if(!empty($user->profile_photo)){
+            $old_photo = $user->profile_photo;
+        }
+
+        if(!$upload = FileManagerController::upload_file($request->profile_photo, env('FILE_DISK', $this->file_disk))){
+            return response([
+                'status' => 'failed',
+                'message' => "Profile Photo Upload failed"
+            ], 500);
+        }
+
+        $user->profile_photo = $upload->id;
+        $user->save();
+
+        if(!empty($old_photo)){
+            FileManagerController::delete($old_photo);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Profile Photo Uploaded successfully',
+            'data' => self::user_details($user)
         ], 200);
     }
 }

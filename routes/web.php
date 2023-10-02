@@ -24,3 +24,7 @@ Route::get('/test-stripe-payment', function(){
 Route::get('/confirm-payment', function(){
     return view('confirm_stripe_payment');
 });
+
+Route::get('/verify-email', function(){
+    return view('verify_email');
+});
