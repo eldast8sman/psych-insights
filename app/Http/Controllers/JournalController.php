@@ -50,7 +50,7 @@ class JournalController extends Controller
 
         unset($journal->user_id);
 
-        self::log_activity($this->user->id, "store-journal", 'journals', $journal->id);
+        self::log_activity($this->user->id, "store_journal", 'journals', $journal->id);
 
         return response([
             'status' => 'success',
@@ -91,7 +91,7 @@ class JournalController extends Controller
 
         unset($journal->user_id);
 
-        self::log_activity($this->user->id, "update-journal", 'journals', $journal->id);
+        self::log_activity($this->user->id, "update_journal", 'journals', $journal->id);
 
         return response([
             'status' => 'success',
@@ -113,7 +113,7 @@ class JournalController extends Controller
 
         unset($journal->user_id);
 
-        self::log_activity($this->user->id, "delete-journal", 'journals', $journal->id);
+        self::log_activity($this->user->id, "delete_journal", 'journals', $journal->id);
 
         return response([
             'status' => 'success',

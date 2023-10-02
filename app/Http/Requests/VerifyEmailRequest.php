@@ -22,7 +22,7 @@ class VerifyEmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string|min:10|max:10'
+            'token' => 'required|string|exists:email_verification_tokens,token'
         ];
     }
 }

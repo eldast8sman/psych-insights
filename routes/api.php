@@ -218,8 +218,8 @@ Route::prefix('admin')->group(function(){
 
 Route::controller(ControllersAuthController::class)->group(function(){
     Route::post('/signup', 'store')->name('signup');
+    Route::post('/verify-email', 'verify_email')->name('verifyEmail.verify');
     Route::post('/login', 'login')->name('login');
-    Route::get('/me', 'me')->name('me');
     Route::post('/forgot-password', 'forgot_password')->name('forgot_password');
     Route::post('/reset-password', 'reset_password')->name('reset_password');
     Route::get('/initiate-google-login', 'initiate_google_login')->name('initiate_google_login');
@@ -227,8 +227,8 @@ Route::controller(ControllersAuthController::class)->group(function(){
 });
 
 Route::middleware('auth:user-api')->group(function(){
-    Route::controller(ControllersAuthController::class)->group(function(){
-        Route::post('/verify-email', 'verify_email')->name('verifyEmail.verify');
+    Route::controller(ControllersAuthController::class)->group(function(){    
+        Route::get('/me', 'me')->name('me');    
         Route::get('/resend-email-verification-token', 'resend_email_verification_link')->name('veryfyEmail.resend');
     });
 
