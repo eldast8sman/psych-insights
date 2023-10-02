@@ -262,6 +262,8 @@ class PodcastController extends Controller
             $opened->frequency += 1;
             $opened->save();
         }
+        $podcast->opened_count += 1;
+        $podcast->save();
 
         return response([
             'status' => 'success',
@@ -387,6 +389,12 @@ class PodcastController extends Controller
         }
 
         $action = self::favourite_resource('podcast', $this->user->id, $podcast->id);
+        if($action == 'saved'){
+            $podcast->favourite_count += 1;
+        } else {
+            $podcast->favourite_count -= 1;
+        }
+        $podcast->save();
         $message = ($action == 'saved') ? 'Podcast added to Favourites' : 'Podcast removed from Favourites';
 
         return response([
