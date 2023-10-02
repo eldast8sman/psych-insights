@@ -146,6 +146,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(BookController::class)->group(function(){
+            Route::get('/books-summary', 'summary')->name('admin.book.summary');
             Route::get('/books', 'index')->name('admin.book.index');
             Route::post('/books', 'store')->name('admin.book.store');
             Route::get('/books/{book}', 'show')->name('admin.book.show');
@@ -155,6 +156,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(PodcastController::class)->group(function(){
+            Route::get('/podcast-summary', 'summary')->name('admin.podcast.summary');
             Route::get('/podcasts', 'index')->name('admin.podcast.index');
             Route::post('/podcasts', 'store')->name('admin.podcast.store');
             Route::get('/podcasts/{podcast}', 'show')->name('admin.podcast.show');

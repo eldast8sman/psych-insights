@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\FileManager;
+use App\Models\OpenedBook;
 use App\Models\SubscriptionPackage;
 use Illuminate\Http\Request;
 
@@ -70,6 +71,28 @@ class BookController extends Controller
             'status' => 'failed',
             'message' => 'Books fetched successfully',
             'data' => $books
+        ], 200);
+    }
+
+    public function summary(){
+        $total_books = Book::count();
+        $total_views = OpenedBook::get()->sum('frequency');
+        $popular_books = Book::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'desc')->limit(5)->get();
+
+        foreach($popular_books as $book){
+            $book = self::book($book);
+        }
+
+        $data = [
+            'total_books' => $total_books,
+            'total_views' => $total_views,
+            'popular_books' => $popular_books
+        ];
+
+        return response([
+            'status' => 'success',
+            'message' => 'Book Summary fetched',
+            'data' => $data
         ], 200);
     }
 

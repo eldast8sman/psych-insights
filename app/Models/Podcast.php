@@ -22,6 +22,8 @@ class Podcast extends Model
         'subscription_level',
         'cover_art',
         'podcast_link',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 

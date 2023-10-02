@@ -6,6 +6,8 @@ use App\Models\Podcast;
 use App\Models\Category;
 use App\Models\FileManager;
 use Illuminate\Http\Request;
+use App\Models\OpenedPodcast;
+use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\StorePodcastRequest;
@@ -42,6 +44,16 @@ class PodcastController extends Controller
 
             $podcast->categories = $categories;
         }
+
+        $sub_level = $podcast->subscription_level;
+        if($sub_level > 0){
+            $package = SubscriptionPackage::where('level', $sub_level)->first();
+            $subscription_level = $package->package;
+        } else {
+            $subscription_level = "Basic";
+        }
+
+        $podcast->subscription_level = $subscription_level;
 
         return $podcast;
     }
@@ -93,6 +105,28 @@ class PodcastController extends Controller
             'status' => 'failed',
             'message' => 'Podcasts fetched successfully',
             'data' => $podcasts
+        ], 200);
+    }
+
+    public function summary(){
+        $total_podcasts = Podcast::count();
+        $total_views = OpenedPodcast::get()->sum('frequency');
+        $popular_podcastss = Podcast::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'desc')->limit(5)->get();
+
+        foreach($popular_podcastss as $podcast){
+            $podcast = self::podcast($podcast);
+        }
+
+        $data = [
+            'total_podcasts' => $total_podcasts,
+            'total_views' => $total_views,
+            'popular_podcastss' => $popular_podcastss
+        ];
+
+        return response([
+            'status' => 'success',
+            'message' => 'Podcast Summary fetched',
+            'data' => $data
         ], 200);
     }
 
