@@ -80,6 +80,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(DailyQuestionController::class)->group(function(){
+            Route::get('/total-checkins', 'total_checkins')->name('admin.dailyQuestions.totalCheckin');
             Route::get('/daily-questions', 'index')->name('admin.dailyQuestions.index');
             Route::post('/daily-questions', 'store')->name('admin.dailyQuestions.store');
             Route::get('/daily-questions/{question}', 'show')->name('admin.dailyQuestions.show');

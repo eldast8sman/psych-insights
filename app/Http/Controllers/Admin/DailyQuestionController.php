@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDailyQuestionOptionRequest;
 use App\Http\Requests\Admin\StoreDailyQuestionRequest;
 use App\Http\Requests\Admin\UpdateDailyQuestionRequest;
+use App\Models\ActivityLog;
 use App\Models\Category;
 use App\Models\DailyQuestion;
 use App\Models\DailyQuestionOption;
@@ -203,6 +204,16 @@ class DailyQuestionController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Daily Question successfuly deleted'
+        ], 200);
+    }
+
+    public function total_checkins(){
+        $checkins = ActivityLog::where('activity', "checkin")->count();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Total Checkins calculated',
+            'data' => ['total_checkins' => number_format($checkins)]
         ], 200);
     }
 }
