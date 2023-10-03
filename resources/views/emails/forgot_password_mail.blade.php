@@ -16,7 +16,7 @@
         <td style="font-size: 14px">
           <p style="margin: 40px 0px">Hello {{ $name }},</p>
           <p style="margin-bottom: 40px">
-            Please click on the link below to reset your Password so that you can have acccess to your acccout
+            We received a request to reset the password for your PsychInsights account. If you initiated this request, please click on the link below to set a new password:
           </p>
         </td>
       </tr>
@@ -52,8 +52,9 @@
       <tr>
         <td style="font-size: 14px">
           <p style="margin-top: 40px">
-            If you did not request this email, it's possible that
-            someone, please make sure your account is secured as someone might be trying to illegally access your account.
+            If you didn't request a password reset, please disregard this email. It's a good practice to periodically update your password to ensure your account's security.
+            <br>
+            Remember, PsychInsights will never ask you for your password through email or any other unsolicited communication. Always ensure you're communicating directly with our community.
           </p>
           <p>
             Warm regards, <br />
