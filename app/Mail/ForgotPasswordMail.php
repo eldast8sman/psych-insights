@@ -31,7 +31,7 @@ class ForgotPasswordMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reset Your Password',
+            subject: 'Oops! Forgot Your PsychInsights Password? We\'ve All Been There!',
         );
     }
 

@@ -31,7 +31,7 @@ class EmailVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Email Verification Mail',
+            subject: 'One Small Step for You, One Giant Leap into the PsychInsights community!',
         );
     }
 
