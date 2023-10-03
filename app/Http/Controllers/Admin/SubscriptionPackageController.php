@@ -61,7 +61,7 @@ class SubscriptionPackageController extends Controller
             foreach($packages->get() as $package){
                 $subs = CurrentSubscription::where('subscription_package_id', $package->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->count();
                 $percentage = ($total_users > 0) ? ($subs / $total_users) * 100 : "No User";
-                $percent_total += $percentage;
+                $percent_total = is_numeric($percentage) ? $percent_total + $percentage : "No User";
                 $subscription_summary[] = [
                     'package' => $package->package,
                     'percentage' => $percentage
