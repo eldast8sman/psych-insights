@@ -1,52 +1,14 @@
 @extends('emails.layouts.app')
 
-@section('content')
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td>
-          <div
-            style="
-              display: flex;
-              text-align: center;
-              align-items: center;
-              gap: 10px;
-              justify-content: center;
-              color: #000000;
-            "
-          >
-            <p
-              style="
-                font-size: 40px;
-                font-weight: 500;
-                text-align: center;
-              "
-            >
-              Activate Your Account
-            </p>
+@section('title')
+  Activate Your Account
+@endsection
 
-            <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
-              alt="checked-icon"
-              width="50px"
-            />
-          </div>
-          <p
-            style="
-              text-align: center;
-              color: #000000;
-              margin-top: -30px;
-              font-size: 14px;
-            "
-          >
-            Please activate your PsychInsights Admin Account
-          </p>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
+@section('subtitle')
+  
+@endsection
+  Please activate your PsychInsights Admin Account
+@section('content')
 
 <tr>
   <td>

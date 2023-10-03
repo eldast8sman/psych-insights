@@ -22,6 +22,8 @@ class Article extends Model
         'publication_date',
         'content',
         'photo',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 

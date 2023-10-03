@@ -263,6 +263,9 @@ class AudioController extends Controller
             $opened->save();
         }
 
+        $audio->opened_count += 1;
+        $audio->save();
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'
@@ -386,6 +389,12 @@ class AudioController extends Controller
         }
 
         $action = self::favourite_resource('audio', $this->user->id, $audio->id);
+        if($action == 'saved'){
+            $audio->favourite_count += 1;
+        } else {
+            $audio->favourite_count -= 1;
+        }
+        $audio->save();
         $message = ($action == 'saved') ? 'Audio added to Favourites' : 'Audio removed from Favourites';
 
         return response([

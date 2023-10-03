@@ -118,8 +118,8 @@ class PodcastController extends Controller
         }
 
         $data = [
-            'total_podcasts' => $total_podcasts,
-            'total_views' => $total_views,
+            'total_podcasts' => number_format($total_podcasts),
+            'total_views' => number_format($total_views),
             'popular_podcastss' => $popular_podcastss
         ];
 

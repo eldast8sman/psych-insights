@@ -265,6 +265,9 @@ class ArticleController extends Controller
             $opened->save();
         }
 
+        $article->opened_count += 1;
+        $article->save();
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'
@@ -388,6 +391,12 @@ class ArticleController extends Controller
         }
 
         $action = self::favourite_resource('article', $this->user->id, $article->id);
+        if($action == 'saved'){
+            $article->favourite_count += 1;
+        } else {
+            $article->favourite_count -= 1;
+        }
+        $article->save();
         $message = ($action == 'saved') ? 'Article added to Favourites' : 'Article removed from Favourites';
 
         return response([

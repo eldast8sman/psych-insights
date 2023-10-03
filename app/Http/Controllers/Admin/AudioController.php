@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Audio;
 use App\Models\Category;
+use App\Models\OpenedAudio;
 use Illuminate\Http\Request;
+use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\StoreAudioRequest;
+use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\UpdateAudioRequest;
 
 class AudioController extends Controller
@@ -40,6 +42,16 @@ class AudioController extends Controller
 
             $audio->categories = $categories;
         }
+
+        $sub_level = $audio->subscription_level;
+        if($sub_level > 0){
+            $package = SubscriptionPackage::where('level', $sub_level)->first();
+            $subscription_level = $package->package;
+        } else {
+            $subscription_level = "Basic";
+        }
+
+        $audio->subscription_level = $subscription_level;
 
         return $audio;
     }
@@ -91,6 +103,28 @@ class AudioController extends Controller
             'status' => 'success',
             'message' => 'Audios fetched successfully',
             'data' => $audios
+        ], 200);
+    }
+
+    public function summary(){
+        $total_audio = Audio::count();
+        $total_views = OpenedAudio::get()->sum('frequency');
+        $popular_audio = Audio::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'desc')->limit(5)->get();
+
+        foreach($popular_audio as $audio){
+            $audio = self::audio($audio);
+        }
+
+        $data = [
+            'total_audio' => number_format($total_audio),
+            'total_views' => number_format($total_views),
+            'popular_audio' => $popular_audio
+        ];
+
+        return response([
+            'status' => 'success',
+            'message' => 'Audio Summary fetched',
+            'data' => $data
         ], 200);
     }
 
