@@ -21,6 +21,8 @@ class Video extends Model
         'photo',
         'video',
         'release_date',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 

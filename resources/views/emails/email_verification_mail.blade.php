@@ -1,53 +1,14 @@
 @extends('emails.layouts.app')
 
+@section('title')
+  Verify your email
+@endsection
+
+@section('subtitle')
+  Please verify Email to secure Account
+@endsection
+
 @section('content')
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td>
-          <div
-            style="
-              display: flex;
-              text-align: center;
-              align-items: center;
-              gap: 10px;
-              justify-content: center;
-              color: #000000;
-            "
-          >
-            <p
-              style="
-                font-size: 40px;
-                font-weight: 500;
-                text-align: center;
-              "
-            >
-              Verify your email
-            </p>
-
-            <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
-              alt="checked-icon"
-              width="50px"
-            />
-          </div>
-          <p
-            style="
-              text-align: center;
-              color: #000000;
-              margin-top: -30px;
-              font-size: 14px;
-            "
-          >
-            Please verify email to secure your account
-          </p>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-
 <tr>
   <td>
     <table width="100%">
@@ -59,8 +20,8 @@
             your mental well-being for you to live a better life, and
             we're excited to have you on board. Before you can fully
             access our community, please verify your email address to
-            ensure the security and authenticity of your account by entering
-            this token on the Email Verification.
+            ensure the security and authenticity of your account by
+            entering this token on the Email Verification.
           </p>
         </td>
       </tr>

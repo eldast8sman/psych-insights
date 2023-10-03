@@ -46,41 +46,115 @@
           <td>
             <table width="100%">
               <tr>
-                <td>
-                  <div
+                <td
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-around;
+                  "
+                >
+                  <!-- <div
                     style="
                       display: flex;
                       align-items: center;
                       justify-content: space-around;
                     "
+                  > -->
+                  <a
+                    href="#"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 5px;
+                      text-decoration: none;
+                      color: #2e2f32;
+                    "
+                    title="PsychInsights"
                   >
-                    <a
-                      href="#"
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 5px;
-                        text-decoration: none;
-                        color: #2e2f32;
-                      "
-                      title="PsychInsights"
-                    >
-                      <img
-                        src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo+(1).png"
-                        alt="Psych-logo"
-                      />
-                      <h2>PsychInsights</h2>
-                    </a>
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.png"
-                      alt="line"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo+(1).png"
+                      alt="Psych-logo"
                     />
-                  </div>
+                    <h2>PsychInsights</h2>
+                  </a>
+                  <img
+                    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.png"
+                    alt="line"
+                  />
+                  <!-- </div> -->
                 </td>
               </tr>
             </table>
           </td>
         </tr>
+
+        <tr>
+          <td>
+            <table width="100%">
+              <tr>
+                <td
+                  style="
+                    display: flex;
+                    text-align: center;
+                    align-items: center;
+                    gap: 10px;
+                    justify-content: center;
+                    color: #000000;
+                  "
+                >
+                  <!-- <div
+                    style="
+                      display: flex;
+                      text-align: center;
+                      align-items: center;
+                      gap: 10px;
+                      justify-content: center;
+                      color: #000000;
+                    "
+                  > -->
+                  <p
+                    style="
+                      font-size: 40px;
+                      font-weight: 500;
+                      text-align: center;
+                    "
+                  >
+                    @yield('title')
+                  </p>
+
+                  <img
+                    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
+                    alt="checked-icon"
+                    width="50px"
+                  />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- mmmmmm -->
+        <tr>
+          <td>
+            <table width="100%">
+              <tr>
+                <td>
+                  <p
+                    style="
+                      text-align: center;
+                      color: #000000;
+                      margin-top: -30px;
+                      font-size: 14px;
+                    "
+                  >
+                    @yield('subtitle')
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- mmmmmm -->
 
         @yield('content')
 
@@ -90,11 +164,9 @@
               <tr>
                 <td
                   style="
+                    text-align: center;
                     background-color: #f0f1f9;
                     border-radius: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                   "
                 >
                   <a href="#">
@@ -105,8 +177,9 @@
                   </a>
                   <a href="#" style="margin: 0px 15px">
                     <img
-                    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/twitter.png"
-                    alt="twitter.svg" />
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/twitter.png"
+                      alt="twitter.svg"
+                    />
                   </a>
                   <a href="#">
                     <img

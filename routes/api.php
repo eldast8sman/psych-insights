@@ -166,6 +166,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(ArticleController::class)->group(function(){
+            Route::get('/articles-summary', 'summary')->name('admin.article.summary');
             Route::get('/articles', 'index')->name('admin.article.index');
             Route::post('/articles', 'store')->name('admin.article.store');
             Route::get('/articles/{article}', 'show')->name('admin.article.show');
@@ -175,6 +176,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(VideoController::class)->group(function(){
+            Route::get('/video-summary', 'summary')->name('admin.video.summary');
             Route::get('/videos', 'index')->name('admin.video.index');
             Route::post('/videos', 'store')->name('admin.video.store');
             Route::get('/videos/{video}', 'show')->name('admin.video.show');
@@ -184,6 +186,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(AudioController::class)->group(function(){
+            Route::get('/audio-summary', 'summary')->name('admin.audio.summary');
             Route::get('/audios', 'index')->name('admin.audio.index');
             Route::post('/audios', 'store')->name('admin.audio.store');
             Route::get('/audios/{audio}', 'show')->name('admin.audio.show');

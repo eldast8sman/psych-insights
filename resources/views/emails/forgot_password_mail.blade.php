@@ -1,53 +1,14 @@
 @extends('emails.layouts.app')
 
+@section('title')
+  Reset Your Password
+@endsection
+
+@section('subtitle')
+  Please reset your Password to access your Account
+@endsection
+
 @section('content')
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td>
-          <div
-            style="
-              display: flex;
-              text-align: center;
-              align-items: center;
-              gap: 10px;
-              justify-content: center;
-              color: #000000;
-            "
-          >
-            <p
-              style="
-                font-size: 40px;
-                font-weight: 500;
-                text-align: center;
-              "
-            >
-              Reset your Password
-            </p>
-
-            <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
-              alt="checked-icon"
-              width="50px"
-            />
-          </div>
-          <p
-            style="
-              text-align: center;
-              color: #000000;
-              margin-top: -30px;
-              font-size: 14px;
-            "
-          >
-            Please reset your Password to access your Account
-          </p>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-
 <tr>
   <td>
     <table width="100%">

@@ -20,6 +20,8 @@ class Audio extends Model
         'subscription_level',
         'release_date',
         'audio',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 

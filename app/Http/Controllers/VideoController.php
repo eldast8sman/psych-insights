@@ -267,6 +267,9 @@ class VideoController extends Controller
             $opened->save();
         }
 
+        $video->opened_count += 1;
+        $video->save();
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'
@@ -391,6 +394,12 @@ class VideoController extends Controller
         }
 
         $action = self::favourite_resource('video', $this->user->id, $video->id);
+        if($action == 'saved'){
+            $video->favourite_count += 1;
+        } else {
+            $video->favourite_count -= 1;
+        }
+        $video->save();
         $message = ($action == 'saved') ? 'Video added to Favourites' : 'Video removed from Favourites';
 
         return response([

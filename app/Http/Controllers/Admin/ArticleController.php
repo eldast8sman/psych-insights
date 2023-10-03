@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\StoreArticleRequest;
 use App\Http\Requests\Admin\UpdateArticleRequest;
+use App\Models\OpenedArticle;
 
 class ArticleController extends Controller
 {
@@ -40,6 +42,16 @@ class ArticleController extends Controller
 
             $article->categories = $categories;
         }
+
+        $sub_level = $article->subscription_level;
+        if($sub_level > 0){
+            $package = SubscriptionPackage::where('level', $sub_level)->first();
+            $subscription_level = $package->package;
+        } else {
+            $subscription_level = "Basic";
+        }
+
+        $article->subscription_level = $subscription_level;
 
         return $article;
     }
@@ -91,6 +103,28 @@ class ArticleController extends Controller
             'status' => 'success',
             'message' => 'Articles fetched successfully',
             'data' => $articles
+        ], 200);
+    }
+
+    public function summary(){
+        $total_articles = Article::count();
+        $total_views = OpenedArticle::get()->sum('frequency');
+        $popular_articles = Article::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'desc')->limit(5)->get();
+
+        foreach($popular_articles as $article){
+            $article = self::article($article);
+        }
+
+        $data = [
+            'total_articles' => number_format($total_articles),
+            'total_views' => number_format($total_views),
+            'popular_articles' => $popular_articles
+        ];
+
+        return response([
+            'status' => 'success',
+            'message' => 'Article Summary fetched',
+            'data' => $data
         ], 200);
     }
 

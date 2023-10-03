@@ -84,8 +84,8 @@ class BookController extends Controller
         }
 
         $data = [
-            'total_books' => $total_books,
-            'total_views' => $total_views,
+            'total_books' => number_format($total_books),
+            'total_views' => number_format($total_views),
             'popular_books' => $popular_books
         ];
 

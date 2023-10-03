@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Video;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\StoreVideoRequest;
+use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\UpdateVideoRequest;
+use App\Models\OpenedVideo;
 
 class VideoController extends Controller
 {
@@ -43,6 +45,16 @@ class VideoController extends Controller
 
             $video->categories = $categories;
         }
+
+        $sub_level = $video->subscription_level;
+        if($sub_level > 0){
+            $package = SubscriptionPackage::where('level', $sub_level)->first();
+            $subscription_level = $package->package;
+        } else {
+            $subscription_level = "Basic";
+        }
+
+        $video->subscription_level = $subscription_level;
 
         return $video;
     }
@@ -94,6 +106,28 @@ class VideoController extends Controller
             'status' => 'success',
             'message' => 'Videos fetched successfully',
             'data' => $videos
+        ], 200);
+    }
+
+    public function summary(){
+        $total_video = Video::count();
+        $total_views = OpenedVideo::get()->sum('frequency');
+        $popular_video = Video::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'desc')->limit(5)->get();
+
+        foreach($popular_video as $video){
+            $video = self::video($video);
+        }
+
+        $data = [
+            'total_video' => number_format($total_video),
+            'total_views' => number_format($total_views),
+            'popular_video' => $popular_video
+        ];
+
+        return response([
+            'status' => 'success',
+            'message' => 'Video Summary fetched',
+            'data' => $data
         ], 200);
     }
 
