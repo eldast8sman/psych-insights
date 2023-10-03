@@ -60,7 +60,7 @@ class SubscriptionPackageController extends Controller
         if($packages->count() > 0){
             foreach($packages->get() as $package){
                 $subs = CurrentSubscription::where('subscription_package_id', $package->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->count();
-                $percentage = ($subs / $total_users) * 100;
+                $percentage = ($total_users > 0) ? ($subs / $total_users) * 100 : "No User";
                 $percent_total += $percentage;
                 $subscription_summary[] = [
                     'package' => $package->package,
@@ -71,7 +71,7 @@ class SubscriptionPackageController extends Controller
 
         $subscription_summary[] = [
             'package' => 'Basic',
-            'percentage' => 100 - $percent_total
+            'percentage' => ($total_users > 0) ? (100 - $percent_total) : "No User"
         ];
 
         $recent_subscribers = CurrentSubscription::orderBy('updated_at', 'desc')->get();
