@@ -14,6 +14,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DailyTipController;
 use App\Http\Controllers\Admin\InterestController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\DassQuestionController;
@@ -218,6 +219,22 @@ Route::prefix('admin')->group(function(){
             Route::get('/interests/{interest}', 'show')->name('admin.interest.show');
             Route::put('/interests/{interest}', 'update')->name('admin.interest.update');
             Route::delete('/interests/{interest}', 'destroy')->name('admin.interest.delete');
+        });
+
+        Route::controller(DailyQuoteController::class)->group(function(){
+            Route::get('/daily-quotes', 'index')->name('admin.dailyQuote.index');
+            Route::post('/daily-quotes', 'store')->name('admin.dailyQuote.store');
+            Route::get('/daily-quotes/{quote}', 'show')->name('admin.dailyQuote.show');
+            Route::put('/daily-quotes/{quote}', 'update')->name('admin.dailyQuote.update');
+            Route::delete('/daily-quotes/{quote}', 'destroy')->name('admin.dailyQuote.delete');
+        });
+
+        Route::controller(DailyTipController::class)->group(function(){
+            Route::get('/daily-tips', 'index')->name('admin.dailyTip.index');
+            Route::post('/daily-tips', 'store')->name('admin.dailyTip.store');
+            Route::get('/daily-tips/{tip}', 'show')->name('admin.dailyTip.show');
+            Route::put('/daily-tips/{tip}', 'update')->name('admin.dailyTip.update');
+            Route::delete('/daily-tips/{tip}', 'destroy')->name('admin.dailyTip.delete');
         });
     });
 });

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\DailyTip;
+use App\Models\DailyQuote;
 use App\Models\PaymentPlan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -60,6 +62,13 @@ class AuthController extends Controller
         ]);
 
         $user->email_verified = 0;
+        $daily_quote = DailyQuote::inRandomOrder()->first();
+        if(!empty($daily_quote)){
+            $user->daily_quote_id = $daily_quote->id;
+        }
+        if(!empty($daily_tip = DailyTip::inRandomOrder()->first())){
+            $user->daily_tip_id = $daily_tip->id;
+        }
         $user->save();
 
         $stripe = new StripeController();
@@ -128,6 +137,16 @@ class AuthController extends Controller
                 $token->delete();
             }
         }
+
+        $token = auth('user-api')->login($user);
+        $auth = [
+            'token' => $token,
+            'type' => 'Bearer',
+            'expiry' => auth('user-api')->factory()->getTTL() * 60
+        ];
+
+        $user = self::user_details($user);
+        $user->authrization = $auth;
 
         self::log_activity($user->id, 'activate_email');
 
@@ -217,6 +236,21 @@ class AuthController extends Controller
             $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit']);
         }
 
+        if(!empty($user->daily_quote_id)){
+            $user->daily_quote = DailyQuote::where('id', $user->daily_quote_id)->first(['quote', 'author']);
+        } else {
+            $user->daily_quote = null;
+        }
+
+        if(!empty($user->daily_tip_id)){
+            $user->daily_tip = DailyTip::where('id', $user->daily_tip_id)->first(['tip']);
+        } else {
+            $user->daily_tip = null;
+        }
+
+        unset($user->daily_quote_id);
+        unset($user->daily_tip_id);
+
         if(!empty($user->profile_photo)){
             $user->profile_photo = FileManagerController::fetch_file($user->profile_photo);
         }
@@ -236,6 +270,15 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        $daily_quote = DailyQuote::inRandomOrder()->first();
+        if(!empty($daily_quote)){
+            $user->daily_quote_id = $daily_quote->id;
+            $user->save();
+        }
+        if(!empty($daily_tip = DailyTip::inRandomOrder()->first())){
+            $user->daily_tip_id = $daily_tip->id;
+            $user->save();
+        }
         $user = self::user_details($user);
         $user->authorization = $auth;
 

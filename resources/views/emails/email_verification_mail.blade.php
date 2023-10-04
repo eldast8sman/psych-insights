@@ -35,7 +35,7 @@
       <tr>
         <td style="text-align: center">
           <a
-            href="{{ env('VERIFICATION_BASE') }}/thank-you.html?token={{ $token }}"
+            href="{{ env('FRONTEND_URL') }}/#verifyemail?token={{ $token }}"
             style="
               color: #ffffff;
               padding: 15px 55px;
