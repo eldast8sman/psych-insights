@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DailyTipController;
 use App\Http\Controllers\Admin\InterestController;
 use App\Http\Controllers\Admin\PromoCodeController;
+use App\Http\Controllers\Admin\DailyQuoteController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
