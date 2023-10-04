@@ -80,8 +80,7 @@ class DailyTipController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Tip deleted successfully',
-            'data' => $tip
+            'message' => 'Tip deleted successfully'
         ], 200);
     }
 }

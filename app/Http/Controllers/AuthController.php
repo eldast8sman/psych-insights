@@ -146,13 +146,14 @@ class AuthController extends Controller
         ];
 
         $user = self::user_details($user);
-        $user->authrization = $auth;
+        $user->authorization = $auth;
 
         self::log_activity($user->id, 'activate_email');
 
         return response([
             'status' => 'success',
-            'message' => 'Email Verified Successfully'
+            'message' => 'Email Verified Successfully',
+            'data' => $user
         ], 200);
     }
 
