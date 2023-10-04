@@ -49,6 +49,8 @@ class User extends Authenticatable implements JWTSubject
         'email_verified',
         'profile_photo',
         'interests',
+        'daily_quote_id',
+        'daily_tip_id',
         'last_login',
         'prev_login',
         'status'
