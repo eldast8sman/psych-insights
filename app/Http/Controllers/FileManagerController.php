@@ -36,6 +36,8 @@ class FileManagerController extends Controller
             $path = 'audios';
         } elseif(($extension == 'mp4') || ($extension == 'mpeg4') || ($extension == 'avi') || ($extension == 'mov') || ($extension == 'mkv')){
             $path = 'videos';
+        } else {
+            $path = 'others';
         }
         $upload = Storage::disk($disk)->putFileAs($path, $file, $filename);
         if(!$upload){
