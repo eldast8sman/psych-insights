@@ -30,7 +30,7 @@
       <tr>
         <td style="text-align: center">
           <a
-            href="{{ env('FRONTEND_URL') }}/#step2?token={{ $token }}"
+            href="{{ env('FRONTEND_URL') }}/?forgetToken={{ $token }}"
             style="
               color: #ffffff;
               padding: 15px 55px;

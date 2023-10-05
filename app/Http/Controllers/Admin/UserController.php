@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\FileManager;
+use Illuminate\Http\Request;
 use App\Models\CurrentSubscription;
 use App\Models\SubscriptionPackage;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -71,6 +72,12 @@ class UserController extends Controller
                     $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
                 }
             }
+            if(!empty($user->profile_photo)){
+                $photo = FileManager::find($user->profile_photo);
+                $user->profile_photo = $photo->url;
+            } else {
+                $user->profile_photo = null;
+            }
         }
 
         return response([
@@ -94,6 +101,12 @@ class UserController extends Controller
             } else {
                 $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
             }
+        }
+        if(!empty($user->profile_photo)){
+            $photo = FileManager::find($user->profile_photo);
+            $user->profile_photo = $photo->url;
+        } else {
+            $user->profile_photo = null;
         }
         $user->recent_activity = ActivityLog::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use stdClass;
 use App\Models\User;
+use App\Models\FileManager;
 use App\Models\PaymentPlan;
 use Illuminate\Http\Request;
 use App\Models\CurrentSubscription;
@@ -41,6 +42,13 @@ class SubscriptionPackageController extends Controller
         foreach($subscribers as $subscriber){
             $user = User::find($subscriber->user_id);
             $subscriber->subscriber = $user->name;
+            $subscriber->email = $user->email;
+            if(empty($user->profile_photo)){
+                $subscriber->profile_photo = null;
+            } else {
+                $photo = FileManager::find($user->profile_photo);
+                $subscriber->profile_photo = $photo->url;
+            }
             $subscriber->subscription_package = SubscriptionPackage::find($subscriber->subscription_package_id);
         }
 
