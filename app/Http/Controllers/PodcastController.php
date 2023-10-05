@@ -161,7 +161,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Recommended Podcast',
-                'data' => []
+                'data' => $rec_podcasts->paginate($limit)
             ], 200);
         }
 
@@ -207,7 +207,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Podcast was found',
-                'data' => []
+                'data' => self::paginate_array($podcasts, $limit, $page)
             ], 200);
         }
 
@@ -289,7 +289,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Podcast',
-                'data' => []
+                'data' => $opened_podcasts->paginate($limit)
             ], 200);
         }
 
@@ -336,7 +336,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Podcast was found',
-                'data' => []
+                'data' => self::paginate_array($podcasts, $limit, $page)
             ], 200);
         }
 
@@ -421,7 +421,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Favourite Podcast',
-                'data' => []
+                'data' => $fav_podcasts->paginate($limit)
             ], 200);
         }
 
@@ -467,7 +467,7 @@ class PodcastController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Podcast was found',
-                'data' => []
+                'data' => self::paginate_array($podcasts, $limit, $page)
             ], 200);
         }
 
