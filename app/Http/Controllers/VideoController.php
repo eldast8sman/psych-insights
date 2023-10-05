@@ -164,7 +164,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Recommended Video',
-                'data' => []
+                'data' => $rec_videos->paginate($limit)
             ], 200);
         }
 
@@ -211,7 +211,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Video was found',
-                'data' => []
+                'data' => self::paginate_array(array_values($videos), $limit, $page)
             ], 200);
         }
 
@@ -294,7 +294,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Video',
-                'data' => []
+                'data' => $opened_videos->paginate($limit)
             ], 200);
         }
 
@@ -341,7 +341,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Video was found',
-                'data' => []
+                'data' => self::paginate_array(array_values($videos), $limit, $page)
             ], 200);
         }
 
@@ -426,7 +426,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Favourite Video',
-                'data' => []
+                'data' => $fav_videos->paginate($limit)
             ], 200);
         }
 
@@ -473,7 +473,7 @@ class VideoController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Video was found',
-                'data' => []
+                'data' => self::paginate_array(array_values($videos), $limit, $page)
             ], 200);
         }
 

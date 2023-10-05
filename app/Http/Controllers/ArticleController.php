@@ -163,7 +163,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Recommended Article',
-                'data' => []
+                'data' => $rec_articles->paginate($limit)
             ], 200);
         }
 
@@ -209,7 +209,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Article was found',
-                'data' => []
+                'data' => self::paginate_array($articles, $limit, $page)
             ], 200);
         }
 
@@ -292,7 +292,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Article',
-                'data' => []
+                'data' => $opened_articles->paginate($limit)
             ], 200);
         }
 
@@ -338,7 +338,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Article was found',
-                'data' => []
+                'data' => self::paginate_array($articles, $limit, $page)
             ], 200);
         }
 
@@ -423,7 +423,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Favourite Article',
-                'data' => []
+                'data' => $fav_articles->paginate($limit)
             ], 200);
         }
 
@@ -469,7 +469,7 @@ class ArticleController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Article was found',
-                'data' => []
+                'data' => self::paginate_array($articles, $limit, $page)
             ], 200);
         }
 

@@ -162,7 +162,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Recommended Book',
-                'data' => []
+                'data' => $rec_books->paginate($limit)
             ], 200);
         }
 
@@ -208,7 +208,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Book was found',
-                'data' => []
+                'data' => self::paginate_array($books, $limit, $page)
             ], 200);
         }
 
@@ -290,7 +290,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Book',
-                'data' => []
+                'data' => $opened_books->paginate($limit)
             ], 200);
         }
 
@@ -336,7 +336,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Book was found',
-                'data' => []
+                'data' => self::paginate_array($books, $limit, $page)
             ], 200);
         }
 
@@ -421,7 +421,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Favourite Book',
-                'data' => []
+                'data' => $fav_books->paginate($limit)
             ], 200);
         }
 
@@ -467,7 +467,7 @@ class BookController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Book was found',
-                'data' => []
+                'data' => self::paginate_array($books, $limit, $page)
             ], 200);
         }
 

@@ -161,7 +161,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Recommended Audio',
-                'data' => []
+                'data' => $rec_audios->paginate($limit)
             ], 200);
         }
 
@@ -207,7 +207,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Audio was found',
-                'data' => []
+                'data' => self::paginate_array($audios, $limit, $page)
             ], 200);
         }
 
@@ -290,7 +290,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Audio',
-                'data' => []
+                'data' => $opened_audios->paginate($limit)
             ], 200);
         }
 
@@ -336,7 +336,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Audio was found',
-                'data' => []
+                'data' => self::paginate_array($audios, $limit, $page)
             ], 200);
         }
 
