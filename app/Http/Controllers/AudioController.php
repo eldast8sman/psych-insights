@@ -421,7 +421,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Favourite Audio',
-                'data' => []
+                'data' => $fav_audios->paginate($limit)
             ], 200);
         }
 
@@ -467,7 +467,7 @@ class AudioController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Audio was found',
-                'data' => []
+                'data' => self::paginate_array($audios, $limit, $page)
             ], 200);
         }
 
