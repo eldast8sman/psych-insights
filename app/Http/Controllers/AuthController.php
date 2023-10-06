@@ -253,7 +253,9 @@ class AuthController extends Controller
         unset($user->daily_tip_id);
 
         if(!empty($user->profile_photo)){
-            $user->profile_photo = FileManagerController::fetch_file($user->profile_photo);
+            $user->profile_photo = FileManagerController::fetch_file($user->profile_photo)->url;
+        } else {
+            $user->profile_photo = "";
         }
 
         $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
