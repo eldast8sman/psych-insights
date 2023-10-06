@@ -20,7 +20,7 @@ class DailyQuestionController extends Controller
     }
 
     public function fetch_questions(){
-        $answered = DailyQuestionAnswer::where('answer_date', date('Y-m-d'));
+        $answered = DailyQuestionAnswer::where('user_id', $this->user->id)->where('answer_date', date('Y-m-d'));
         if($answered->count() < 1){
             $fetch = true;
         } else {
@@ -55,7 +55,7 @@ class DailyQuestionController extends Controller
     }
 
     public function answer_questions(AnswerDailyQuestionRequest $request){
-        $answered = DailyQuestionAnswer::where('answer_date', date('Y-m-d'));
+        $answered = DailyQuestionAnswer::where('user_id', $this->user->id)->where('answer_date', date('Y-m-d'));
         if($answered->count() < 1){
             $fetch = true;
         } else {
