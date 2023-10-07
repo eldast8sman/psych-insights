@@ -212,8 +212,8 @@ class DassQuestionController extends Controller
         $highest_cat_id = array_shift($highest_category_id);
         $highest_cat = array_shift($highest_category);
 
-        $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 7));
-        // $next_question = date('Y-m-d');
+        // $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 7));
+        $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
             'user_id' => $this->user->id,
