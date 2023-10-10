@@ -124,7 +124,7 @@ class VideoController extends Controller
         return true;
     }
 
-    public function fetch_video(Video $video) : Video
+    public function fetch_video(Video $video, $user_id) : Video
     {
         if(!empty($video->photo)){
             $video->photo = FileManagerController::fetch_file($video->photo);
@@ -146,6 +146,8 @@ class VideoController extends Controller
 
             $video->categories = $categories;
         }
+
+        $video->favourited = !empty(FavouriteResource::where('resource_id', $video->id)->where('user_id', $user_id)->where('type', 'video')->first()) ? true : false;
 
         unset($video->created_at);
         unset($video->updated_at);
@@ -174,7 +176,7 @@ class VideoController extends Controller
             foreach($rec_videos as $rec_video){
                 $video = Video::find($rec_video->video_id);
                 if(!empty($video) && ($video->status == 1)){
-                    $videos[] = $this->fetch_video($video);
+                    $videos[] = $this->fetch_video($video, $this->user->id);
                 }
             }
         } else {
@@ -201,7 +203,7 @@ class VideoController extends Controller
                 foreach($keys as $key){
                     $video = Video::find($key);
                     if(!empty($video) and ($video->status == 1)){
-                        $videos[] = $this->fetch_video($video);
+                        $videos[] = $this->fetch_video($video, $this->user->id);
                     }
                 }
             }
@@ -242,7 +244,7 @@ class VideoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Video fetched successfully',
-            'data' => $this->fetch_video($video)
+            'data' => $this->fetch_video($video, $this->user->id)
         ], 200);
     }
 
@@ -304,7 +306,7 @@ class VideoController extends Controller
             foreach($opened_videos as $opened_video){
                 $video = Video::find($opened_video->video_id);
                 if(!empty($video) && ($video->status == 1)){
-                    $videos[] = $this->fetch_video($video);
+                    $videos[] = $this->fetch_video($video, $this->user->id);
                 }
             }
         } else {
@@ -331,7 +333,7 @@ class VideoController extends Controller
                 foreach($keys as $key){
                     $video = Video::find($key);
                     if(!empty($video) and ($video->status == 1)){
-                        $videos[] = $this->fetch_video($video);
+                        $videos[] = $this->fetch_video($video, $this->user->id);
                     }
                 }
             }
@@ -380,7 +382,7 @@ class VideoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Video fetched successfully',
-            'data' => $this->fetch_video($video)
+            'data' => $this->fetch_video($video, $this->user->id)
         ], 200);
     }
 
@@ -436,7 +438,7 @@ class VideoController extends Controller
             foreach($fav_videos as $fav_video){
                 $video = Video::find($fav_video->resource_id);
                 if(!empty($video) && ($video->status == 1)){
-                    $videos[] = $this->fetch_video($video);
+                    $videos[] = $this->fetch_video($video, $this->user->id);
                 }
             }
         } else {
@@ -463,7 +465,7 @@ class VideoController extends Controller
                 foreach($keys as $key){
                     $video = Video::find($key);
                     if(!empty($video) and ($video->status == 1)){
-                        $videos[] = $this->fetch_video($video);
+                        $videos[] = $this->fetch_video($video, $this->user->id);
                     }
                 }
             }
@@ -512,7 +514,7 @@ class VideoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Video fetched successfully',
-            'data' => $this->fetch_video($video)
+            'data' => $this->fetch_video($video, $this->user->id)
         ], 200);
     }
 }

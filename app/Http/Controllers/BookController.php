@@ -125,7 +125,7 @@ class BookController extends Controller
         return true;
     }
 
-    public static function fetch_book(Book $book) : Book
+    public static function fetch_book(Book $book, $user_id) : Book
     {
         if(!empty($book->book_cover)){
             $book->book_cover = FileManagerController::fetch_file($book->book_cover);
@@ -144,6 +144,8 @@ class BookController extends Controller
 
             $book->categories = $categories;
         }
+
+        $book->favourited = !empty(FavouriteResource::where('resource_id', $book->id)->where('user_id', $user_id)->where('type', 'book')->first()) ? true : false;
 
         unset($book->id);
         unset($book->created_at);
@@ -172,7 +174,7 @@ class BookController extends Controller
             foreach($rec_books as $rec_book){
                 $book = Book::find($rec_book->book_id);
                 if(!empty($book) && ($book->status == 1)){
-                    $books[] = $this->fetch_book($book);
+                    $books[] = $this->fetch_book($book, $this->user->id);
                 }
             }
         } else {
@@ -198,7 +200,7 @@ class BookController extends Controller
                 foreach($keys as $key){
                     $book = Book::find($key);
                     if(!empty($book) and ($book->status == 1)){
-                        $books[] = $this->fetch_book($book);
+                        $books[] = $this->fetch_book($book, $this->user->id);
                     }
                 }
             }
@@ -239,7 +241,7 @@ class BookController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Book fetched successfully',
-            'data' => $this->fetch_book($book)
+            'data' => $this->fetch_book($book, $this->user->id)
         ], 200);
     }
 
@@ -300,7 +302,7 @@ class BookController extends Controller
             foreach($opened_books as $opened_book){
                 $book = Book::find($opened_book->book_id);
                 if(!empty($book) && ($book->status == 1)){
-                    $books[] = $this->fetch_book($book);
+                    $books[] = $this->fetch_book($book, $this->user->id);
                 }
             }
         } else {
@@ -326,7 +328,7 @@ class BookController extends Controller
                 foreach($keys as $key){
                     $book = Book::find($key);
                     if(!empty($book) and ($book->status == 1)){
-                        $books[] = $this->fetch_book($book);
+                        $books[] = $this->fetch_book($book, $this->user->id);
                     }
                 }
             }
@@ -375,7 +377,7 @@ class BookController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Book fetched successfully',
-            'data' => $this->fetch_book($book)
+            'data' => $this->fetch_book($book, $this->user->id)
         ], 200);
     }
 
@@ -431,7 +433,7 @@ class BookController extends Controller
             foreach($fav_books as $fav_book){
                 $book = Book::find($fav_book->resource_id);
                 if(!empty($book) && ($book->status == 1)){
-                    $books[] = $this->fetch_book($book);
+                    $books[] = $this->fetch_book($book, $this->user->id);
                 }
             }
         } else {
@@ -457,7 +459,7 @@ class BookController extends Controller
                 foreach($keys as $key){
                     $book = Book::find($key);
                     if(!empty($book) and ($book->status == 1)){
-                        $books[] = $this->fetch_book($book);
+                        $books[] = $this->fetch_book($book, $this->user->id);
                     }
                 }
             }
@@ -506,7 +508,7 @@ class BookController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Book fetched successfully',
-            'data' => $this->fetch_book($book)
+            'data' => $this->fetch_book($book, $this->user->id)
         ], 200);
     }
 }

@@ -124,7 +124,7 @@ class PodcastController extends Controller
         return true;
     }
 
-    public static function fetch_podcast(Podcast $podcast) : Podcast
+    public static function fetch_podcast(Podcast $podcast, $user_id) : Podcast
     {
         if(!empty($podcast->cover_art)){
             $podcast->cover_art = FileManagerController::fetch_file($podcast->cover_art);
@@ -143,6 +143,8 @@ class PodcastController extends Controller
 
             $podcast->categories = $categories;
         }
+
+        $podcast->favourited = !empty(FavouriteResource::where('resource_id', $podcast->id)->where('user_id', $user_id)->where('type', 'podcast')->first()) ? true : false;
 
         unset($podcast->id);
         unset($podcast->created_at);
@@ -171,7 +173,7 @@ class PodcastController extends Controller
             foreach($rec_podcasts as $rec_podcast){
                 $podcast = Podcast::find($rec_podcast->podcast_id);
                 if(!empty($podcast) && ($podcast->status == 1)){
-                    $podcasts[] = $this->fetch_podcast($podcast);
+                    $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                 }
             }
         } else {
@@ -197,7 +199,7 @@ class PodcastController extends Controller
                 foreach($keys as $key){
                     $podcast = Podcast::find($key);
                     if(!empty($podcast) and ($podcast->status == 1)){
-                        $podcasts[] = $this->fetch_podcast($podcast);
+                        $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                     }
                 }
             }
@@ -238,7 +240,7 @@ class PodcastController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Podcast fetched successfully',
-            'data' => $this->fetch_podcast($podcast)
+            'data' => $this->fetch_podcast($podcast, $this->user->id)
         ], 200);
     }
 
@@ -299,7 +301,7 @@ class PodcastController extends Controller
             foreach($opened_podcasts as $opened_podcast){
                 $podcast = Podcast::find($opened_podcast->podcast_id);
                 if(!empty($podcast) && ($podcast->status == 1)){
-                    $podcasts[] = $this->fetch_podcast($podcast);
+                    $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                 }
             }
         } else {
@@ -325,7 +327,7 @@ class PodcastController extends Controller
                 foreach($keys as $key){
                     $podcast = Podcast::find($key);
                     if(!empty($podcast) and ($podcast->status == 1)){
-                        $podcasts[] = $this->fetch_podcast($podcast);
+                        $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                     }
                 }
             }
@@ -375,7 +377,7 @@ class PodcastController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Podcast fetched successfully',
-            'data' => $this->fetch_podcast($podcast)
+            'data' => $this->fetch_podcast($podcast, $this->user->id)
         ], 200);
     }
 
@@ -431,7 +433,7 @@ class PodcastController extends Controller
             foreach($fav_podcasts as $fav_podcast){
                 $podcast = Podcast::find($fav_podcast->resource_id);
                 if(!empty($podcast) && ($podcast->status == 1)){
-                    $podcasts[] = $this->fetch_podcast($podcast);
+                    $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                 }
             }
         } else {
@@ -457,7 +459,7 @@ class PodcastController extends Controller
                 foreach($keys as $key){
                     $podcast = Podcast::find($key);
                     if(!empty($podcast) and ($podcast->status == 1)){
-                        $podcasts[] = $this->fetch_podcast($podcast);
+                        $podcasts[] = $this->fetch_podcast($podcast, $this->user->id);
                     }
                 }
             }
@@ -506,7 +508,7 @@ class PodcastController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Podcast fetched successfully',
-            'data' => $this->fetch_podcast($podcast)
+            'data' => $this->fetch_podcast($podcast, $this->user->id)
         ], 200);
     }
 }
