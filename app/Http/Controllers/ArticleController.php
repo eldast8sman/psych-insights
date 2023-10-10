@@ -126,7 +126,7 @@ class ArticleController extends Controller
         return true;
     }
 
-    public static function fetch_article(Article $article) : Article
+    public static function fetch_article(Article $article, $user_id) : Article
     {
         if(!empty($article->photo)){
             $article->photo = FileManagerController::fetch_file($article->photo);
@@ -145,6 +145,8 @@ class ArticleController extends Controller
 
             $article->categories = $categories;
         }
+
+        $article->favourited = !empty(FavouriteResource::where('resource_id', $article->id)->where('user_id', $user_id)->where('type', 'article')->first()) ? true : false;
 
         unset($article->created_at);
         unset($article->updated_at);
@@ -173,7 +175,7 @@ class ArticleController extends Controller
             foreach($rec_articles as $rec_article){
                 $article = Article::find($rec_article->article_id);
                 if(!empty($article) && ($article->status == 1)){
-                    $articles[] = $this->fetch_article($article);
+                    $articles[] = $this->fetch_article($article, $this->user->id);
                 }
             }
         } else {
@@ -199,7 +201,7 @@ class ArticleController extends Controller
                 foreach($keys as $key){
                     $article = Article::find($key);
                     if(!empty($article) and ($article->status == 1)){
-                        $articles[] = $this->fetch_article($article);
+                        $articles[] = $this->fetch_article($article, $this->user->id);
                     }
                 }
             }
@@ -240,7 +242,7 @@ class ArticleController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Article fetched successfully',
-            'data' => $this->fetch_article($article)
+            'data' => $this->fetch_article($article, $this->user->id)
         ], 200);
     }
 
@@ -302,7 +304,7 @@ class ArticleController extends Controller
             foreach($opened_articles as $opened_article){
                 $article = Article::find($opened_article->article_id);
                 if(!empty($article) && ($article->status == 1)){
-                    $articles[] = $this->fetch_article($article);
+                    $articles[] = $this->fetch_article($article, $this->user->id);
                 }
             }
         } else {
@@ -328,7 +330,7 @@ class ArticleController extends Controller
                 foreach($keys as $key){
                     $article = Article::find($key);
                     if(!empty($article) and ($article->status == 1)){
-                        $articles[] = $this->fetch_article($article);
+                        $articles[] = $this->fetch_article($article, $this->user->id);
                     }
                 }
             }
@@ -377,7 +379,7 @@ class ArticleController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Article fetched successfully',
-            'data' => $this->fetch_article($article)
+            'data' => $this->fetch_article($article, $this->user->id)
         ], 200);
     }
 
@@ -433,7 +435,7 @@ class ArticleController extends Controller
             foreach($fav_articles as $fav_article){
                 $article = Article::find($fav_article->resource_id);
                 if(!empty($article) && ($article->status == 1)){
-                    $articles[] = $this->fetch_article($article);
+                    $articles[] = $this->fetch_article($article, $this->user->id);
                 }
             }
         } else {
@@ -459,7 +461,7 @@ class ArticleController extends Controller
                 foreach($keys as $key){
                     $article = Article::find($key);
                     if(!empty($article) and ($article->status == 1)){
-                        $articles[] = $this->fetch_article($article);
+                        $articles[] = $this->fetch_article($article, $this->user->id);
                     }
                 }
             }
@@ -508,7 +510,7 @@ class ArticleController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Article fetched successfully',
-            'data' => $this->fetch_article($article)
+            'data' => $this->fetch_article($article, $this->user->id)
         ], 200);
     }
 }

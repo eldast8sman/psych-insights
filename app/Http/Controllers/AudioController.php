@@ -124,7 +124,7 @@ class AudioController extends Controller
         return true;
     }
 
-    public function fetch_audio(Audio $audio) : Audio
+    public function fetch_audio(Audio $audio, $user_id) : Audio
     {
         if(!empty($audio->audio)){
             $audio->audio = FileManagerController::fetch_file($audio->audio);
@@ -143,6 +143,8 @@ class AudioController extends Controller
 
             $audio->categories = $categories;
         }
+
+        $audio->favourited = !empty(FavouriteResource::where('resource_id', $audio->id)->where('user_id', $this->user->id)->where('type', 'audio')->first()) ? true : false;
 
         unset($audio->created_at);
         unset($audio->updated_at);
@@ -171,7 +173,7 @@ class AudioController extends Controller
             foreach($rec_audios as $rec_audio){
                 $audio = Audio::find($rec_audio->audio_id);
                 if(!empty($audio) && ($audio->status == 1)){
-                    $audios[] = $this->fetch_audio($audio);
+                    $audios[] = $this->fetch_audio($audio, $this->user->id);
                 }
             }
         } else {
@@ -197,7 +199,7 @@ class AudioController extends Controller
                 foreach($keys as $key){
                     $audio = Audio::find($key);
                     if(!empty($audio) and ($audio->status == 1)){
-                        $audios[] = $this->fetch_audio($audio);
+                        $audios[] = $this->fetch_audio($audio, $this->user->id);
                     }
                 }
             }
@@ -238,7 +240,7 @@ class AudioController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Audio fetched successfully',
-            'data' => $this->fetch_audio($audio)
+            'data' => $this->fetch_audio($audio, $this->user->id)
         ], 200);
     }
 
@@ -300,7 +302,7 @@ class AudioController extends Controller
             foreach($opened_audios as $opened_audio){
                 $audio = Audio::find($opened_audio->audio_id);
                 if(!empty($audio) && ($audio->status == 1)){
-                    $audios[] = $this->fetch_audio($audio);
+                    $audios[] = $this->fetch_audio($audio, $this->user->id);
                 }
             }
         } else {
@@ -326,7 +328,7 @@ class AudioController extends Controller
                 foreach($keys as $key){
                     $audio = Audio::find($key);
                     if(!empty($audio) and ($audio->status == 1)){
-                        $audios[] = $this->fetch_audio($audio);
+                        $audios[] = $this->fetch_audio($audio, $this->user->id);
                     }
                 }
             }
@@ -375,7 +377,7 @@ class AudioController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Audio fetched successfully',
-            'data' => $this->fetch_audio($audio)
+            'data' => $this->fetch_audio($audio, $this->user->id)
         ], 200);
     }
 
@@ -431,7 +433,7 @@ class AudioController extends Controller
             foreach($fav_audios as $fav_audio){
                 $audio = Audio::find($fav_audio->resource_id);
                 if(!empty($audio) && ($audio->status == 1)){
-                    $audios[] = $this->fetch_audio($audio);
+                    $audios[] = $this->fetch_audio($audio, $this->user->id);
                 }
             }
         } else {
@@ -457,7 +459,7 @@ class AudioController extends Controller
                 foreach($keys as $key){
                     $audio = Audio::find($key);
                     if(!empty($audio) and ($audio->status == 1)){
-                        $audios[] = $this->fetch_audio($audio);
+                        $audios[] = $this->fetch_audio($audio, $this->user->id);
                     }
                 }
             }
@@ -506,7 +508,7 @@ class AudioController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Audio fetched successfully',
-            'data' => $this->fetch_audio($audio)
+            'data' => $this->fetch_audio($audio, $this->user->id)
         ], 200);
     }
 }
