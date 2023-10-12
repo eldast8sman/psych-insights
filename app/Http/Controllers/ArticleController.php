@@ -21,7 +21,7 @@ class ArticleController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_articles($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_articles($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_articles = RecommendedArticle::where('user_id', $user_id);
         if($rec_articles->count() > 0){
             foreach($rec_articles->get() as $rec_article){
@@ -72,6 +72,45 @@ class ArticleController extends Controller
                         }
                     } else {
                         break;
+                    }
+                }
+            }
+
+            $counting = count($articles_id);
+            if(($counting < $limit) and (Article::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+                $s_articles = Article::where('status', 1)->where('subscription_level', '<=', $level);
+                if(!empty($articles_id)){
+                    foreach($articles_id as $article_id){
+                        $s_articles = $s_articles->where('id', '<>', $article_id->id);
+                    }
+                }
+                $s_articles = $s_articles->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                foreach($s_articles as $article){
+                    if(count($articles_id) < $limit){
+                        $categories = explode(',', $article->categories);
+                        if(in_array($sec_cat_id, $categories) and !in_array($article->id, $opened_articles)){
+                            $articles_id[] = $article;
+                            $ids[] = $article->id;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(count($articles_id) < $limit){
+                    foreach($opened_articles as $opened_article){
+                        if(count($articles_id) < $limit){
+                            $article = Article::find($opened_article);
+                            if(!empty($article) && ($article->status == 1) and ($article->subscription_level <= $level)){
+                                $categories = explode(',', $article->categories);
+                                if(in_array($sec_cat_id, $categories)){
+                                    $articles_id[] = $article;
+                                    $ids[] = $article->id;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
             }

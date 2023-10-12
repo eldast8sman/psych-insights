@@ -20,6 +20,8 @@ class QuestionAnswerSummary extends Model
         'category_scores',
         'highest_category_id',
         'highest_category',
+        'second_highest_category_id',
+        'second_highest_category',
         'next_question'
     ];
 

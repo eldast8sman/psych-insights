@@ -21,7 +21,7 @@ class BookController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_books($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_books($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_books = RecommendedBook::where('user_id', $user_id);
         if($rec_books->count() > 0){
             foreach($rec_books->get() as $rec_book){
@@ -71,6 +71,45 @@ class BookController extends Controller
                         }
                     } else {
                         break;
+                    }
+                }
+            }
+
+            $counting = count($books_id);
+            if(($counting < $limit) and (Book::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+                $s_books = Book::where('status', 1)->where('subscription_level', '<=', $level);
+                if(!empty($books_id)){
+                    foreach($books_id as $book_id){
+                        $s_books = $s_books->where('id', '<>', $book_id->id);
+                    }
+                }
+                $s_books = $s_books->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                foreach($s_books as $book){
+                    if(count($books_id) < $limit){
+                        $categories = explode(',', $book->categories);
+                        if(in_array($sec_cat_id, $categories) and !in_array($book->id, $opened_books)){
+                            $books_id[] = $book;
+                            $ids[] = $book->id;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(count($books_id) < $limit){
+                    foreach($opened_books as $opened_book){
+                        if(count($books_id) < $limit){
+                            $book = Book::find($opened_book);
+                            if(!empty($book) and ($book->status == 1) and ($book->subscription_level <= $level)){
+                                $categories = explode(',', $book->categories);
+                                if(in_array($sec_cat_id, $categories)){
+                                    $books_id[] = $book;
+                                    $ids[] = $book->id;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
             }

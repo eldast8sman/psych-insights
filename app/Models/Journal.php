@@ -11,6 +11,9 @@ class Journal extends Model
 
     protected $fillable = [
         'user_id',
-        'journal'
+        'title',
+        'journal',
+        'color',
+        'pinned'
     ];
 }
