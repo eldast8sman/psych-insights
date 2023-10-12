@@ -344,9 +344,11 @@ Route::middleware('auth:user-api')->group(function(){
 
     Route::controller(JournalController::class)->group(function(){
         Route::get('/journals', 'index')->name('journal.index');
+        Route::get('/pinned-journals', 'pinned_journals')->name('journal.pinned');
         Route::post('/journals', 'store')->name('journal.store');
         Route::get('/journals/{journal}', 'show')->name('journal.show');
         Route::put('/journals/{journal}', 'update')->name('journal.update');
+        Route::get('/journals/{journal}/pin', 'pin_journal')->name('journal.pin');
         Route::delete('/journals/{journal}', 'destroy')->name('journal.delete');
     });
 });
