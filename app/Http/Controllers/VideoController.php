@@ -21,7 +21,7 @@ class VideoController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_videos($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_videos($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_videos = RecommendedVideo::where('user_id', $user_id);
         if($rec_videos->count() > 0){
             foreach($rec_videos->get() as $rec_video){
@@ -70,6 +70,45 @@ class VideoController extends Controller
                         }
                     } else {
                         break;
+                    }
+                }
+            }
+
+            $counting = count($videos_id);
+            if(($counting < $limit) and (Video::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+                $s_videos = Video::where('status', 1)->where('subscription_level', '<=', $level);
+                if(!empty($videos_id)){
+                    foreach($videos_id as $video_id){
+                        $s_videos = $s_videos->where('id', '<>', $video_id->id);
+                    }
+                }
+                $s_videos = $s_videos->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                foreach($s_videos as $video){
+                    if(count($videos_id) < $limit){
+                        $categories = explode(',', $video->categories);
+                        if(in_array($sec_cat_id, $categories) and !in_array($video->id, $opened_videos)){
+                            $videos_id[] = $video;
+                            $ids[] = $video->id;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(count($videos_id) < $limit){
+                    foreach($opened_videos as $opened_video){
+                        if(count($videos_id) < $limit){
+                            $video = Video::find($opened_video);
+                            if(!empty($video) and ($video->status == 1) and ($video->subscription_level <= $level)){
+                                $categories = explode(',', $video->categories);
+                                if(in_array($sec_cat_id, $categories)){
+                                    $videos_id[] = $video;
+                                    $ids[] = $video->id;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
             }

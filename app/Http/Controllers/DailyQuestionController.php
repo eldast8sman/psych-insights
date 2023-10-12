@@ -70,11 +70,13 @@ class DailyQuestionController extends Controller
         }
 
         $category_scores = [];
+        $category_total = [];
         $answers = [];
 
         foreach($request->answers as $answer){
             $question = DailyQuestion::find($answer['question_id']);
             $option = DailyQuestionOption::find($answer['option_id']);
+            $highest_value = DailyQuestionOption::where('daily_question_id', $question->id)->orderBy('value', 'desc')->first()->value;
 
             $ans = [
                 'question_id' => $question->id,
@@ -94,6 +96,10 @@ class DailyQuestionController extends Controller
                     } else {
                         $category_scores[$category->id] = $option->value;
                     }
+                    if(!isset($category_total[$category->id])){
+                        $category_total[$category->id] = 0;
+                    }
+                    $category_total[$category->id] += $highest_value;
                 }
             }
         }
@@ -104,7 +110,8 @@ class DailyQuestionController extends Controller
             $categ_scores[] = [
                 'category_id' => $category->id,
                 'category' => $category->category,
-                'value' => $value
+                'value' => $value,
+                'highest_value' => $category_total[$key]
             ];
         }
 

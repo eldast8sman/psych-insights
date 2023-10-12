@@ -21,7 +21,7 @@ class AudioController extends Controller
         $this->user = AuthController::user();
     }
 
-    public static function recommend_audios($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_audios($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_audios = RecommendedAudio::where('user_id', $user_id);
         if($rec_audios->count() > 0){
             foreach($rec_audios->get() as $rec_audio){
@@ -70,6 +70,45 @@ class AudioController extends Controller
                         }
                     } else {
                         break;
+                    }
+                }
+            }
+
+            $counting = count($audios_id);
+            if(($counting < $limit) and (Audio::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+                $s_audios = Audio::where('status', 1)->where('subscription_level', '<=', $level);
+                if(!empty($audios_id)){
+                    foreach($audios_id as $audio_id){
+                        $s_audios = $s_audios->where('id', '<>', $audio_id->id);
+                    }
+                }
+                $s_audios = $s_audios->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                foreach($s_audios as $audio){
+                    if(count($audios_id) < $limit){
+                        $categories = explode(',', $audio->categories);
+                        if(in_array($sec_cat_id, $categories) and !in_array($audio->id, $opened_audios)){
+                            $audios_id[] = $audio;
+                            $ids[] = $audio->id;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(count($audios_id) < $limit){
+                    foreach($opened_audios as $opened_audio){
+                        if(count($audios_id) < $limit){
+                            $audio = Audio::find($opened_audio);
+                            if(!empty($audio) && ($audio->status == 1) and ($audio->subscription_level <= $level)){
+                                $categories = explode(',', $audio->categories);
+                                if(in_array($sec_cat_id, $categories)){
+                                    $audios_id[] = $audio;
+                                    $ids[] = $audio->id;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
             }

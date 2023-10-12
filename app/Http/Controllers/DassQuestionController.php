@@ -114,9 +114,11 @@ class DassQuestionController extends Controller
         $total_score = 0;
         $k10_score = 0;
         $category_scores = [];
+        $category_total = [];
         $premium_scores = [];
         $answers = [];
-
+        
+        $highest_value = DassQuestionOption::orderBy('value', 'desc')->first()->value;
         foreach($request->answers as $answer){
             $question = DassQuestion::find($answer['question_id']);
             $option = DassQuestionOption::find($answer['option_id']);
@@ -137,6 +139,10 @@ class DassQuestionController extends Controller
                     } else {
                         $category_scores[$category->id] = $option->value;
                     }
+                    if(!isset($category_total[$category->id])){
+                        $category_total[$category->id] = 0;
+                    }
+                    $category_total[$category->id] += $highest_value;
 
                     if($category->premium_category == 1){
                         if(isset($premium_scores[$category->id])){
@@ -156,17 +162,19 @@ class DassQuestionController extends Controller
 
         $categ_scores = [];
         $prem_scores = [];
-        $score_list = [];
-        $highest_category_id = [];
-        $highest_category = [];
+        $percent_list = [];
+        $daily_percent_list = [];
 
         foreach($category_scores as $key=>$value){
             $category = Category::find($key);
+            $percentage = ($value / $category_total[$key]) * 100;
             $categ_scores[] = [
                 'category_id' => $category->id,
                 'category' => $category->category,
-                'value' => $value
+                'value' => $value,
+                'percentage' => $percentage
             ];
+            $percent_list[$key] = $percentage;
         }
 
         foreach($premium_scores as $key=>$value){
@@ -182,35 +190,45 @@ class DassQuestionController extends Controller
 
         $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
         if($uncomputeds->count() > 0){
+            $daily_score = [];
+            $daily_total = [];
             foreach($uncomputeds->get() as $uncomputed){
                 $scores = json_decode($uncomputed->category_scores, true);
                 foreach($scores as $score){
-                    $category_scores[$score['category_id']] += $score['value'];
+                    // $category_scores[$score['category_id']] += $score['value'];
+                    if(!isset($daily_score[$score['category_id']])){
+                        $daily_score[$score['category_id']] = 0;
+                    }
+                    $daily_score[$score['category_id']] += $score['value'];
+
+                    if(!isset($daily_total[$score['category_id']])){
+                        $daily_total[$score['category_id']] = 0;
+                    }
+                    $daily_total[$score['category_id']] += $score['highest_value'];
                 }
                 $uncomputed->computed = 1;
                 $uncomputed->save();
             }
-        }
 
-        foreach($category_scores as $key=>$value){
-            if(!isset($score_list[$value])){
-                $score_list[$value] = [];
+            foreach($daily_score as $key=>$value){
+                $daily_percent_list[$key] = ($daily_score[$key]/$daily_total[$key]) * 100;
             }
-            $score_list[$value][] = $key;
         }
 
-        krsort($score_list);
-
-        $highest = array_shift($score_list);
-
-        foreach($highest as $high){
-            $highest_category_id[] = $high;
-            $category = Category::find($high);
-            $highest_category[] = $category->category;
+        foreach($percent_list as $key=>$value){
+            if(isset($daily_percent_list[$key])){
+                $percent_list[$key] = ($value + $daily_percent_list[$key]) / 2;
+            }
         }
 
-        $highest_cat_id = array_shift($highest_category_id);
-        $highest_cat = array_shift($highest_category);
+        arsort($percent_list);
+        $cat_list = array_keys($percent_list);
+
+        $highest_cat_id = array_shift($cat_list);
+        $highest_cat = Category::find($highest_cat_id)->category;
+
+        $second_highest_cat_id = array_shift($cat_list);
+        $second_highest_category = Category::find($second_highest_cat_id)->category;
 
         $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 7));
         // $next_question = date('Y-m-d');
@@ -226,6 +244,8 @@ class DassQuestionController extends Controller
             'category_scores' => json_encode($categ_scores),
             'highest_category_id' => $highest_cat_id,
             'highest_category' => $highest_cat,
+            'second_highest_category_id' => $second_highest_cat_id,
+            'second_highest_category' => $second_highest_category,
             'next_question' => $next_question
         ]);
 

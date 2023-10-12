@@ -21,7 +21,7 @@ class PodcastController extends Controller
         $this->user = AuthController::user();
     }
     
-    public static function recommend_podcasts($limit, $user_id, $cat_id, $level=0){
+    public static function recommend_podcasts($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_podcasts = RecommendedPodcast::where('user_id', $user_id);
         if($rec_podcasts->count() > 0){
             foreach($rec_podcasts->get() as $rec_podcast){
@@ -70,6 +70,45 @@ class PodcastController extends Controller
                         }
                     } else {
                         break;
+                    }
+                }
+            }
+
+            $counting = count($podcasts_id);
+            if(($counting < $limit) and (Podcast::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+                $s_podcasts = Podcast::where('status', 1)->where('subscription_level', '<=', $level);
+                if(!empty($podcasts_id)){
+                    foreach($podcasts_id as $podcast_id){
+                        $s_podcasts = $s_podcasts->where('id', '<>', $podcast_id->id);
+                    }
+                }
+                $s_podcasts = $s_podcasts->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                foreach($s_podcasts as $podcast){
+                    if(count($podcasts_id) < $limit){
+                        $categories = explode(',', $podcast->categories);
+                        if(in_array($sec_cat_id, $categories) and !in_array($podcast->id, $opened_podcasts)){
+                            $podcasts_id[] = $podcast;
+                            $ids[] = $podcast->id;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(count($podcasts_id) < $limit){
+                    foreach($opened_podcasts as $opened_podcast){
+                        if(count($podcasts_id) < $limit){
+                            $podcast = Podcast::find($opened_podcast);
+                            if(!empty($podcast) and ($podcast->status == 1) and ($podcast->subscription_level <= $level)){
+                                $categories = explode(',', $podcast->categories);
+                                if(in_array($sec_cat_id, $categories)){
+                                    $podcasts_id[] = $podcast;
+                                    $ids[] = $podcast->id;
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
