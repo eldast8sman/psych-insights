@@ -30,7 +30,7 @@ class StoreArticleRequest extends FormRequest
             'duration' => 'integer|nullable',
             'publication_date' => 'date|nullable',
             'content' => 'required|string',
-            'photo' => 'required|file|mimes:png,jpg,jpeg,gif|max:200'
+            'photo' => 'required|file|mimes:png,jpg,jpeg,gif|max:500'
         ];
     }
 }
