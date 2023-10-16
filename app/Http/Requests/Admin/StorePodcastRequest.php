@@ -29,7 +29,7 @@ class StorePodcastRequest extends FormRequest
             'summary' => 'string|nullable',
             'release_date' => 'required|date',
             'subscription_level' => 'required|integer',
-            'cover_art' => 'file|mimes:png,jpg,jpeg,gif|max:200|nullable',
+            'cover_art' => 'file|mimes:png,jpg,jpeg,gif|max:500|nullable',
             'podcast_link' => 'required|string|url'
         ];
     }
