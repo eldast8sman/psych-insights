@@ -167,7 +167,14 @@ class BookController extends Controller
     public static function fetch_book(Book $book, $user_id) : Book
     {
         if(!empty($book->book_cover)){
-            $book->book_cover = FileManagerController::fetch_file($book->book_cover);
+            $book_cover = FileManagerController::fetch_file($book->book_cover);
+            if(empty($book_cover)){
+                $book->book_cover = "";
+            } else {
+                $book->book_cover = $book_cover->url;
+            }
+        } else {
+            $book->book_cover = "";
         }
 
         if(!empty($book->categories)){

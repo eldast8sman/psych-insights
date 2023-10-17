@@ -241,8 +241,8 @@ class BasicQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        // $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
-        $next_question = date('Y-m-d');
+        $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        // $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
             'user_id' => $this->user->id,
