@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class FileManagerController extends Controller
 {
-    public static function fetch_file($file) : FileManager
+    public static function fetch_file($file)
     {
         $file = FileManager::find($file);
         if(empty($file)){
@@ -20,7 +20,7 @@ class FileManagerController extends Controller
         return $file;
     }
 
-    public static function upload_file($file, $disk='public') : FileManager
+    public static function upload_file($file, $disk='public')
     {
         if(!$file instanceof UploadedFile){
             return false;
