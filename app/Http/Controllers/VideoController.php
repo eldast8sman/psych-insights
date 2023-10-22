@@ -168,8 +168,8 @@ class VideoController extends Controller
         if(!empty($video->photo)){
             $video->photo = FileManagerController::fetch_file($video->photo);
         }
-        if(!empty($video->video)){
-            $video->video = FileManagerController::fetch_file($video->video);
+        if(!empty($video->video_file)){
+            $video->video = FileManagerController::fetch_file($video->video_file);
         }
 
         if(!empty($video->categories)){

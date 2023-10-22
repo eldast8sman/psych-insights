@@ -165,8 +165,8 @@ class AudioController extends Controller
 
     public function fetch_audio(Audio $audio, $user_id) : Audio
     {
-        if(!empty($audio->audio)){
-            $audio->audio = FileManagerController::fetch_file($audio->audio);
+        if(!empty($audio->audio_file)){
+            $audio->audio = FileManagerController::fetch_file($audio->audio_file);
         }
 
         if(!empty($audio->categories)){
