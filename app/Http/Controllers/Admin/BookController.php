@@ -183,7 +183,6 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        $old_cover = $book->book_cover;
         $all = $request->except(['categories', 'book_cover']);
         if(!empty($request->book_cover)){
             if(!$upload = FileManagerController::upload_file($request->book_cover, env('FILE_DISK', $this->file_disk))){
@@ -194,6 +193,7 @@ class BookController extends Controller
             }
 
             $all['book_cover'] = $upload->id;
+            $old_cover = $book->book_cover;
         }
         $categories = [];
         foreach($request->categories as $cat_id){
@@ -215,7 +215,7 @@ class BookController extends Controller
             ], 500);
         }
         $book->update_dependencies();
-        if(!empty($old_cover)){
+        if(isset($old_cover)){
             FileManagerController::delete($old_cover);
         }
 

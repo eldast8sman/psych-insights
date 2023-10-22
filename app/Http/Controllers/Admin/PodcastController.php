@@ -183,7 +183,6 @@ class PodcastController extends Controller
      */
     public function update(UpdatePodcastRequest $request, Podcast $podcast)
     {
-        $old_cover = $podcast->cover_art;
         $all = $request->except(['categories', 'cover_art']);
         if(!empty($request->cover_art)){
             if(!$upload = FileManagerController::upload_file($request->cover_art, env('FILE_DISK', $this->file_disk))){
@@ -194,6 +193,7 @@ class PodcastController extends Controller
             }
 
             $all['cover_art'] = $upload->id;
+            $old_cover = $podcast->cover_art;
         }
         $categories = [];
         foreach($request->categories as $cat_id){
@@ -215,7 +215,7 @@ class PodcastController extends Controller
             ], 500);
         }
         $podcast->update_dependencies();
-        if(!empty($old_cover)){
+        if(isset($old_cover)){
             FileManagerController::delete($old_cover);
         }
 

@@ -173,7 +173,7 @@ Route::prefix('admin')->group(function(){
             Route::get('/articles', 'index')->name('admin.article.index');
             Route::post('/articles', 'store')->name('admin.article.store');
             Route::get('/articles/{article}', 'show')->name('admin.article.show');
-            Route::post('/articles/{article}', 'update')->name('admin.article.update');
+            Route::post('/articles/{music}', 'update')->name('admin.article.update');
             Route::get('/articles/{article}/activation', 'activation')->name('admin.article.activation');
             Route::delete('/articles/{article}', 'destroy')->name('admin.article.delete');
         });

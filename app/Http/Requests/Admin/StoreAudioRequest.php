@@ -29,7 +29,7 @@ class StoreAudioRequest extends FormRequest
             'description' => 'string|nullable',
             'subscription_level' => 'required|integer|min:0',
             'release_date' => 'date|nullable',
-            'audio' => 'required|file|mimes:mp3,mpeg3,wav,aac|max:20000'
+            'audio_file' => 'required|file|mimes:mp3,mpeg3,wav,aac|max:20000'
         ];
     }
 }

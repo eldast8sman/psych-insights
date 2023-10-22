@@ -28,7 +28,7 @@ class UpdateVideoRequest extends FormRequest
             'categories' => 'required|array',
             'duration' => 'integer|nullable',
             'photo' => 'file|mimes:png,jpg,jpeg,gif|max:500|nullable',
-            'video' => 'file|mimes:mp4,mpeg4,avi,mkv,mov|max:100000|nullable',
+            'video_file' => 'file|mimes:mp4,mpeg4,avi,mkv,mov|max:100000|nullable',
             'release_date' => 'date|nullable'
         ];
     }
