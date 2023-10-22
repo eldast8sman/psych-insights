@@ -19,7 +19,7 @@ class Video extends Model
         'description',
         'duration',
         'photo',
-        'video',
+        'video_file',
         'release_date',
         'favourite_count',
         'opened_count',

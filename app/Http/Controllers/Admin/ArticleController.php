@@ -185,7 +185,6 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        $old_photo = $article->photo;
         $all = $request->except(['categories', 'photo']);
         if(!empty($request->photo)){
             if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
@@ -196,6 +195,7 @@ class ArticleController extends Controller
             }
 
             $all['photo'] = $upload->id;
+            $old_photo = $article->photo;
         }
 
         $categories = [];
@@ -218,7 +218,7 @@ class ArticleController extends Controller
             ], 500);
         }
         $article->update_dependencies();
-        if(!empty($old_photo)){
+        if(isset($old_photo)){
             FileManagerController::delete($old_photo);
         }
 

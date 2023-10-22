@@ -28,8 +28,8 @@ class VideoController extends Controller
         if(!empty($video->photo)){
             $video->photo = FileManagerController::fetch_file($video->photo);
         }
-        if(!empty($video->video)){
-            $video->video = FileManagerController::fetch_file($video->video);
+        if(!empty($video->video_file)){
+            $video->video_file = FileManagerController::fetch_file($video->video_file);
         }
 
         if(!empty($video->categories)){
@@ -136,20 +136,20 @@ class VideoController extends Controller
      */
     public function store(StoreVideoRequest $request)
     {
-        $all = $request->except(['video', 'photo', 'categories']);
-        if(!empty($request->video)){
-            if(!$upload = FileManagerController::upload_file($request->video, env('FILE_DISK', $this->file_disk))){
+        $all = $request->except(['video_file', 'photo', 'categories']);
+        if(!empty($request->video_file)){
+            if(!$upload = FileManagerController::upload_file($request->video_file, env('FILE_DISK', $this->file_disk))){
                 return response([
                     'status' => 'failed',
                     'message' => 'Video file could not be uploaded'
                 ], 500);
             }
-            $all['video'] = $upload->id;
+            $all['video_file'] = $upload->id;
         }
         if(!empty($request->photo)){
             if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
-                if(isset($all['video']) && !empty($all['video'])){
-                    FileManagerController::delete($all['video']);
+                if(isset($all['video_file']) && !empty($all['video_file'])){
+                    FileManagerController::delete($all['video_file']);
                 }
                 return response([
                     'status' => 'failed',
@@ -164,8 +164,8 @@ class VideoController extends Controller
             if(isset($all['photo']) && !empty($all['photo'])){
                 FileManagerController::delete($all['photo']);
             }
-            if(isset($all['video']) && !empty($all['video'])){
-                FileManagerController::delete($all['video']);
+            if(isset($all['video_file']) && !empty($all['video_file'])){
+                FileManagerController::delete($all['video_file']);
             }
 
             return response([
@@ -202,29 +202,29 @@ class VideoController extends Controller
      */
     public function update(UpdateVideoRequest $request, Video $video)
     {
-        $old_photo = $video->photo;
-        $old_video = $video->video;
-        $all = $request->except(['video', 'photo', 'categories']);
-        if(!empty($request->video)){
-            if(!$upload = FileManagerController::upload_file($request->video, env('FILE_DISK', $this->file_disk))){
+        $all = $request->except(['video_file', 'photo', 'categories']);
+        if(!empty($request->video_file)){
+            if(!$upload = FileManagerController::upload_file($request->video_file, env('FILE_DISK', $this->file_disk))){
                 return response([
                     'status' => 'failed',
                     'message' => 'Video file could not be uploaded'
                 ], 500);
             }
-            $all['photo'] = $upload->id;
+            $all['video_file'] = $upload->id;
+            $old_video = $video->video_file;
         }
         if(!empty($request->photo)){
             if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
-                if(isset($all['video']) && !empty($all['video'])){
-                    FileManagerController::delete($all['video']);
+                if(isset($all['video_file']) && !empty($all['video_file'])){
+                    FileManagerController::delete($all['video_file']);
                 }
                 return response([
                     'status' => 'failed',
                     'message' => 'Photo could not be uploaded'
                 ], 500);
             }
-            $all['video'] = $upload->id;
+            $all['photo'] = $upload->id;
+            $old_photo = $video->photo;
         }
 
         $categories = [];
@@ -241,7 +241,7 @@ class VideoController extends Controller
             if(isset($all['photo']) && !empty($all['photo'])){
                 FileManagerController::delete($all['photo']);
             }
-            if(isset($all['video']) && !empty($all['video'])){
+            if(isset($all['video_file']) && !empty($all['video_file'])){
                 FileManagerController::delete($all['video']);
             }
 
@@ -250,10 +250,10 @@ class VideoController extends Controller
                 'message' => 'Video update failed'
             ], 500);
         }
-        if(!empty($old_video)){
+        if(isset($old_video)){
             FileManagerController::delete($old_video);
         }
-        if(!empty($old_photo)){
+        if(isset($old_photo)){
             FileManagerController::delete($old_photo);
         }
         $video->update_dependencies();
@@ -281,8 +281,8 @@ class VideoController extends Controller
     public function destroy(Video $video)
     {
         $video->delete();
-        if(!empty($video->video)){
-            FileManagerController::delete($video->video);
+        if(!empty($video->video_file)){
+            FileManagerController::delete($video->video_file);
         }
         if(!empty($video->photo)){
             FileManagerController::delete($video->photo);

@@ -25,8 +25,8 @@ class AudioController extends Controller
 
     public static function audio(Audio $audio) : Audio
     {
-        if(!empty($audio->audio)){
-            $audio->audio = FileManagerController::fetch_file($audio->audio);
+        if(!empty($audio->audio_file)){
+            $audio->audio_file = FileManagerController::fetch_file($audio->audio_file);
         }
 
         if(!empty($audio->categories)){
@@ -134,21 +134,21 @@ class AudioController extends Controller
     public function store(StoreAudioRequest $request)
     {
         $all = $request->except(['audio', 'categories']);
-        if(!empty($request->audio)){
-            if(!$upload = FileManagerController::upload_file($request->audio, env('FILE_DISK', $this->file_disk))){
+        if(!empty($request->audio_file)){
+            if(!$upload = FileManagerController::upload_file($request->audio_file, env('FILE_DISK', $this->file_disk))){
                 return response([
                     'status' => 'failed',
                     'message' => 'Audio file could not be uploaded'
                 ], 500);
             }
-            $all['audio'] = $upload->id;
+            $all['audio_file'] = $upload->id;
         }
         $all['categories'] = join(',', $request->categories);
         $all['status'] = 1;
 
         if(!$audio = Audio::create($all)){
-            if(isset($all['audio']) && !empty($all['audio'])){
-                FileManagerController::delete($all['audio']);
+            if(isset($all['audio_file']) && !empty($all['audio_file'])){
+                FileManagerController::delete($all['audio_file']);
             }
 
             return response([
@@ -185,17 +185,17 @@ class AudioController extends Controller
      */
     public function update(UpdateAudioRequest $request, Audio $audio)
     {
-        $old_audio = $audio->audio;
-        $all = $request->except(['audio', 'categories']);
-        if(!empty($request->audio)){
-            if(!$upload = FileManagerController::upload_file($request->audio, env('FILE_DISK', $this->file_disk))){
+        $all = $request->except(['audio_file', 'categories']);
+        if(!empty($request->audio_file)){
+            if(!$upload = FileManagerController::upload_file($request->audio_file, env('FILE_DISK', $this->file_disk))){
                 return response([
                     'status' => 'failed',
                     'message' => 'Audio file could not be uploaded'
                 ], 500);
             }
-            $all['audio'] = $upload->id;
-        }
+            $all['audio_file'] = $upload->id;
+            $old_audio = $audio->audio_file;
+        } 
 
         $categories = [];
         foreach($request->categories as $cat_id){
@@ -208,7 +208,7 @@ class AudioController extends Controller
         }
         $all['categories'] = join(',', $categories);
         if(!$audio->update($all)){
-            if(isset($all['audio']) && !empty($all['audio'])){
+            if(isset($all['audio_file']) && !empty($all['audio_file'])){
                 FileManagerController::delete($all['audio']);
             }
 
@@ -218,7 +218,7 @@ class AudioController extends Controller
             ], 500);
         }
         $audio->update_dependencies();
-        if(!empty($old_audio)){
+        if(isset($old_audio)){
             FileManagerController::delete($old_audio);
         }
 
@@ -246,8 +246,8 @@ class AudioController extends Controller
     public function destroy(Audio $audio)
     {
         $audio->delete();
-        if(!empty($audio->audio)){
-            FileManagerController::delete($audio->audio);
+        if(!empty($audio->audio_file)){
+            FileManagerController::delete($audio->audio_file);
         }
 
         return response([
