@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\ChatGPTController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BookController;
@@ -355,3 +356,5 @@ Route::middleware('auth:user-api')->group(function(){
 
 Route::get('/test-token/{card}/{year}/{month}/{cvv}', [StripeController::class, 'create_token']);
 Route::get('/test-customer/{name}/{email}', [StripeController::class, 'create_customer']);
+
+Route::get('/test-gpt/{prompt}', [ChatGPTController::class, 'complete_chat']);

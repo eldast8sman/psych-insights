@@ -263,6 +263,7 @@ class BasicQuestionController extends Controller
         $answer_summary->answers = $answers;
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
+        $answer_summary->welcome_message = "";
         
         $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
@@ -284,6 +285,15 @@ class BasicQuestionController extends Controller
         VideoController::recommend_videos($video_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
+
+        if($new){
+            $gpt = new ChatGPTController();
+            $name = explode(' ', $this->user->name);
+            $name = $name[0];
+
+            $welcome_message = $gpt->welcome_message($name, $distress_level);
+            $answer_summary->welcome_message = $welcome_message;
+        }
 
         return response([
             'status' => 'success',
