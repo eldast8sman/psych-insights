@@ -18,7 +18,7 @@ class ChatGPTController extends Controller
 
         $messages = [
             ['role' => 'system', 'content' => 'You are ChatGPT, a mental health therapist.'],
-            ['role' => 'user', 'content' => "Create a welcome message for '{$name}' on the PsychInsights App after the App has analysed that he/she is '{$diagnosis}' telling him/her that we are happy to have them on the PsychInsights App and they can browse through the recommended resources which includes Mental Health Strategies, Articles, Podcasts, Audio, Videos and Books, which have been curated just for him/her based on our analysis of his/her mental health condition to help his/her mental well being. Please note that this shold be in not more than 150 words"],
+            ['role' => 'user', 'content' => "Create a welcome message for '{$name}' on the PsychInsights App after the App has analysed that he/she is likely to be '{$diagnosis}' telling him/her that we are happy to have them on the PsychInsights App and they can browse through the recommended resources which includes Mental Health Strategies, Articles, Podcasts, Audio, Videos and Books, which have been curated just for him/her based on our analysis of his/her mental health condition to help his/her mental well being. Please note that this shold be in not more than 150 words"],
             ['role' => 'assistant', 'content' => ''], // Empty content for GPT to fill
         ];
 
