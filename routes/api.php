@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\DailyQuoteController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
+use App\Http\Controllers\Admin\ReadAndReflectController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
@@ -237,6 +238,28 @@ Route::prefix('admin')->group(function(){
             Route::get('/daily-tips/{tip}', 'show')->name('admin.dailyTip.show');
             Route::put('/daily-tips/{tip}', 'update')->name('admin.dailyTip.update');
             Route::delete('/daily-tips/{tip}', 'destroy')->name('admin.dailyTip.delete');
+        });
+
+        Route::controller(ReadAndReflectController::class)->group(function(){
+            Route::get('/read-and-reflects', 'index')->name('admin.readAndReflect.index');
+            Route::post('/read-and-reflects', 'store')->name('admin.readAndReflect.store');
+            Route::get('/read-and-reflects/{reflection}', 'show')->name('admin.readAndReflect.show');
+            Route::post('/read-and-reflects/{reflection}/reflections', 'add_reflection')->name('admin.readAndReflect.Reflection.store');
+            Route::put('/read-and-reflects/reflections/{reflection}', 'update_reflection')->name('admin.readAndReflect.reflection.update');
+            Route::delete('/read-and-reflected/reflections/{reflection}', 'delete_reflection')->name('admin.readAndReflect.reflection.delete');
+            Route::post('/read-and-reflects/{reflection}', 'update')->name('admin.readAndReflect.update');
+            Route::delete('/read-and-reflects/{reflection}', 'destroy')->name('admin.readAndReflect.delete');
+        });
+
+        Route::controller(ListenandLearnController::class)->group(function(){
+            Route::get('/listen-and-learns', 'index')->name('admin.listenAndLearn.index');
+            Route::post('/listen-and-learns', 'store')->name('admin.listenAndLearn.store');
+            Route::post('/listen-and-learns/{learn}/audios', 'add_audio')->name('admin.listenAndLearn.audio.store');
+            Route::post('/listen-and-learns/audios/{audio}', 'update_audio')->name('admin.listenAndLearn.audio.update');
+            Route::delete('/listen-and-learns/audios/{audio}', 'delete_audio')->name('admin.listenAndLearn.audio.delete');
+            Route::get('/listen-and-learns/{learn}', 'show')->name('admin.listenAndLearn.show');
+            Route::post('/listen-and-learns/{learn}', 'update')->name('admin.listenAndLearn.update');
+            Route::delete('/listen-and-learns/{learn}', 'destroy')->name('admin.listenAndLearn.delete');
         });
     });
 });
