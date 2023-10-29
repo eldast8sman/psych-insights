@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\DailyQuoteController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
+use App\Http\Controllers\Admin\ListenAndLearnController;
 use App\Http\Controllers\Admin\ReadAndReflectController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
@@ -246,12 +247,12 @@ Route::prefix('admin')->group(function(){
             Route::get('/read-and-reflects/{reflection}', 'show')->name('admin.readAndReflect.show');
             Route::post('/read-and-reflects/{reflection}/reflections', 'add_reflection')->name('admin.readAndReflect.Reflection.store');
             Route::put('/read-and-reflects/reflections/{reflection}', 'update_reflection')->name('admin.readAndReflect.reflection.update');
-            Route::delete('/read-and-reflected/reflections/{reflection}', 'delete_reflection')->name('admin.readAndReflect.reflection.delete');
+            Route::delete('/read-and-reflects/reflections/{reflection}', 'delete_reflection')->name('admin.readAndReflect.reflection.delete');
             Route::post('/read-and-reflects/{reflection}', 'update')->name('admin.readAndReflect.update');
             Route::delete('/read-and-reflects/{reflection}', 'destroy')->name('admin.readAndReflect.delete');
         });
 
-        Route::controller(ListenandLearnController::class)->group(function(){
+        Route::controller(ListenAndLearnController::class)->group(function(){
             Route::get('/listen-and-learns', 'index')->name('admin.listenAndLearn.index');
             Route::post('/listen-and-learns', 'store')->name('admin.listenAndLearn.store');
             Route::post('/listen-and-learns/{learn}/audios', 'add_audio')->name('admin.listenAndLearn.audio.store');

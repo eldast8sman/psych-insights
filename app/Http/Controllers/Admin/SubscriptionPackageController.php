@@ -138,6 +138,9 @@ class SubscriptionPackageController extends Controller
             'audio_limit' => !empty($mirror_package) ? $mirror_package->audio_limit : -1,
             'video_limit' => !empty($mirror_package) ? $mirror_package->video_limit : -1,
             'book_limit' => !empty($mirror_package) ? $mirror_package->book_limit : -1,
+            'listen_and_learn_limit' => !empty($mirror_package) ? $mirror_package->listen_and_learn_limit : -1,
+            'read_and_reflect_limit' => !empty($mirror_package) ? $mirror_package->read_and_reflect_limit : -1,
+            'learn_and_do_limit' => !empty($mirror_package) ? $mirror_package->learn_and_do_limit : -1,
             'free_trial' => 1,
             'first_time_promo' => 0
         ];
@@ -248,6 +251,9 @@ class SubscriptionPackageController extends Controller
             'audio_limit' => !empty($mirror_package) ? $mirror_package->audio_limit : -1,
             'video_limit' => !empty($mirror_package) ? $mirror_package->video_limit : -1,
             'book_limit' => !empty($mirror_package) ? $mirror_package->book_limit : -1,
+            'listen_and_learn_limit' => !empty($mirror_package) ? $mirror_package->listen_and_learn_limit : -1,
+            'read_and_reflect_limit' => !empty($mirror_package) ? $mirror_package->read_and_reflect_limit : -1,
+            'learn_and_do_limit' => !empty($mirror_package) ? $mirror_package->learn_and_do_limit : -1,
             'free_trial' => 1,
             'first_time_promo' => 0
         ];
@@ -392,6 +398,9 @@ class SubscriptionPackageController extends Controller
                 'audio_limit' => $request->audio_limit,
                 'video_limit' => $request->video_limit,
                 'book_limit' => $request->book_limit,
+                'read_and_reflect_limit' => $request->read_and_reflect_limit,
+                'learn_and_do_limit_limit' => $request->learn_and_do_limit,
+                'listen_and_learn_limit' => $request->listen_and_learn_limit,
                 'free_trial' => 0,
                 'first_time_promo' => 0,
                 'subsequent_promo' => 0,
@@ -401,7 +410,7 @@ class SubscriptionPackageController extends Controller
             $package->update($request->all());
         }
 
-        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit']);
+        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'read_and_reflect_limit', 'listen_and_learn_limit', 'learn_and_do_limit']);
 
         return response([
             'status' => 'success',
@@ -411,7 +420,7 @@ class SubscriptionPackageController extends Controller
     }
 
     public function fetch_basic_package(){
-        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit']);
+        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'read_and_reflect_limit', 'listen_and_learn_limit', 'learn_and_do_limit']);
 
         return response([
             'status' => 'success',

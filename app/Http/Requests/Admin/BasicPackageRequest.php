@@ -26,7 +26,10 @@ class BasicPackageRequest extends FormRequest
             'article_limit' => 'required|integer|min:0',
             'audio_limit' => 'required|integer|min:0',
             'video_limit' => 'required|integer|min:0',
-            'book_limit' => 'required|integer|min:0'
+            'book_limit' => 'required|integer|min:0',
+            'listen_and_learn_limit' => 'required|integer|min:-1',
+            'read_and_reflect_limit' => 'required|integer|min:-1',
+            'learn_and_do_limit' => 'required|integer|min:-1'
         ];
     }
 }
