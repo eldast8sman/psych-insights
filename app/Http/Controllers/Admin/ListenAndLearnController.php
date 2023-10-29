@@ -13,7 +13,7 @@ use App\Http\Requests\Admin\AddListenAndLearnAudioRequest;
 use App\Http\Requests\Admin\StoreListenAndLearnRequest;
 use App\Http\Requests\Admin\UpdateListenAndLearnRequest;
 
-class ListenAndLeanrController extends Controller
+class ListenAndLearnController extends Controller
 {
     private $user;
     private $file_disk = 'public';
@@ -45,7 +45,7 @@ class ListenAndLeanrController extends Controller
         $audios = ListenAndLearnAudio::where('listen_and_learn_id', $learn->id)->get();
         if(!empty($audios)){
             foreach($audios as $audio){
-                $audio = self::audio($audio);
+                $audio->audio = FileManagerController::fetch_file($audio->audio);
             }
         }
         $learn->audios = $audios;
@@ -105,7 +105,7 @@ class ListenAndLeanrController extends Controller
     }
 
     public function store(StoreListenAndLearnRequest $request){
-        $all = $request->excpet(['photo', 'categories']);
+        $all = $request->except(['photo', 'categories']);
         if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
             return response([
                 'status' => 'failed',
