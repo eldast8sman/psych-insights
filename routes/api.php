@@ -231,6 +231,7 @@ Route::prefix('admin')->group(function(){
             Route::get('/daily-quotes/{quote}', 'show')->name('admin.dailyQuote.show');
             Route::put('/daily-quotes/{quote}', 'update')->name('admin.dailyQuote.update');
             Route::delete('/daily-quotes/{quote}', 'destroy')->name('admin.dailyQuote.delete');
+            Route::get('/quotes-summary', 'quote_tip_summary')->name('admin.quoteTipSummary');
         });
 
         Route::controller(DailyTipController::class)->group(function(){
