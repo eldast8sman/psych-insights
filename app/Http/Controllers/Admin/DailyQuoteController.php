@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreDailyQuoteRequest;
+use App\Models\DailyTip;
 use App\Models\DailyQuote;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreDailyQuoteRequest;
 
 class DailyQuoteController extends Controller
 {
@@ -80,6 +81,20 @@ class DailyQuoteController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Daily Quote deleted successfully'
+        ], 200);
+    }
+
+    public function quote_tip_summary(){
+        $quote_count = DailyQuote::count();
+        $tip_count = DailyTip::count();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Quotes and Tips Summary fetched successfully',
+            'data' => [
+                'total_quotes' => $quote_count,
+                'total_tips' => $tip_count
+            ]
         ], 200);
     }
 }
