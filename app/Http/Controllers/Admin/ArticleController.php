@@ -183,7 +183,7 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateArticleRequest $request, Article $article)
+    public function update(UpdateArticleRequest $request, Article $music)
     {
         $all = $request->except(['categories', 'photo']);
         if(!empty($request->photo)){
@@ -195,7 +195,7 @@ class ArticleController extends Controller
             }
 
             $all['photo'] = $upload->id;
-            $old_photo = $article->photo;
+            $old_photo = $music->photo;
         }
 
         $categories = [];
@@ -208,7 +208,7 @@ class ArticleController extends Controller
             }
         }
         $all['categories'] = join(',', $categories);
-        if(!$article->update($all)){
+        if(!$music->update($all)){
             if(isset($all['photo']) && !empty($all['photo'])){
                 FileManagerController::delete($all['photo']);
             }
@@ -217,7 +217,7 @@ class ArticleController extends Controller
                 'message' => 'Article Update failed'
             ], 500);
         }
-        $article->update_dependencies();
+        $music->update_dependencies();
         if(isset($old_photo)){
             FileManagerController::delete($old_photo);
         }
@@ -225,7 +225,7 @@ class ArticleController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Article updated successfully',
-            'data' => self::article($article) 
+            'data' => self::article($music) 
         ], 200);
     }
 
