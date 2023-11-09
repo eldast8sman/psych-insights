@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
- class StoreReflectionRequest extends FormRequest
+class UpdateLearnAndDoActivityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,10 @@ use Illuminate\Foundation\Http\FormRequest;
     public function rules(): array
     {
         return [
-            'reflection' => 'required|string'
+            'title' => 'required|string',
+            'overview' => 'string|nullable',
+            'post_text' => 'string|nullable',
+            'example' => 'string|nullable'
         ];
     }
 }

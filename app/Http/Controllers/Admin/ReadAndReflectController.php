@@ -64,7 +64,7 @@ class ReadAndReflectController extends Controller
         $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
 
         $reflections = ReadAndReflect::where('status', '>=', 0);
-        if(!empty($reflections)){
+        if(!empty($search)){
             $reflections = $reflections->where('title', 'like', '%'.$search.'%');
         }
         if($filter !== NULL){
