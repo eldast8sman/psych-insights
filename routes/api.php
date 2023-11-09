@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\DailyTipController;
 use App\Http\Controllers\Admin\InterestController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\DailyQuoteController;
+use App\Http\Controllers\Admin\LearnAndDoController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
@@ -262,6 +263,22 @@ Route::prefix('admin')->group(function(){
             Route::get('/listen-and-learns/{learn}', 'show')->name('admin.listenAndLearn.show');
             Route::post('/listen-and-learns/{learn}', 'update')->name('admin.listenAndLearn.update');
             Route::delete('/listen-and-learns/{learn}', 'destroy')->name('admin.listenAndLearn.delete');
+        });
+
+        Route::controller(LearnAndDoController::class)->group(function(){
+            Route::get('/learn-and-dos', 'index')->name('admin.learnAndDo.index');
+            Route::post('/learn-and-dos', 'store')->name('admin.learnAndDo.store');
+            Route::get('/learn-and-dos/{learn}', 'show')->name('admin.learnAndDo.show');
+            Route::get('/learn-and-dos/activities/{activity}', 'show_activity')->name('admin.learnAndDo.activity.show');
+            Route::get('/learn-and-dos/questions/{question}', 'show_question')->name('admin.learnAndDo.question.show');
+            Route::post('/learn-and-dos/{learn}/activities', 'store_activity')->name('admin.learnAndDo.activity.store');
+            Route::post('/learn-and-dos/activities/{activity}/questions', 'store_question')->name('admin.learnAndDo.activity.question.store');
+            Route::post('/learn-and-dos/{learn}', 'update')->name('admin.learnAndDo.update');
+            Route::put('/learn-and-dos/activities/{activity}', 'update_activity')->name('admin.LearnAndDo.activity.update');
+            Route::put('/learn-and-dos/questions/{question}', 'update_question')->name('admin.learnAndDo.question.update');
+            Route::delete('/learn-and-dos/activities/{activity}', 'destroy_activity')->name('admin.learnAndD0.activity.delete');
+            Route::delete('learn-and-dos/questions/{question}', 'destroy_question')->name('admin.learnAndDo.question.delete');
+            Route::delete('/learn-and-dos/{learn}', 'destroy')->name('admin.learnAndDo.delete');
         });
     });
 });
