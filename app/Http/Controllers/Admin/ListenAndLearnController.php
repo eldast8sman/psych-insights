@@ -243,6 +243,8 @@ class ListenAndLearnController extends Controller
             ], 500);
         }
 
+        $learn->update_dependencies();
+
         if(isset($old_photo)){
             FileManagerController::delete($old_photo);
         }
