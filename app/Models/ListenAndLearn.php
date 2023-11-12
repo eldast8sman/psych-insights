@@ -19,6 +19,8 @@ class ListenAndLearn extends Model
         'audio_overview',
         'photo',
         'subscription_level',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 
@@ -27,5 +29,15 @@ class ListenAndLearn extends Model
         return SlugOptions::create()
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
+    }
+
+    public function update_dependencies(){
+        $learns = RecommendedListenAndLearn::where('listen_and_learn_id', $this->id);
+        if($learns->count() > 0){
+            foreach($learns->get() as $learn){
+                $learn->slug = $this->slug;
+                $learn->save();
+            }
+        }
     }
 }

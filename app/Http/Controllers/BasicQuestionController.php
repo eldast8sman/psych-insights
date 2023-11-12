@@ -241,8 +241,8 @@ class BasicQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
-        // $next_question = date('Y-m-d');
+        // $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
             'user_id' => $this->user->id,
@@ -277,12 +277,16 @@ class BasicQuestionController extends Controller
         $article_limit = ($package->article_limit >= 0) ? $package->article_limit : 1000000000;
         $audio_limit = ($package->audio_limit >= 0) ? $package->audio_limit : 1000000000;
         $video_limit = ($package->video_limit >= 0) ? $package->video_limit : 1000000000;
+        $listen_and_learn_limit = ($package->listen_and_learn_limit) ? $package->listen_and_learn_limit : 1000000000;
+        $read_and_reflect_limit = ($package->read_and_reflect_limit) ? $package->read_and_reflect_limit : 1000000000;
+        $learn_and_do_limit = ($package->learn_and_do_limit) ? $package->learn_and_do_limit : 1000000000;
 
         BookController::recommend_books($book_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         PodcastController::recommend_podcasts($podcast_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         ArticleController::recommend_articles($article_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         AudioController::recommend_audios($audio_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         VideoController::recommend_videos($video_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
+        ListenAndLearnController::recommend_strategies($listen_and_learn_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 

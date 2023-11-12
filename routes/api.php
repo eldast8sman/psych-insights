@@ -33,6 +33,7 @@ use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\PodcastController as ControllersPodcastController;
+use App\Http\Controllers\ListenAndLearnController as UserListenAndLearnController;
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
@@ -393,6 +394,17 @@ Route::middleware('auth:user-api')->group(function(){
         Route::put('/journals/{journal}', 'update')->name('journal.update');
         Route::get('/journals/{journal}/pin', 'pin_journal')->name('journal.pin');
         Route::delete('/journals/{journal}', 'destroy')->name('journal.delete');
+    });
+
+    Route::controller(UserListenAndLearnController::class)->group(function(){
+        Route::get('/recommended-listen-and-learns', 'recommended_strategies')->name('recommendedListenAndLearn.fetch');
+        Route::get('/recommended-listen-and-learns/{slug}', 'recommended_strategy')->name('recommendedListenAndLearn.show');
+        Route::get('/listen-and-learns/{slug}/mark-as-opened', 'mark_as_opened')->name('recommendedListenAndLearn.markAsOpened');
+        Route::get('/opened-listen-and-learns', 'opened_strategies')->name('openedListenAndLearn.fetch');
+        Route::get('/opened-listen-and-learns/{slug}', 'opened_strategy')->name('openedListenAndLearn.show');
+        Route::get('/listen-and-learns/{slug}/favourites', 'strategy_favourite')->name('listenAndLearn.addOrRemove');
+        Route::get('/favourite-listen-and-learns', 'favourite_strategies')->name('favouriteListenAndLearn.fetch');
+        Route::get('/favourite-listen-and-learns/{slug}', 'favourite_strategy')->name('favouriteListenAndLearn.show');
     });
 });
 
