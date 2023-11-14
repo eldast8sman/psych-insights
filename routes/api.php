@@ -34,6 +34,7 @@ use App\Http\Controllers\VideoController as ControllersVideoController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
 use App\Http\Controllers\PodcastController as ControllersPodcastController;
 use App\Http\Controllers\ListenAndLearnController as UserListenAndLearnController;
+use App\Http\Controllers\ReadAndReflectController as UserReadAndReflectController;
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
@@ -405,6 +406,17 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/listen-and-learns/{slug}/favourites', 'strategy_favourite')->name('listenAndLearn.addOrRemove');
         Route::get('/favourite-listen-and-learns', 'favourite_strategies')->name('favouriteListenAndLearn.fetch');
         Route::get('/favourite-listen-and-learns/{slug}', 'favourite_strategy')->name('favouriteListenAndLearn.show');
+    });
+
+    Route::controller(UserReadAndReflectController::class)->group(function(){
+        Route::get('/recommended-read-and-reflects', 'recommended_strategies')->name('recommendedReadAndReflect.fetch');
+        Route::get('/recommended-read-and-reflects/{slug}', 'recommended_strategy')->name('recommendedReadAndReflect.show');
+        Route::get('/read-and-reflects/{slug}/mark-as-opened', 'mark_as_opened')->name('recommendedReadAndReflect.markAsOpened');
+        Route::get('/opened-read-and-reflects', 'opened_strategies')->name('openedReadAndReflect.index');
+        Route::get('/opened-read-and-reflects/{slug}', 'opened_strategy')->name('openedReadAndReflect.show');
+        Route::get('/read-and-reflects/{slug}/favourites', 'strategy_favourite')->name('readAndReflect.addOrRemove');
+        Route::get('/favourite-read-and-reflects', 'favourite_strategies')->name('favouriteReadAndReflect.index');
+        Route::get('/favourite-read-and-reflects/{slug}', 'favourite_strategy')->name('favouriteReadAndReflect.show');
     });
 });
 

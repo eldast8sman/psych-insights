@@ -27,8 +27,8 @@ class LearnAndDoController extends Controller
         $this->user = AuthController::user();
     }
 
-    public function learn_and_do($learn_id){
-        $learn = LearnAndDo::find($learn_id);
+    public function learn_and_do(LearnAndDo $learn) : LearnAndDo
+    {
         if(!empty($learn->photo)){
             $learn->photo = FileManagerController::fetch_file($learn->photo);
         }
@@ -106,13 +106,13 @@ class LearnAndDoController extends Controller
         $a_learns = [];
         $learns = $learns->paginate($limit);
         foreach($learns as $learn){
-            $a_learns[] = $this->learn_and_do($learn->id);
+            $learn = $this->learn_and_do($learn);
         }
 
         return response([
             'status' => 'success',
             'message' => 'Learn and Do Strategies fetched successfully',
-            'data' => $a_learns
+            'data' => $learns
         ], 200);
     }
 

@@ -19,6 +19,8 @@ class ReadAndReflect extends Model
         'protocols',
         'photo',
         'subscription_level',
+        'favourite_count',
+        'opened_count',
         'status'
     ];
 
@@ -27,5 +29,15 @@ class ReadAndReflect extends Model
         return SlugOptions::create()
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
+    }
+
+    public function update_dependencies(){
+        $reads = RecommendedReadAndReflect::where('read_and_reflect_id', $this->id);
+        if($reads->count() > 0){
+            foreach($reads->get() as $read){
+                $read->slug = $this->slug;
+                $read->save();
+            }
+        }
     }
 }

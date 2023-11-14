@@ -222,6 +222,8 @@ class ReadAndReflectController extends Controller
             ], 500);
         }
 
+        $reflection->update_dependencies();
+
         if(isset($old_photo)){
             FileManagerController::delete($old_photo);
         }
