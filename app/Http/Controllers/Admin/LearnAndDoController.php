@@ -27,6 +27,27 @@ class LearnAndDoController extends Controller
         $this->user = AuthController::user();
     }
 
+    public function summary(){
+        $learns = LearnAndDo::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        if($learns->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Strategy was fetched',
+                'data' => null
+            ], 200);
+        }
+        $learns = $learns->limit(3)->get();
+        foreach($learns as $learn){
+            $learn = $this->learn_and_do($learn);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Strategy Summary fetched successfully',
+            'data' => $learns
+        ], 200);
+    }
+
     public function learn_and_do(LearnAndDo $learn) : LearnAndDo
     {
         if(!empty($learn->photo)){
@@ -141,7 +162,7 @@ class LearnAndDoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Learn and Do Upload successful',
-            'data' => $this->learn_and_do($learn->id)
+            'data' => $this->learn_and_do($learn)
         ], 200);
     }
 
@@ -174,12 +195,12 @@ class LearnAndDoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Activity added to Strategy',
-            'data' => $this->learn_and_do($learn->id)
+            'data' => $this->learn_and_do($learn)
         ], 200);
     }
 
     public function show(LearnAndDo $learn){
-        $learn = $this->learn_and_do($learn->id);
+        $learn = $this->learn_and_do($learn);
 
         return response([
             'status' => 'success',
@@ -268,7 +289,7 @@ class LearnAndDoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Learn and Do Strategy updated successfully',
-            'data' => $this->learn_and_do($learn->id)
+            'data' => $this->learn_and_do($learn)
         ], 200);
     }
 

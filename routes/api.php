@@ -246,6 +246,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(ReadAndReflectController::class)->group(function(){
+            Route::get('/read-and-reflect-summary', 'summary')->name('admin.readAndReflect.summary');
             Route::get('/read-and-reflects', 'index')->name('admin.readAndReflect.index');
             Route::post('/read-and-reflects', 'store')->name('admin.readAndReflect.store');
             Route::get('/read-and-reflects/{reflection}', 'show')->name('admin.readAndReflect.show');
@@ -257,6 +258,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(ListenAndLearnController::class)->group(function(){
+            Route::get('/listen-and-learn-summary', 'summary')->name('admin.listenAndLearn.summary');
             Route::get('/listen-and-learns', 'index')->name('admin.listenAndLearn.index');
             Route::post('/listen-and-learns', 'store')->name('admin.listenAndLearn.store');
             Route::post('/listen-and-learns/{learn}/audios', 'add_audio')->name('admin.listenAndLearn.audio.store');
@@ -268,6 +270,7 @@ Route::prefix('admin')->group(function(){
         });
 
         Route::controller(LearnAndDoController::class)->group(function(){
+            Route::get('/learn-and-do-summary', 'summary')->name('admin.learnAndDo.summary');
             Route::get('/learn-and-dos', 'index')->name('admin.learnAndDo.index');
             Route::post('/learn-and-dos', 'store')->name('admin.learnAndDo.store');
             Route::get('/learn-and-dos/{learn}', 'show')->name('admin.learnAndDo.show');

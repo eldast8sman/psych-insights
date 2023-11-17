@@ -69,6 +69,27 @@ class ListenAndLearnController extends Controller
         return $audio;
     }
 
+    public function summary(){
+        $learns = ListenAndLearn::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        if($learns->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Strategy was fetched',
+                'data' => null
+            ], 200);
+        }
+        $learns = $learns->limit(3)->get();
+        foreach($learns as $learn){
+            $learn = $this->listen_and_learn($learn);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Strategy Summary fetched successfully',
+            'data' => $learns
+        ], 200);
+    }
+
     public function index(){
         $search = !empty($_GET['search']) ? $_GET['search'] : "";
         $filter = isset($_GET['status']) ? (int)$_GET['status'] : NULL;
