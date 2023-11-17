@@ -57,6 +57,27 @@ class ReadAndReflectController extends Controller
         return $reflection;
     }
 
+    public function summary(){
+        $reads = ReadAndReflect::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        if($reads->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Strategy was fetched',
+                'data' => null
+            ], 200);
+        }
+        $reads = $reads->limit(3)->get();
+        foreach($reads as $read){
+            $read = $this->read_and_reflect($read);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Strategy Summary fetched successfully',
+            'data' => $reads
+        ], 200);
+    }
+
     public function index(){
         $search = !empty($_GET['search']) ? $_GET['search'] : "";
         $filter = isset($_GET['status']) ? (int)$_GET['status'] : NULL;
