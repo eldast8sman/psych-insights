@@ -8,8 +8,10 @@ use App\Models\ReadAndReflect;
 use App\Models\FavouriteResource;
 use App\Models\CurrentSubscription;
 use App\Models\OpenedReadAndReflect;
+use App\Models\ReadAndReflectAnswer;
 use App\Models\ReadAndReflectReflection;
 use App\Models\RecommendedReadAndReflect;
+use App\Http\Requests\AnswerReadAndReflectRequest;
 
 class ReadAndReflectController extends Controller
 {
@@ -549,7 +551,71 @@ class ReadAndReflectController extends Controller
         ], 200);
     }
 
-    public function answer_reflections($slug){
-        
+    public function answer_reflections(AnswerReadAndReflectRequest $request, $slug){
+        $reflect = ReadAndReflect::where('slug', $slug)->first();
+        if(empty($reflect)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Read and Reflect not found'
+            ], 404);
+        }
+
+        $answers = [];
+        foreach($request->answers as $answer){
+            $reflection = ReadAndReflectReflection::find($answer['reflection_id']);
+            if(!empty($reflection) and ($reflection->read_and_reflect_id == $reflect->id)){
+                $answers[] = [
+                    'reflection_id' => $answer['reflection_id'],
+                    'question' => $reflection->reflection,
+                    'answer' => $answer['answer']
+                ];
+            } else {
+                $answers[] = $reflection;
+            }
+        }
+
+        $answered = ReadAndReflectAnswer::create([
+            'user_id' => $this->user->id,
+            'read_and_reflect_id' => $reflect->id,
+            'answers' => json_encode($answers)
+        ], 200);
+
+        $answered->answers = json_decode($answered->answers, true);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Reflection successful',
+            'data' => $answered
+        ], 200);
+    }
+
+    public function previous_answers($slug){
+        $reflect = ReadAndReflect::where('slug', $slug)->first();
+        if(empty($reflect)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Read and Reflect not found'
+            ], 404);
+        }
+
+        $answers = ReadAndReflectAnswer::where('read_and_reflect_id', $reflect->id)->orderBy('created_at', 'desc');
+        if($answers->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Answer has been provided yet',
+                'data' => null
+            ], 200);
+        }
+
+        $answers = $answers->paginate(10);
+        foreach($answers as $answer){
+            $answer->answers = json_decode($answer->answers, true);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Answers fetched successfully',
+            'data' => $answers
+        ], 200);
     }
 }

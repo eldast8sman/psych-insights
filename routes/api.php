@@ -420,6 +420,8 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/read-and-reflects/{slug}/favourites', 'strategy_favourite')->name('readAndReflect.addOrRemove');
         Route::get('/favourite-read-and-reflects', 'favourite_strategies')->name('favouriteReadAndReflect.index');
         Route::get('/favourite-read-and-reflects/{slug}', 'favourite_strategy')->name('favouriteReadAndReflect.show');
+        Route::post('/read-and-reflects/{slug}/answer', 'answer_reflections')->name('readAndReflect.answer');
+        Route::get('/read-and-reflects/{slug}/previous-answers', 'previous_answers')->name('readAndReflect.previousAnswer');
     });
 });
 
