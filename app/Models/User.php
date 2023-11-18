@@ -53,6 +53,7 @@ class User extends Authenticatable implements JWTSubject
         'daily_tip_id',
         'last_login',
         'prev_login',
+        'user_guide',
         'status'
     ];
 

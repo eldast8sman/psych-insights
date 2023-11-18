@@ -277,9 +277,9 @@ class BasicQuestionController extends Controller
         $article_limit = ($package->article_limit >= 0) ? $package->article_limit : 1000000000;
         $audio_limit = ($package->audio_limit >= 0) ? $package->audio_limit : 1000000000;
         $video_limit = ($package->video_limit >= 0) ? $package->video_limit : 1000000000;
-        $listen_and_learn_limit = ($package->listen_and_learn_limit) ? $package->listen_and_learn_limit : 1000000000;
-        $read_and_reflect_limit = ($package->read_and_reflect_limit) ? $package->read_and_reflect_limit : 1000000000;
-        $learn_and_do_limit = ($package->learn_and_do_limit) ? $package->learn_and_do_limit : 1000000000;
+        $listen_and_learn_limit = ($package->listen_and_learn_limit >= 0) ? $package->listen_and_learn_limit : 1000000000;
+        $read_and_reflect_limit = ($package->read_and_reflect_limit >= 0) ? $package->read_and_reflect_limit : 1000000000;
+        $learn_and_do_limit = ($package->learn_and_do_limit >= 0) ? $package->learn_and_do_limit : 1000000000;
 
         BookController::recommend_books($book_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         PodcastController::recommend_podcasts($podcast_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
