@@ -70,7 +70,7 @@ class ListenAndLearnController extends Controller
     }
 
     public function summary(){
-        $learns = ListenAndLearn::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        $learns = ListenAndLearn::orderBy('favourite_count', 'desc')->where('status', '<>', 0)->orderBy('opened_count', 'asc');
         if($learns->count() < 1){
             return response([
                 'status' => 'failed',
