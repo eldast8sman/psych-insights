@@ -58,7 +58,7 @@ class ReadAndReflectController extends Controller
     }
 
     public function summary(){
-        $reads = ReadAndReflect::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        $reads = ReadAndReflect::orderBy('favourite_count', 'desc')->where('status', '<>', 0)->orderBy('opened_count', 'asc');
         if($reads->count() < 1){
             return response([
                 'status' => 'failed',

@@ -28,7 +28,7 @@ class LearnAndDoController extends Controller
     }
 
     public function summary(){
-        $learns = LearnAndDo::orderBy('favourite_count', 'desc')->orderBy('opened_count', 'asc');
+        $learns = LearnAndDo::orderBy('favourite_count', 'desc')->where('status', '<>', 0)->orderBy('opened_count', 'asc');
         if($learns->count() < 1){
             return response([
                 'status' => 'failed',
