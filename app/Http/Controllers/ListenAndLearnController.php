@@ -25,7 +25,7 @@ class ListenAndLearnController extends Controller
     public static function recommend_strategies($limit, $user_id, $cat_id, $sec_cat_id, $level=0){
         $rec_strategies = RecommendedListenAndLearn::where('user_id', $user_id);
         if($rec_strategies->count() > 0){
-            foreach($rec_strategies as $rec_strategy){
+            foreach($rec_strategies->get() as $rec_strategy){
                 $rec_strategy->delete();
             }
         }

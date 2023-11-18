@@ -220,6 +220,17 @@ class AuthController extends Controller
         return auth('user-api')->user();
     }
 
+    public function user_guide(){
+        $user = User::find(self::user()->id);
+        $user->user_guide = true;
+        $user->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'User Guide updated successfully'
+        ], 200);
+    }
+
     public static function user_details(User $user) : User
     {
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
