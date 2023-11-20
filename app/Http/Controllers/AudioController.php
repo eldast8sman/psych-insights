@@ -436,6 +436,8 @@ class AudioController extends Controller
             $audio->favourite_count -= 1;
         }
         $audio->save();
+        $audio->update_dependencies();
+        
         $message = ($action == 'saved') ? 'Audio added to Favourites' : 'Audio removed from Favourites';
 
         return response([

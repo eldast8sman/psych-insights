@@ -32,6 +32,7 @@ use App\Http\Controllers\BookController as ControllersBookController;
 use App\Http\Controllers\AudioController as ControllersAudioController;
 use App\Http\Controllers\VideoController as ControllersVideoController;
 use App\Http\Controllers\ArticleController as ControllerArticleController;
+use App\Http\Controllers\LearnAndDoController as UserLearnAndDoController;
 use App\Http\Controllers\PodcastController as ControllersPodcastController;
 use App\Http\Controllers\ListenAndLearnController as UserListenAndLearnController;
 use App\Http\Controllers\ReadAndReflectController as UserReadAndReflectController;
@@ -423,6 +424,19 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/favourite-read-and-reflects/{slug}', 'favourite_strategy')->name('favouriteReadAndReflect.show');
         Route::post('/read-and-reflects/{slug}/answer', 'answer_reflections')->name('readAndReflect.answer');
         Route::get('/read-and-reflects/{slug}/previous-answers', 'previous_answers')->name('readAndReflect.previousAnswer');
+    });
+
+    Route::controller(UserLearnAndDoController::class)->group(function(){
+        Route::get('/recommended-learn-and-dos', 'recommended_strategies')->name('recommendedLearnAndDo.fetch');
+        Route::get('/recommended-learn-and-dos/{slug}', 'recommended_strategy')->name('recommendedLearnAndDo.show');
+        Route::get('/learn-and-dos/{slug}/mark-as-opened', 'mark_as_opened')->name('recommendedLearnAndDo.markAsOpened');
+        Route::get('/opened-learn-and-dos', 'opened_strategies')->name('openedLearnAndDo.index');
+        Route::get('/opened-learn-and-dos/{slug}', 'opened_strategy')->name('openedLearnAndDo.show');
+        Route::get('/learn-and-dos/{slug}/favourites', 'strategy_favourite')->name('learnAndDo.addOrRemove');
+        Route::get('/favourite-learn-and-dos', 'favourite_strategies')->name('favouriteLearnAndDo.index');
+        Route::get('/favourite-learn-and-dos/{slug}', 'favourite_strategy')->name('favouriteReadAndReflect.show');
+        Route::post('/learn-and-dos/{slug}/answer', 'answer_questions')->name('learnAndDo.answer');
+        Route::get('/learn-and-dos/{slug}/previous-answers', 'previous_answers')->name('learnAndDo.previousAnswer');
     });
 });
 

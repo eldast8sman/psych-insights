@@ -438,6 +438,8 @@ class ArticleController extends Controller
             $article->favourite_count -= 1;
         }
         $article->save();
+        $article->update_dependencies();
+        
         $message = ($action == 'saved') ? 'Article added to Favourites' : 'Article removed from Favourites';
 
         return response([

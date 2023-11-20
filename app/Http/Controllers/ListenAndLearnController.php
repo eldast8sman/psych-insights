@@ -442,6 +442,7 @@ class ListenAndLearnController extends Controller
             $learn->favourite_count -= 1;
         }
         $learn->save();
+        $learn->update_dependencies();
         
         $message = ($action == 'saved') ? 'Strategy added to Favourites' : 'Strategy removed from Favourites';
 
