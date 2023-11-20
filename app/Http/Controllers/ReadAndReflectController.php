@@ -435,6 +435,7 @@ class ReadAndReflectController extends Controller
             $read->favourite_count -= 1;
         }
         $read->save();
+        $read->update_dependencies();
         
         $message = ($action == 'saved') ? 'Strategy added to Favourites' : 'Strategy removed from Favourites';
 
@@ -569,8 +570,6 @@ class ReadAndReflectController extends Controller
                     'question' => $reflection->reflection,
                     'answer' => $answer['answer']
                 ];
-            } else {
-                $answers[] = $reflection;
             }
         }
 
@@ -598,7 +597,7 @@ class ReadAndReflectController extends Controller
             ], 404);
         }
 
-        $answers = ReadAndReflectAnswer::where('read_and_reflect_id', $reflect->id)->orderBy('created_at', 'desc');
+        $answers = ReadAndReflectAnswer::where('read_and_reflect_id', $reflect->id)->where('user_id', $this->user->id)->orderBy('created_at', 'desc');
         if($answers->count() < 1){
             return response([
                 'status' => 'failed',

@@ -32,4 +32,14 @@ class LearnAndDo extends Model
             ->generateSlugsFrom('title')
             ->saveSlugsTo('slug');
     }
+
+    public function update_dependencies(){
+        $reads = RecommendedLearnAndDo::where('learn_and_do_id', $this->id);
+        if($reads->count() > 0){
+            foreach($reads->get() as $read){
+                $read->slug = $this->slug;
+                $read->save();
+            }
+        }
+    }
 }

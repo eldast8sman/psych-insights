@@ -288,6 +288,7 @@ class BasicQuestionController extends Controller
         VideoController::recommend_videos($video_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         ListenAndLearnController::recommend_strategies($listen_and_learn_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         ReadAndReflectController::recommend_strategies($read_and_reflect_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
+        LearnAndDoController::recommend_strategies($learn_and_do_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
 
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 

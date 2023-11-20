@@ -443,6 +443,8 @@ class BookController extends Controller
             $book->favourite_count -= 1;
         }
         $book->save();
+        $book->update_dependencies();
+        
         $message = ($action == 'saved') ? 'Book added to Favourites' : 'Book removed from Favourites';
 
         return response([

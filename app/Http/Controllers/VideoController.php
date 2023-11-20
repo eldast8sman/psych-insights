@@ -441,6 +441,8 @@ class VideoController extends Controller
             $video->favourite_count -= 1;
         }
         $video->save();
+        $video->updatw_dependencies();
+        
         $message = ($action == 'saved') ? 'Video added to Favourites' : 'Video removed from Favourites';
 
         return response([
