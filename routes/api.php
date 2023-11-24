@@ -444,3 +444,4 @@ Route::get('/test-token/{card}/{year}/{month}/{cvv}', [StripeController::class, 
 Route::get('/test-customer/{name}/{email}', [StripeController::class, 'create_customer']);
 
 Route::get('/test-gpt/{prompt}', [ChatGPTController::class, 'complete_chat']);
+Route::post('/test-gpt-chat', [ChatGPTController::class, 'chat']);

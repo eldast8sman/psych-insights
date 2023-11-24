@@ -242,6 +242,16 @@ class BasicQuestionController extends Controller
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
         $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        $current = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>', date('Y-m-d'))->first();
+        if(!empty($current)){
+            $package = SubscriptionPackage::find($current->subscription_package_id);
+            if($package->free_trial == 1){
+                if(((strtolower($package->duration_type) == 'week') and ($package->duration < 2)) or ((strtolower($package->durtion_type) == 'day') and ($package->duration < 14))){
+                    $next_question = date('Y-m-d', strtotime($current->end_date.' 01:00:00') + (60 * 60 * 24));                    
+                }
+            }
+        }
+
         // $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
