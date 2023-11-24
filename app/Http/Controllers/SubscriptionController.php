@@ -43,10 +43,14 @@ class SubscriptionController extends Controller
             return false;
         }
 
+        $next_date =  false;
         $histories = SubscriptionHistory::where('user_id', $user_id)->where('subscription_package_id', $package->id);
         if($histories->count() > 0){
             $bonanza = $package->subsequent_promo;
             $history = $histories->first();
+            if($history->end_date <  date('Y-m-d')){
+                $next_date = true;
+            }
         } else {
             $bonanza = $package->first_time_promo;
         }
@@ -149,10 +153,8 @@ class SubscriptionController extends Controller
         if(!empty($answer_summary)){
             $today = date('Y-m-d');
 
-            if($answer_summary->next_question > $today){
-                $expected_next = $next_question = date('Y-m-d', strtotime($answer_summary->created_at) + (60 * 60 * 24 * 7));
-
-                $answer_summary->next_question = ($expected_next > $today) ? $expected_next : $today;
+            if($next_date){
+                $answer_summary->next_question = $today;
                 $answer_summary->save();
             }
         }
