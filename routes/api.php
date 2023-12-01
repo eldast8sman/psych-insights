@@ -321,6 +321,7 @@ Route::middleware('auth:user-api')->group(function(){
     Route::controller(ControllerDassQuestionController::class)->group(function(){
         Route::get('/dass-questions', 'fetch_questions')->name('dassQuestion.fetch');
         Route::post('/dass-questions/answer', 'answer_dass_questions')->name('dassQuestion.answer');
+        Route::get('/distress-scores', 'distress_scores')->name('distressScore');
     });
 
     Route::controller(ControllersDailyQuestionController::class)->group(function(){
