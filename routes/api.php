@@ -308,6 +308,7 @@ Route::middleware('auth:user-api')->group(function(){
         Route::post('/change-email', 'change_email')->name('changeEmail');
         Route::post('/upload-profile-photo', 'upload_profile_photo')->name('uploadProfilePhoto');
         Route::get('/user-guide', 'user_guide')->name('userGuide');
+        Route::post('/deactivate', 'deactivate')->name('userDeactivation');
     });
 
     Route::controller(ControllersBasicQuestionController::class)->group(function(){
