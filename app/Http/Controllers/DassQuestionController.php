@@ -286,4 +286,38 @@ class DassQuestionController extends Controller
             'data' => $answer_summary
         ], 200);
     }
+
+    public function distress_scores(){
+        if(!$this->check_validity()){
+            return response([
+                'status' => 'failed',
+                'message' => 'Not Authorised'
+            ], 409);
+        }
+
+        $prem_scores = QuestionAnswerSummary::where('user_id', $this->user->id)->where('question_type', 'dass_question');
+        if($prem_scores->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'You are yet to complete any Dass21 Question'
+            ], 404);
+        }
+
+        $prem_scores = $prem_scores->first()->premium_scores;
+        $prem_scores = json_decode($prem_scores, true);
+        $scores = [];
+        foreach($prem_scores as $prem_score){
+            $scores[] = [
+                'category' => $prem_score['category'],
+                'score' => $prem_score['value'],
+                'verdict' => $prem_score['verdict']
+            ];
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Latest Distress Score fetched successfully',
+            'data' => $scores
+        ], 200);
+    }
 }
