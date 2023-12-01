@@ -237,7 +237,7 @@ class AuthController extends Controller
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
            
-            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'audio_limit', 'free_trial']);
+            $user->subscription_package = SubscriptionPackage::where('id', $current_subscription->subscription_package_id)->first(['package', 'podcast_limit', 'article_limit', 'video_limit', 'book_limit', 'audio_limit', 'listen_and_learn_limit', 'read_and_reflect_limit', 'learn_and_do_limit', 'free_trial']);
              if($user->subscription_package->free_trial != 1){
                 $user->question_type = "Dass21 Questions";
             } else {
@@ -246,7 +246,7 @@ class AuthController extends Controller
         } else {
             $user->current_subscription = [];
             $user->question_type = "Basic Questions";
-            $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit']);
+            $user->subscription_package = SubscriptionPackage::where('free_package', 1)->first(['package', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit', 'listen_and_learn_limit', 'read_and_reflect_limit', 'learn_and_do_limit']);
         }
 
         if(!empty($user->daily_quote_id)){
@@ -271,7 +271,7 @@ class AuthController extends Controller
         }
 
         $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
-        $user->next_question_date = !empty($last_answet) ? $last_answer->next_question : date('Y-m-d');
+        $user->next_question_date = !empty($last_answer) ? $last_answer->next_question : date('Y-m-d');
         $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', date('Y-m-d'));
         $user->daily_question = ($answered->count() < 1) ? true : false;
 

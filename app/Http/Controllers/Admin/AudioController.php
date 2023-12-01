@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAudioRequest;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Requests\Admin\UpdateAudioRequest;
+use App\Models\FileManager;
 
 class AudioController extends Controller
 {
@@ -25,6 +26,10 @@ class AudioController extends Controller
 
     public static function audio(Audio $audio) : Audio
     {
+        if(!empty($audio->photo)){
+            $audio->photo = FileManagerController::fetch_file($audio->photo);
+        }
+
         if(!empty($audio->audio_file)){
             $audio->audio_file = FileManagerController::fetch_file($audio->audio_file);
         }
@@ -133,7 +138,7 @@ class AudioController extends Controller
      */
     public function store(StoreAudioRequest $request)
     {
-        $all = $request->except(['audio', 'categories']);
+        $all = $request->except(['audio', 'categories', 'photo']);
         if(!empty($request->audio_file)){
             if(!$upload = FileManagerController::upload_file($request->audio_file, env('FILE_DISK', $this->file_disk))){
                 return response([
@@ -143,12 +148,24 @@ class AudioController extends Controller
             }
             $all['audio_file'] = $upload->id;
         }
+        if(!empty($request->photo)){
+            if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'Photo could not be uploaded'
+                ], 500);
+            }
+            $all['photo'] = $upload->id;
+        }
         $all['categories'] = join(',', $request->categories);
         $all['status'] = 1;
 
         if(!$audio = Audio::create($all)){
             if(isset($all['audio_file']) && !empty($all['audio_file'])){
                 FileManagerController::delete($all['audio_file']);
+            }
+            if(isset($all['photo']) and !empty($all['photo'])){
+                FileManagerController::delete($all['photo']);
             }
 
             return response([
@@ -185,7 +202,7 @@ class AudioController extends Controller
      */
     public function update(UpdateAudioRequest $request, Audio $audio)
     {
-        $all = $request->except(['audio_file', 'categories']);
+        $all = $request->except(['audio_file', 'categories', 'photo']);
         if(!empty($request->audio_file)){
             if(!$upload = FileManagerController::upload_file($request->audio_file, env('FILE_DISK', $this->file_disk))){
                 return response([
@@ -195,7 +212,17 @@ class AudioController extends Controller
             }
             $all['audio_file'] = $upload->id;
             $old_audio = $audio->audio_file;
-        } 
+        }
+        if(!empty($request->photo)){
+            if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'Photo could not be uploaded'
+                ], 500);
+            }
+            $all['photo'] = $upload->id;
+            $old_photo = $audio->photo;
+        }
 
         $categories = [];
         foreach($request->categories as $cat_id){
@@ -211,6 +238,9 @@ class AudioController extends Controller
             if(isset($all['audio_file']) && !empty($all['audio_file'])){
                 FileManagerController::delete($all['audio']);
             }
+            if(isset($all['photo']) and !empty($all['photo'])){
+                FileManagerController::delete($all['photo']);
+            }
 
             return response([
                 'status' => 'failed',
@@ -220,6 +250,9 @@ class AudioController extends Controller
         $audio->update_dependencies();
         if(isset($old_audio)){
             FileManagerController::delete($old_audio);
+        }
+        if(isset($old_photo) and !empty($old_photo)){
+            FileManagerController::delete($old_photo);
         }
 
         return response([
@@ -248,6 +281,9 @@ class AudioController extends Controller
         $audio->delete();
         if(!empty($audio->audio_file)){
             FileManagerController::delete($audio->audio_file);
+        }
+        if(!empty($audio->photo)){
+            FileManagerController::delete($audio->photo);
         }
 
         return response([

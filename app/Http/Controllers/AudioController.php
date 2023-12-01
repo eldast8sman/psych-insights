@@ -169,6 +169,12 @@ class AudioController extends Controller
             $audio->audio = FileManagerController::fetch_file($audio->audio_file);
         }
 
+        if(!empty($audio->photo)){
+            $audio->photo = FileManagerController::fetch_file($audio->photo)->url;
+        } else {
+            $audio->photo = "";
+        }
+
         if(!empty($audio->categories)){
             $categories = [];
 

@@ -19,6 +19,7 @@ class Audio extends Model
         'description',
         'subscription_level',
         'release_date',
+        'photo',
         'audio_file',
         'favourite_count',
         'opened_count',
