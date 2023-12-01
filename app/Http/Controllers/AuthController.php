@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\StripeCustomer;
 use App\Mail\ForgotPasswordMail;
 use App\Models\GoogleLoginToken;
+use App\Models\UserDeactivation;
 use App\Http\Requests\LoginRequest;
 use App\Mail\EmailVerificationMail;
 use App\Models\CurrentSubscription;
@@ -30,6 +31,7 @@ use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\DeactivateAccountRequest;
 use App\Http\Requests\UploadProfilePhotoRequest;
 
 class AuthController extends Controller
@@ -47,6 +49,13 @@ class AuthController extends Controller
         $all = $request->only(['name', 'email']);
         $all['password'] = Hash::make($request->password);
 
+        $founds = User::where('deactivated', 0)->where('email', $all['email']);
+        if($founds->count() > 0){
+            return response([
+                'status' => 'failed',
+                'message' => 'This Email is already taken'
+            ], 409);
+        }
         if(!$user = User::create($all)){
             return response([
                 'status' => 'failed',
@@ -186,13 +195,13 @@ class AuthController extends Controller
     }
 
     private function user_login($email, $password){
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $email)->where('deactivated', 0)->first();
         if(empty($user)){
             $this->errors = "Wrong Credentials";
             return false;
         }
         if($user->status != 1){
-            $this->errors = 'User Account has been deactivated';
+            $this->errors = 'User Account has been rendered inactive. Please contact the Admin';
             return false;
         }
         if(!$token = auth('user-api')->attempt([
@@ -514,6 +523,24 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Profile Photo Uploaded successfully',
             'data' => self::user_details($user)
+        ], 200);
+    }
+
+    public function deactivate(DeactivateAccountRequest $request){
+        $user = User::find(self::user()->id);
+
+        $user->deactivated = 1;
+        $user->save();
+
+        $all = $request->all();
+        $all['user_id'] = $user->id;
+        UserDeactivation::create($all);
+
+        auth('user-api')->logout();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Account deactivated successfully'
         ], 200);
     }
 }
