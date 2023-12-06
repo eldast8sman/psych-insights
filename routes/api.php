@@ -40,6 +40,7 @@ use App\Http\Controllers\ReadAndReflectController as UserReadAndReflectControlle
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
+use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -455,6 +456,13 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/favourite-learn-and-dos/{slug}', 'favourite_strategy')->name('favouriteReadAndReflect.show');
         Route::post('/learn-and-dos/{slug}/answer', 'answer_questions')->name('learnAndDo.answer');
         Route::get('/learn-and-dos/{slug}/previous-answers', 'previous_answers')->name('learnAndDo.previousAnswer');
+    });
+
+    Route::controller(ControllersSelfReflectionController::class)->group(function(){
+        Route::get('/self-reflections', 'index')->name('selfReflection.index');
+        Route::get('/self-reflections/{slug}', 'show')->name('selfReflection.show');
+        Route::post('/self-reflections/{slug}/answer', 'answer_reflection')->name('selfReflection.answer');
+        Route::get('/self-reflection-answers', 'previous_answers')->name('selfReflection.answers');
     });
 });
 
