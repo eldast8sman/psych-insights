@@ -43,7 +43,7 @@ class ChatGPTController extends Controller
     public function chat(ChatRequest $request){        
         $client = new Client();
         $messages = [
-            ['role' => 'system', 'content' => 'You are ChatGPT, a mental health therapist.']
+            ['role' => 'system', 'content' => 'You are Sarah Tonin, a mental health therapist.']
         ];
 
        foreach($request->prompt as $req){
