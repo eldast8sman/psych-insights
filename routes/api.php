@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\ListenAndLearnController;
 use App\Http\Controllers\Admin\ReadAndReflectController;
+use App\Http\Controllers\Admin\SelfReflectionController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
@@ -285,6 +286,21 @@ Route::prefix('admin')->group(function(){
             Route::delete('/learn-and-dos/activities/{activity}', 'destroy_activity')->name('admin.learnAndD0.activity.delete');
             Route::delete('learn-and-dos/questions/{question}', 'destroy_question')->name('admin.learnAndDo.question.delete');
             Route::delete('/learn-and-dos/{learn}', 'destroy')->name('admin.learnAndDo.delete');
+        });
+
+        Route::controller(SelfReflectionController::class)->group(function(){
+            Route::post('/self-reflections', 'store')->name('admin.selfReflection.store');
+            Route::get('/self-reflections', 'index')->name('admin.selfReflection.index');
+            Route::get('/self-reflections/{category}', 'show')->name('admin.selfReflection.show');
+            Route::post('/self-reflections/{category}/questions', 'store_question')->name('admin.selfReflection.question.store');
+            Route::get('/self-reflections/questions/{question}', 'show_question')->name('admin.selfReflection.question.show');
+            Route::post('/self-reflections/questions/{question}/options', 'store_option')->name('admin.selfReflection.question.option.store');
+            Route::put('/self-reflections/options/{option}', 'update_option')->name('admin.selfReflection.option.update');
+            Route::put('/self-reflections/questions/{question}', 'update_question')->name('admin.selfReflection.question.update');
+            Route::put('self-reflections/{category}', 'update')->name('admin.selfReflection.update');
+            Route::delete('/self-reflections/options/{option}', 'destroy_option')->name('admin.selfReflection.option.delete');
+            Route::delete('/self-reflections/questions/{question}', 'destroy_question')->name('admin.selfReflection.question.delete');
+            Route::delete('/self-reflections/{category}', 'destroy')->name('admin.selfReflection.delete');
         });
     });
 });
