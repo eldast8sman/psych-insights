@@ -15,6 +15,7 @@ use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use App\Models\QuestionAnswerSummary;
 use App\Models\SubscriptionPaymentAttempt;
+use App\Http\Requests\OldCardSubscriptionRequest;
 use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\CalculateSubscriptionAmountRequest;
 use App\Http\Requests\CompleteSubscriptionPaymentRequest;
@@ -31,7 +32,7 @@ class SubscriptionController extends Controller
         $this->user = AuthController::user();
     }
 
-    public function subscribe($user_id, $package_id, $plan_id, $amount_paid, $promo_code=null, $auto_renew=0){
+    public function subscribe($user_id, $package_id, $plan_id, $amount_paid, $promo_code=null, $auto_renew=0, $type="subscribe"){
         $plan = PaymentPlan::find($plan_id);
         if(empty($plan) or $plan->subscription_package_id != $package_id){
             $this->errors = "No Payment Plan";
@@ -48,8 +49,10 @@ class SubscriptionController extends Controller
         if($histories->count() > 0){
             $bonanza = $package->subsequent_promo;
             $history = $histories->first();
-            if($history->end_date <  date('Y-m-d')){
-                $next_date = true;
+            if($type == "subscribe"){
+                if($history->end_date <  date('Y-m-d')){
+                    $next_date = true;
+                }
             }
         } else {
             $bonanza = $package->first_time_promo;
@@ -133,30 +136,40 @@ class SubscriptionController extends Controller
         ]);
 
         $current = CurrentSubscription::where('user_id', $user_id)->first();
-        $data = [
-            'user_id' => $user_id,
-            'subscription_package_id' => $package->id,
-            'payment_plan_id' => $plan->id,
-            'amount_paid' => $amount_paid,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'auto_renew' => $auto_renew,
-            'grace_end' => $grace_end
-        ];
-        if(empty($current)){
-            CurrentSubscription::create($data);
-        } else {
-            $current->update($data);
-        }
-
-        $answer_summary = QuestionAnswerSummary::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
-        if(!empty($answer_summary)){
-            $today = date('Y-m-d');
-
-            if($next_date){
-                $answer_summary->next_question = $today;
-                $answer_summary->save();
+        if($type == "subscribe"){
+            $data = [
+                'user_id' => $user_id,
+                'subscription_package_id' => $package->id,
+                'payment_plan_id' => $plan->id,
+                'amount_paid' => $amount_paid,
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'auto_renew' => $auto_renew,
+                'grace_end' => $grace_end
+            ];
+            if(empty($current)){
+                CurrentSubscription::create($data);
+            } else {
+                $current->update($data);
             }
+
+            $answer_summary = QuestionAnswerSummary::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
+            if(!empty($answer_summary)){
+                $today = date('Y-m-d');
+
+                if($next_date){
+                    $answer_summary->next_question = $today;
+                    $answer_summary->save();
+                }
+            }
+        } elseif($type == "renew_subscription"){
+            $current->update([
+                'payment_plan_id' => $plan->id,
+                'amount_paid' => $amount_paid,
+                'end_date' => $end_date,
+                'auto_renew' => $auto_renew,
+                'grace_end' => $grace_end
+            ]);
         }
 
         return true;
@@ -172,7 +185,7 @@ class SubscriptionController extends Controller
             ], 200);
         }
 
-        $packages = $packages->get(['package', 'slug', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit', 'first_time_promo', 'subsequent_promo', 'id']);
+        $packages = $packages->get(['package', 'slug', 'podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit', 'listen_and_learn_limit', 'read_and_reflect_limit', 'learn_and_do_limit', 'first_time_promo', 'subsequent_promo', 'id']);
         foreach($packages as $package){
             $package->payment_plans = PaymentPlan::where('subscription_package_id', $package->id)->orderBy('amount', 'asc')->get(['id', 'amount', 'duration_type', 'duration']);
             unset($package->id);
@@ -204,14 +217,13 @@ class SubscriptionController extends Controller
 
     public function calculate_total_payment($id, $user_id, $type='subscription', $promo_code=''){
         $data = [];
+        $plan = PaymentPlan::find($id);
+        $package = SubscriptionPackage::find($plan->subscription_package_id);
+
+        $amount = $plan->amount;
+
+        $data['original_amount'] = $amount;
         if($type == 'subscription'){
-            $plan = PaymentPlan::find($id);
-            $package = SubscriptionPackage::find($plan->subscription_package_id);
-
-            $amount = $plan->amount;
-
-            $data['original_amount'] = $amount;
-
             $previous_sub = SubscriptionHistory::where('user_id', $user_id)->where('subscription_package_id', $package->id)->first();
             if(empty($previous_sub)){
                 $percentage = $package->first_time_promo;
@@ -242,9 +254,34 @@ class SubscriptionController extends Controller
                     }
                 }
             }
+        } elseif($type == 'subscription_renewal'){
+            $percentage = $package->subsequent_promo;
 
-            $data['calculated_amount'] = $amount;
+            if($percentage > 0){
+                $data['package_promo_percent'] = $percentage;
+                $promo_price = ($percentage / 100) * $amount;
+                $data['package_promo_price'] = $promo_price;
+                $amount -= $promo_price;
+            }
+
+            if(!empty($promo_code)){
+                $promo_code = PromoCode::where('promo_code', $promo_code)->first();
+                if(!empty($promo_code)){
+                    $used = UsedPromoCode::where('user_id', $user_id)->where('promo_code_id', $promo_code->id)->first();
+                    $usage = !empty($used) ? $used->frequency : 0;
+
+                    $scope = explode(',', $promo_code->scope);
+                    if(($promo_code->usage_limit > $usage) and (in_array($type, $scope) or in_array('all', $scope))){
+                        $data['promo_code'] = $promo_code;
+                        $data['promo_code_percent'] = $promo_code->percentage_off;
+                        $price_off = ($promo_code->percentage_off / 100) * $amount;
+                        $data['promo_code_price'] = $price_off;
+                        $amount -= $price_off;
+                    }
+                }
+            }
         }
+        $data['calculated_amount'] = $amount;
 
         return $data;
     }
@@ -255,10 +292,6 @@ class SubscriptionController extends Controller
             'message' => 'Subscription Amount calculated successfully',
             'data' => $this->calculate_total_payment($request->payment_plan_id, $this->user->id, 'subscription', !empty($request->promo_code) ? $request->promo_code : "")
         ], 200);
-    }
-
-    public function store_payment_method($method_id){
-
     }
 
     public function fetch_user_payment_methods(){
@@ -319,6 +352,19 @@ class SubscriptionController extends Controller
     }
 
     public function initiate_subscription(InitiateSubscriptionRequest $request){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->end_date > date('Y-m-d')){
+                $pack = SubscriptionPackage::find($current_plan->subscription_package_id);
+                if($pack->free_trial != 1){
+                    return response([
+                        'status' => 'failed',
+                        'message' => 'You still have an active Subscription'
+                    ], 409);
+                }
+            }
+        }
+
         $payment_plan = PaymentPlan::find($request->payment_plan_id);
         if(empty($payment_plan)){
             return response([
@@ -336,9 +382,6 @@ class SubscriptionController extends Controller
         }
 
         $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
-        if(!empty($promo_code)){
-            $promo = PromoCode::where('promo_code', $promo_code)->first();
-        }
 
         $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
 
@@ -417,8 +460,375 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
+    public function initiate_subscription_old_card(OldCardSubscriptionRequest $request){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->end_date > date('Y-m-d')){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'You still have an active Subscription'
+                ], 409);
+            }
+        }
+
+        $payment_plan = PaymentPlan::find($request->payment_plan_id);
+        if(empty($payment_plan)){
+            return response([
+                'status' => 'failed',
+                'message' => 'Payment Plan Not Provided'
+            ], 404);
+        }
+
+        $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
+        if(empty($package)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Subscription Package was fetched'
+            ], 404);
+        }
+        $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
+
+        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
+
+        $method = StripePaymentMethod::find($request->payment_method_id);
+        if($method->user_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Payment Method was fetched'
+            ], 404);
+        }
+
+        $stripe = new StripeController();
+        if(!$charge = $stripe->charge_payment_method($method->stripe_customer_id, $method->payment_id, $amount_array['calculated_amount'])){
+            return response([
+                'status' => 'failed',
+                'message' => $stripe->errors
+            ], 409);
+        }
+        if($charge->status != 'succeeded'){
+            return response([
+                'status' => 'failed',
+                'message' => 'Failed to Charge Payment Method'
+            ], 409);
+        }
+
+        $internal_ref = 'SUB_'.Str::random(20).time();
+        $intent = StripePaymentIntent::create([
+            'internal_ref' => $internal_ref,
+            'user_id' => $this->user->id,
+            'client_secret' => $charge->client_secret,
+            'intent_id' => $charge->id,
+            'intent_data' => json_encode($charge),
+            'amount' => $amount_array['calculated_amount'],
+            'purpose' => 'subscription',
+            'purpose_id' => $payment_plan->id,
+            'auto_renew' => $request->auto_renew,
+            'value_given' => 0
+        ]);
+
+        if(isset($amount_array['promo_code'])){
+            $used_promo_code = PromoCode::where('promo_code', $amount_array['promo_code'])->first();
+            if(!empty($used_promo_code)){
+                $used_promo_id = $used_promo_code->id;
+
+                $used = UsedPromoCode::where('user_id', $this->user->id)->where('promo_code_id', $used_promo_id)->first();
+                if(!empty($used)){
+                    $used->frequency += 1;
+                    $used->save();
+                } else {
+                    UsedPromoCode::create([
+                        'user_id' => $this->user->id,
+                        'promo_code_id' => $used_promo_id,
+                        'frequency' => 1
+                    ]);
+                }
+            }
+        }
+
+        $attempt = SubscriptionPaymentAttempt::create([
+            'user_id' => $this->user->id,
+            'internal_ref' => $internal_ref,
+            'payment_plan_id' => $payment_plan->id,
+            'subscription_amount' => $amount_array['original_amount'],
+            'amount_paid' => $amount_array['calculated_amount'],
+            'promo_percentage' => isset($amount_array['package_promo_percent']) ? $amount_array['package_promo_percent'] : 0,
+            'promo_code_id' => isset($used_promo_id) ? $used_promo_id : null,
+            'promo_code' => isset($amount_array['promo_code']) ? $amount_array['promo_code'] : null,
+            'promo_code_percentage' => isset($amount_array['promo_code_percent']) ? $amount_array['promo_code_percent'] : 0,
+            'status' => 0
+        ]);
+
+        if(!$this->subscribe($this->user->id, $package->id, $payment_plan->id, $attempt->amount_paid, $attempt->promo_code_id, $request->auto_renew)){
+            return response([
+                'status' => 'failed',
+                'message' => $this->errors
+            ], 409);
+        }
+
+        $history = SubscriptionHistory::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->first();
+        $history->update([
+            'subscription_amount' => $attempt->subscription_amount,
+            'promo_percentage' => $attempt->promo_percentage,
+            'promo_code' => $attempt->promo_code,
+            'promo_code_percentage' => $attempt->promo_code_percentage
+        ]);
+
+        $attempt->status = 1;
+        $attempt->save();
+
+        $intent->value_given = 1;
+        $intent->save();
+
+        $user = AuthController::user_details($this->user);
+
+        self::log_activity($this->user->id, "complete_subscription", "subscription_payment_attempts", $attempt->id);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription successful',
+            'data' => $user
+        ], 200);
+    }
+
+    public function initiate_subscription_renewal(InitiateSubscriptionRequest $request){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->grace_end < date('Y-m-d')){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'You do not have an Active Subscription to Renew'
+                ], 409);
+            }
+        }
+
+        $package = SubscriptionPackage::find($current_plan->subscription_package_id);
+        if($package->free_trial == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew Free Trial'
+            ], 409);
+        }
+
+        $payment_plan = PaymentPlan::find($request->payment_plan_id);
+        if($payment_plan->subscription_package_id != $package->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew a Subscription you are not subscribed to'
+            ], 409);
+        }
+
+        $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
+
+        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
+
+        $stripe = new StripeController();
+        $customer = StripeCustomer::where('user_id', $this->user->id);
+        if($customer->count() < 1){
+            $s_customer = $stripe->create_customer($this->user->name, $this->user->email);
+            $customer = StripeCustomer::create([
+                'user_id' => $this->user->id,
+                'customer_id' => $s_customer->id,
+                'customer_data' => json_encode($s_customer)
+            ]);
+        } else {
+            $customer  = $customer->first();
+        }
+        
+        $payment_intent = StripeController::create_payment_intent($customer->customer_id, $amount_array['calculated_amount']);
+
+        $customer_secret = $payment_intent->client_secret;
+
+        $internal_ref = 'SUB_'.Str::random(20).time();
+        StripePaymentIntent::create([
+            'internal_ref' => $internal_ref,
+            'user_id' => $this->user->id,
+            'client_secret' => $customer_secret,
+            'intent_id' => $payment_intent->id,
+            'intent_data' => json_encode($payment_intent),
+            'amount' => $amount_array['calculated_amount'],
+            'purpose' => 'subscription_renewal',
+            'purpose_id' => $payment_plan->id,
+            'auto_renew' => $request->auto_renew,
+            'value_given' => 0
+        ]);
+
+        if(isset($amount_array['promo_code'])){
+            $used_promo_code = PromoCode::where('promo_code', $amount_array['promo_code'])->first();
+            if(!empty($used_promo_code)){
+                $used_promo_id = $used_promo_code->id;
+
+                $used = UsedPromoCode::where('user_id', $this->user->id)->where('promo_code_id', $used_promo_id)->first();
+                if(!empty($used)){
+                    $used->frequency += 1;
+                    $used->save();
+                } else {
+                    UsedPromoCode::create([
+                        'user_id' => $this->user->id,
+                        'promo_code_id' => $used_promo_id,
+                        'frequency' => 1
+                    ]);
+                }
+            }
+        }
+
+        $attempt = SubscriptionPaymentAttempt::create([
+            'user_id' => $this->user->id,
+            'internal_ref' => $internal_ref,
+            'payment_plan_id' => $payment_plan->id,
+            'subscription_amount' => $amount_array['original_amount'],
+            'amount_paid' => $amount_array['calculated_amount'],
+            'promo_percentage' => isset($amount_array['package_promo_percent']) ? $amount_array['package_promo_percent'] : 0,
+            'promo_code_id' => isset($used_promo_id) ? $used_promo_id : null,
+            'promo_code' => isset($amount_array['promo_code']) ? $amount_array['promo_code'] : null,
+            'promo_code_percentage' => isset($amount_array['promo_code_percent']) ? $amount_array['promo_code_percent'] : 0,
+            'status' => 0
+        ]);
+
+        self::log_activity($this->user->id, "initiate_subscription_renewal", "subscription_payment_attempts", $attempt->id);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription Payment Initiated successfully',
+            'data' => [
+                'client_secret' => $customer_secret,
+                'intent_id' => $internal_ref
+            ]
+        ], 200);
+    }
+
+    public function initiate_subscription_renewal_old_card(OldCardSubscriptionRequest $request){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->grace_end < date('Y-m-d')){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'You do not have an Active Subscription to Renew'
+                ], 409);
+            }
+        }
+
+        $package = SubscriptionPackage::find($current_plan->subscription_package_id);
+        if($package->free_trial == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew Free Trial'
+            ], 409);
+        }
+
+        $payment_plan = PaymentPlan::find($request->payment_plan_id);
+        if($payment_plan->subscription_package_id != $package->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew a Subscription you are not subscribed to'
+            ], 409);
+        }
+
+        $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
+
+        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
+
+        $method = StripePaymentMethod::find($request->payment_method_id);
+        if($method->user_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Payment Method was fetched'
+            ], 404);
+        }
+
+        $stripe = new StripeController();
+        if(!$charge = $stripe->charge_payment_method($method->stripe_customer_id, $method->payment_id, $amount_array['calculated_amount'])){
+            return response([
+                'status' => 'failed',
+                'message' => $stripe->errors
+            ], 409);
+        }
+        if($charge->status != 'succeeded'){
+            return response([
+                'status' => 'failed',
+                'message' => 'Failed to Charge Payment Method'
+            ], 409);
+        }
+
+        $internal_ref = 'SUB_'.Str::random(20).time();
+        $intent = StripePaymentIntent::create([
+            'internal_ref' => $internal_ref,
+            'user_id' => $this->user->id,
+            'client_secret' => $charge->client_secret,
+            'intent_id' => $charge->id,
+            'intent_data' => json_encode($charge),
+            'amount' => $amount_array['calculated_amount'],
+            'purpose' => 'subscription_renewal',
+            'purpose_id' => $payment_plan->id,
+            'auto_renew' => $request->auto_renew,
+            'value_given' => 0
+        ]);
+
+        if(isset($amount_array['promo_code'])){
+            $used_promo_code = PromoCode::where('promo_code', $amount_array['promo_code'])->first();
+            if(!empty($used_promo_code)){
+                $used_promo_id = $used_promo_code->id;
+
+                $used = UsedPromoCode::where('user_id', $this->user->id)->where('promo_code_id', $used_promo_id)->first();
+                if(!empty($used)){
+                    $used->frequency += 1;
+                    $used->save();
+                } else {
+                    UsedPromoCode::create([
+                        'user_id' => $this->user->id,
+                        'promo_code_id' => $used_promo_id,
+                        'frequency' => 1
+                    ]);
+                }
+            }
+        }
+
+        $attempt = SubscriptionPaymentAttempt::create([
+            'user_id' => $this->user->id,
+            'internal_ref' => $internal_ref,
+            'payment_plan_id' => $payment_plan->id,
+            'subscription_amount' => $amount_array['original_amount'],
+            'amount_paid' => $amount_array['calculated_amount'],
+            'promo_percentage' => isset($amount_array['package_promo_percent']) ? $amount_array['package_promo_percent'] : 0,
+            'promo_code_id' => isset($used_promo_id) ? $used_promo_id : null,
+            'promo_code' => isset($amount_array['promo_code']) ? $amount_array['promo_code'] : null,
+            'promo_code_percentage' => isset($amount_array['promo_code_percent']) ? $amount_array['promo_code_percent'] : 0,
+            'status' => 0
+        ]);
+
+        if(!$this->subscribe($this->user->id, $package->id, $payment_plan->id, $attempt->amount_paid, $attempt->promo_code_id, $request->auto_renew, 'renew_subscription')){
+            return response([
+                'status' => 'failed',
+                'message' => $this->errors
+            ], 409);
+        }
+
+        $history = SubscriptionHistory::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->first();
+        $history->update([
+            'subscription_amount' => $attempt->subscription_amount,
+            'promo_percentage' => $attempt->promo_percentage,
+            'promo_code' => $attempt->promo_code,
+            'promo_code_percentage' => $attempt->promo_code_percentage
+        ]);
+
+        $attempt->status = 1;
+        $attempt->save();
+
+        $intent->value_given = 1;
+        $intent->save();
+
+        $user = AuthController::user_details($this->user);
+
+        self::log_activity($this->user->id, "complete_subscription", "subscription_payment_attempts", $attempt->id);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription successful',
+            'data' => $user
+        ], 200);
+    }
+
     public function complete_subscription(CompleteSubscriptionPaymentRequest $request){
-        $intent = StripePaymentIntent::where('purpose', 'subscription')->where('user_id', $this->user->id)->where('internal_ref', $request->intent_ref)->first();
+        $intent = StripePaymentIntent::where('user_id', $this->user->id)->where('internal_ref', $request->intent_ref)->first();
         if(empty($intent)){
             return response([
                 'status' => 'failed',
@@ -481,7 +891,13 @@ class SubscriptionController extends Controller
         $payment_plan = PaymentPlan::find($intent->purpose_id);
         $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
 
-        if(!$this->subscribe($this->user->id, $package->id, $payment_plan->id, $attempt->amount_paid, $attempt->promo_code_id)){
+        if($intent->purpose == "subscription"){
+            $type = "subscribe";
+        } elseif($intent->purpose == "subscription_renewal"){
+            $type = "renew_subscription";
+        }
+
+        if(!$this->subscribe($this->user->id, $package->id, $payment_plan->id, $attempt->amount_paid, $attempt->promo_code_id, $intent->auto_renew, $type)){
             return response([
                 'status' => 'failed',
                 'message' => $this->errors
@@ -511,33 +927,6 @@ class SubscriptionController extends Controller
             'message' => 'Subscription successful',
             'data' => $user
         ], 200);
-    }
-
-    public function charge_payment_method(StripePaymentMethod $method){
-        /**
-         * // Set your secret key. Remember to switch to your live secret key in production.
-            // See your keys here: https://dashboard.stripe.com/apikeys
-            \Stripe\Stripe::setApiKey('sk_test_51N3Zm3IQRSSYnnaZymhjA3O97ZR9SHKjoTampfQ0OavEpeGUEThw58VX5VN39mfDSSUSGkcynawKNo5IkG9wDQRQ00KMVMji6P');
-
-            try {
-            \Stripe\PaymentIntent::create([
-                'amount' => 1099,
-                'currency' => 'usd',
-                // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-                'automatic_payment_methods' => ['enabled' => true],
-                'customer' => '{{CUSTOMER_ID}}',
-                'payment_method' => '{{PAYMENT_METHOD_ID}}',
-                'return_url' => 'https://example.com/order/123/complete',
-                'off_session' => true,
-                'confirm' => true,
-            ]);
-            } catch (\Stripe\Exception\CardException $e) {
-            // Error code will be authentication_required if authentication is needed
-            echo 'Error code is:' . $e->getError()->code;
-            $payment_intent_id = $e->getError()->payment_intent->id;
-            $payment_intent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
-            }
-         */
     }
 
     public function subscription_attempts(){
@@ -601,5 +990,29 @@ class SubscriptionController extends Controller
             'message' => 'Subscription Attempt fetched successfully',
             'data' => $attempt
         ], 200);
+    }
+
+    public function charge_previous_card(StripePaymentMethod $method){
+        if($method->user_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Payment Method was fetched'
+            ], 404);
+        }
+
+        $stripe = new StripeController();
+        if($charge = $stripe->charge_payment_method($method->stripe_customer_id, $method->payment_id, 100)){
+            return response([
+                'status' => 'success',
+                'message' => 'Charge successful',
+                'data' => $charge
+            ], 200);
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'Charge failed',
+                'data' => $stripe->errors
+            ], 405);
+        }
     }
 }
