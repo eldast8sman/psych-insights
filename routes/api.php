@@ -409,6 +409,12 @@ Route::middleware('auth:user-api')->group(function(){
         Route::post('/subscriptions/complete', 'complete_subscription')->name('subscription.complete');
         Route::get('/subscription-attempts', 'subscription_attempts')->name('subscriptionAttempts.index');
         Route::get('/subscription-attempts/{internal_ref}', 'subscription_attempt')->name('subscriptionAttempt.show');
+        Route::get('/payment-methods', 'fetch_user_payment_methods')->name('paymentMethods');
+        Route::delete('/payment-methods/{method}', 'remove_payment_method');
+        Route::get('/payment-methods/{method}/charge', 'charge_previous_card')->name('paymentMethod.charge');
+        Route::post('/subscriptions/initiate/old-card', 'initiate_subscription_old_card')->name('subscription.complete.oldCard');
+        Route::post('/subscriptions/initiate-renewal', 'initiate_subscription_renewal')->name('subscription.initiateRenewal');
+        Route::post('/subscriptions/initiate-renewal/old-card', 'initiate_subscription_renewal_old_card')->name('subscriotionRenewal.compleye.oldCard');
     });
 
     Route::controller(JournalController::class)->group(function(){

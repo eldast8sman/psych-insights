@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use Illuminate\Http\Request;
-use Stripe\Exception\ApiErrorException;
-use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Stripe\StripeClient;
+use Stripe\PaymentIntent;
+use Illuminate\Http\Request;
+use Stripe\Exception\CardException;
+use Stripe\Exception\ApiErrorException;
 
 class StripeController extends Controller
 {
@@ -36,7 +37,7 @@ class StripeController extends Controller
     }
 
     public static function create_payment_intent($customer_id, $amount){
-        $amount = $amount * 100;
+        $amount = round($amount, 2) * 100;
 
         $intent = self::$stripe->paymentIntents->create([
             'customer' => $customer_id,
@@ -72,6 +73,30 @@ class StripeController extends Controller
             self::$stripe->paymentMethods->detach($method_id);
             return true;
         } catch(ApiErrorException $e){
+            return false;
+        }
+    }
+
+    public function charge_payment_method($customer_id, $payment_method_id, $amount){
+        $amount = round($amount, 2) * 100;
+
+        Stripe::setApiKey(config('stripe.api_keys.secret_key'));
+
+        try {
+            $intent = PaymentIntent::create([
+                'amount' => $amount,
+                'currency' => 'usd',
+                'automatic_payment_methods' => ['enabled' => true],
+                'customer' => $customer_id,
+                'payment_method' => $payment_method_id,
+                'return_url' => 'https://127.0.0.1:8000',
+                'off_session' => true,
+                'confirm' => true,
+            ]);
+
+            return $intent;
+        } catch (ApiErrorException $e) {
+            $this->errors = $e->getMessage();
             return false;
         }
     }
