@@ -6,6 +6,7 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\ChatGPTController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Admin\InterestController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\DailyQuoteController;
 use App\Http\Controllers\Admin\LearnAndDoController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
@@ -27,6 +29,7 @@ use App\Http\Controllers\Admin\ListenAndLearnController;
 use App\Http\Controllers\Admin\ReadAndReflectController;
 use App\Http\Controllers\Admin\SelfReflectionController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
+use App\Http\Controllers\BlogController as UserBlogController;
 use App\Http\Controllers\Admin\PremiumCategoryScoreRangeController;
 use App\Http\Controllers\AuthController as ControllersAuthController;
 use App\Http\Controllers\BookController as ControllersBookController;
@@ -303,6 +306,23 @@ Route::prefix('admin')->group(function(){
             Route::delete('/self-reflections/questions/{question}', 'destroy_question')->name('admin.selfReflection.question.delete');
             Route::delete('/self-reflections/{category}', 'destroy')->name('admin.selfReflection.delete');
         });
+
+        Route::controller(BlogCategoryController::class)->group(function(){
+            Route::get('/blog-categories', 'index')->name('admin.blogCategory.index');
+            Route::post('/blog-categories', 'store')->name('admin.blogCategory.store');
+            Route::get('/blog-categories/{category}', 'show')->name('admin.blogCategory.show');
+            Route::put('/blog-categories/{category}', 'update')->name('admin.blogCategory.update');
+            Route::delete('/blog-categories/{category}', 'destroy')->name('admin.blogCategory.delete');
+        });
+
+        Route::controller(BlogController::class)->group(function(){
+            Route::get('/blogs', 'index')->name('admin.blog.index');
+            Route::post('/blogs', 'store')->name('admin.blog.store');
+            Route::get('/blogs/{blog}', 'show')->name('admin.blog.show');
+            Route::post('/blogs/{blog}', 'update')->name('admin.blog.update');
+            Route::get('/blogs/{blog}/activation', 'activation')->name('admin.blog.activation');
+            Route::delete('/blogs/{blog}', 'destroy')->name('admin.blog.delete');
+        });
     });
 });
 
@@ -469,6 +489,15 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/self-reflections/{slug}', 'show')->name('selfReflection.show');
         Route::post('/self-reflections/{slug}/answer', 'answer_reflection')->name('selfReflection.answer');
         Route::get('/self-reflection-answers', 'previous_answers')->name('selfReflection.answers');
+    });
+
+    Route::controller(UserBlogController::class)->group(function(){
+        Route::get('/blog-categories', 'categories')->name('blogCategory.index');
+        Route::get('/blogs', 'index')->name('blog.index');
+        Route::get('/blogs/by-category/{slug}', 'byCategory')->name('blog.byCategory');
+        Route::get('/blogs/{slug}', 'show')->name('blog.show');
+        Route::get('/blog/{slug}/favourites', 'blog_favourite')->name('blog.favourite');
+        Route::get('/favourite-blogs', 'favourite_blogs')->name('faouriteBlog.index');
     });
 });
 
