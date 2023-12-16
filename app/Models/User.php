@@ -55,7 +55,11 @@ class User extends Authenticatable implements JWTSubject
         'prev_login',
         'user_guide',
         'status',
-        'deactivated'
+        'deactivated',
+        'last_login_date',
+        'present_streak',
+        'longest_streak',
+        'total_logins'
     ];
 
     /**

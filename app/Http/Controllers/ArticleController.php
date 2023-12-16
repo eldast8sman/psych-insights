@@ -309,6 +309,11 @@ class ArticleController extends Controller
         $article->opened_count += 1;
         $article->save();
 
+        $article = self::fetch_article($article, $this->user->id);
+        if(!empty($article->categories)){
+            self::category_log($this->user->id, $article->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'

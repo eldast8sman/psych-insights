@@ -314,6 +314,11 @@ class BookController extends Controller
         $book->opened_count += 1;
         $book->save();
 
+        $book = self::fetch_book($book, $this->user->id);
+        if(!empty($book->categories)){
+            self::category_log($this->user->id, $book->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'

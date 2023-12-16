@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ActivityLog;
+use App\Models\OpenedAudio;
+use Illuminate\Http\Request;
+
+class DashboardController extends Controller
+{
+    private $user;
+
+    public function __construct()
+    {
+        $this->middleware('auth:user-api');
+        $this->user = AuthController::user();
+    }
+
+    public function activities(){
+        $activities = [];
+
+        for($i=6; $i>=0; $i--){
+            $date = date('Y-m-d', time() - (60 * 60 * 24 * $i));
+            $from = $date." 00:00:00";
+            $to = $date." 23:59:59";
+            $day = date('l', time() - (60 * 60 * 24 * $i));
+
+            $activities[] = [
+                'day' => $day,
+                'activities' => ActivityLog::where('user_id', $this->user->id)->where('created_at', '>=', $from)->where('created_at', '<=', $to)->count()
+            ];
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Activities fetched successfully',
+            'data' => $activities
+        ], 200);
+    }
+
+    public function my_stat(){
+        return response([
+            'insightful_days' => $this->user->total_logins,
+            'total_checkins' => ActivityLog::where('user_id', $this->user->id)->where('activity', 'checkin')->count(),
+            'total_audios' => OpenedAudio::where('user_id')->count(),
+            'longest_streak' => $this->user->longest_streak
+        ], 200);
+    }
+}

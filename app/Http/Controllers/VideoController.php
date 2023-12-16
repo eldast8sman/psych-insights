@@ -311,6 +311,11 @@ class VideoController extends Controller
         $video->opened_count += 1;
         $video->save();
 
+        $video = $this->fetch_video($video, $this->user->id);
+        if(!empty($video->categories)){
+            self::category_log($video->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'

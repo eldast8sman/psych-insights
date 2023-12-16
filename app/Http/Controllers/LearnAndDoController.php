@@ -321,6 +321,14 @@ class LearnAndDoController extends Controller
             $opened->save();
         }
 
+        $learn->opened_count += 1;
+        $learn->save();
+
+        $learn = $this->fetch_strategy($learn, $this->user->id);
+        if(!empty($learn->categories)){
+            self::category_log($this->user->id, $learn->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'

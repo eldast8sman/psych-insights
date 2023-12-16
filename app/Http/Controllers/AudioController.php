@@ -189,7 +189,7 @@ class AudioController extends Controller
             $audio->categories = $categories;
         }
 
-        $audio->favourited = !empty(FavouriteResource::where('resource_id', $audio->id)->where('user_id', $this->user->id)->where('type', 'audio')->first()) ? true : false;
+        $audio->favourited = !empty(FavouriteResource::where('resource_id', $audio->id)->where('user_id', $user_id)->where('type', 'audio')->first()) ? true : false;
 
         unset($audio->created_at);
         unset($audio->updated_at);
@@ -312,6 +312,11 @@ class AudioController extends Controller
 
         $audio->opened_count += 1;
         $audio->save();
+
+        $audio = $this->fetch_audio($audio, $this->user->id);
+        if(!empty($audio->categories)){
+            self::category_log($this->user->id, $audio->categories);
+        }
 
         return response([
             'status' => 'success',

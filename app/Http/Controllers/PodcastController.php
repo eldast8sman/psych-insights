@@ -306,6 +306,11 @@ class PodcastController extends Controller
         $podcast->opened_count += 1;
         $podcast->save();
 
+        $podcast = self::fetch_podcast($podcast, $this->user->id);
+        if(!empty($podcast->categories)){
+            self::category_log($this->user->id, $podcast->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'
