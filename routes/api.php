@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\ChatGPTController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BookController;
@@ -498,6 +499,12 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/blogs/{slug}', 'show')->name('blog.show');
         Route::get('/blog/{slug}/favourites', 'blog_favourite')->name('blog.favourite');
         Route::get('/favourite-blogs', 'favourite_blogs')->name('faouriteBlog.index');
+    });
+
+    Route::controller(DashboardController::class)->group(function(){
+        Route::get('/dashboard/activities', 'activities')->name('dashboard.actiity');
+        Route::get('/dashboard/my-stats', 'my_stat')->name('dashboard.myStat');
+        Route::get('/dashboard/my-progress', 'my_progress');
     });
 });
 

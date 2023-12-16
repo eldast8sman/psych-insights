@@ -214,6 +214,27 @@ class AuthController extends Controller
 
         $user->prev_login = !empty($user->last_login) ? $user->last_login : date('Y-m-d H:i:s');
         $user->last_login = date('Y-m-d H:i:s');
+        if(empty($user->last_login_date)){
+            $user->last_login_date = date('Y-m-d');
+            $user->present_streak = 1;
+            $user->longest_streak = 1;
+            $user->total_logins = 1;
+        } else {
+            $last_date = $user->last_login_date;
+            $user->last_login_date = date('Y-m-d');
+            $yesterday = date('Y-m-d', time() - (60 * 60 * 24));
+            if($last_date == $yesterday){
+                $user->present_streak += 1;
+                $user->total_logins += 1;
+            } elseif($last_date < $yesterday){
+                $user->present_streak = 1;
+                $user->total_logins += 1;
+                $user->total_logins += 1;
+            }
+            if($user->present_streak > $user->longest_streak){
+                $user->longest_streak = $user->present_streak;
+            }
+        }
         $user->save();
 
         $auth = [
@@ -410,6 +431,27 @@ class AuthController extends Controller
         $token = auth('user-api')->login($user);
         $user->prev_login = !empty($user->last_login) ? $user->last_login : date('Y-m-d H:i:s');
         $user->last_login = date('Y-m-d H:i:s');
+        if(empty($user->last_login_date)){
+            $user->last_login_date = date('Y-m-d');
+            $user->present_streak = 1;
+            $user->longest_streak = 1;
+            $user->total_logins = 1;
+        } else {
+            $last_date = $user->last_login_date;
+            $user->last_login_date = date('Y-m-d');
+            $yesterday = date('Y-m-d', time() - (60 * 60 * 24));
+            if($last_date == $yesterday){
+                $user->present_streak += 1;
+                $user->total_logins += 1;
+            } elseif($last_date < $yesterday){
+                $user->present_streak = 1;
+                $user->total_logins += 1;
+                $user->total_logins += 1;
+            }
+            if($user->present_streak > $user->longest_streak){
+                $user->longest_streak = $user->present_streak;
+            }
+        }
         $user->save();
 
         $stripe = new StripeController();

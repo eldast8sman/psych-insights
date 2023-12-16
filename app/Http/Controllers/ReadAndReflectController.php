@@ -307,6 +307,14 @@ class ReadAndReflectController extends Controller
             $opened->save();
         }
 
+        $read->opened_count += 1;
+        $read->save();
+
+        $read = $this->fetch_strategy($read, $this->user->id);
+        if(!empty($read->categories)){
+            self::category_log($this->user->id, $read->categories);
+        }
+
         return response([
             'status' => 'success',
             'message' => 'Marked as Opened'

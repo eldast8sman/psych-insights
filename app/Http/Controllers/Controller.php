@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Audio;
 use App\Models\FavouriteResource;
+use App\Models\UserCategoryLog;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -48,6 +50,27 @@ class Controller extends BaseController
         } else {
             $resource->delete();
             return "deleted";
+        }
+    }
+
+    public static function category_log($user_id, $categories=[]) : void
+    {
+        if(!empty($categories)){
+            foreach($categories as $category){
+                $usercateg = UserCategoryLog::where('user_id', $user_id)->where('category_id', $category->id)->where('day', date('Y-m-d'));
+                if($usercateg->count() < 1){
+                    UserCategoryLog::create([
+                        'user_id' => $user_id,
+                        'category_id' => $category->id,
+                        'count' => 1,
+                        'day' => date('Y-m-d')
+                    ]);
+                } else {
+                    $usercateg = $usercateg->first();
+                    $usercateg->count += 1;
+                    $usercateg->save();
+                }
+            }
         }
     }
 }
