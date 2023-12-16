@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\OpenedAudio;
+use App\Models\UserCategoryLog;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -44,6 +46,44 @@ class DashboardController extends Controller
             'total_checkins' => ActivityLog::where('user_id', $this->user->id)->where('activity', 'checkin')->count(),
             'total_audios' => OpenedAudio::where('user_id')->count(),
             'longest_streak' => $this->user->longest_streak
+        ], 200);
+    }
+
+    public function my_progress(){
+        $progress = [];
+
+        $categories = Category::orderBy('category', 'asc')->get();
+        if(!empty($categories)){
+            foreach($categories as $category){
+                $logs = [];
+                for($i=6; $i>=0; $i--){
+                    $date = date('Y-m-d', time() - (60 * 60 * 24 * $i));
+                    $day = date('l', time() - (60 * 60 * 24 * $i));
+    
+                    $log = UserCategoryLog::where('user_id', $this->user->id)->where('category_id', $category->id)->where('day', $date)->first();
+                    if(!empty($log)){
+                        $count = $log->count;
+                    } else {
+                        $count = 0;
+                    }
+
+                    $logs[] = [
+                        'day' => $day,
+                        'count' => $count
+                    ];
+                }
+
+                $progress[] = [
+                    'category' => $category->category,
+                    'logs' => $logs
+                ];
+            }
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'My Progress fetched successfully',
+            'data' => $progress
         ], 200);
     }
 }
