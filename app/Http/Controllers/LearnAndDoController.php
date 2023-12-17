@@ -316,6 +316,7 @@ class LearnAndDoController extends Controller
                 'learn_and_do_id' => $learn->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();

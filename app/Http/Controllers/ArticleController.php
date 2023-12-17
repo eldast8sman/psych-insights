@@ -301,6 +301,7 @@ class ArticleController extends Controller
                 'article_id' => $article->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();

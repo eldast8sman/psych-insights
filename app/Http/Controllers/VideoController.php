@@ -303,6 +303,7 @@ class VideoController extends Controller
                 'video_id' => $video->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();

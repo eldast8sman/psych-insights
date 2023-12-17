@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Audio;
 use App\Models\FavouriteResource;
+use App\Models\User;
 use App\Models\UserCategoryLog;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -72,5 +73,12 @@ class Controller extends BaseController
                 }
             }
         }
+    }
+
+    public static function complete_resource($user_id) : void
+    {
+        $user = User::find($user_id);
+        $user->resources_completed += 1;
+        $user->save();
     }
 }

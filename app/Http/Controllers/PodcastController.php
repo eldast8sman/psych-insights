@@ -299,6 +299,7 @@ class PodcastController extends Controller
                 'podcast_id' => $podcast->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();
