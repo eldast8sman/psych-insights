@@ -302,6 +302,7 @@ class ReadAndReflectController extends Controller
                 'read_and_reflect_id' => $read->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();

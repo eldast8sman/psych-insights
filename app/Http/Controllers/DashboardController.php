@@ -86,4 +86,26 @@ class DashboardController extends Controller
             'data' => $progress
         ], 200);
     }
+
+    public function days_in_a_row(){
+        $activities = [];
+
+        for($i=6; $i>=0; $i--){
+            $date = date('Y-m-d', time() - (60 * 60 * 24 * $i));
+            $from = $date." 00:00:00";
+            $to = $date." 23:59:59";
+            $day = date('l', time() - (60 * 60 * 24 * $i));
+
+            $activities[] = [
+                'day' => $day,
+                'active' => (ActivityLog::where('user_id', $this->user->id)->where('created_at', '>=', $from)->where('created_at', '<=', $to)->count() > 0) ? true : false 
+            ];
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Activities fetched successfully',
+            'data' => $activities
+        ], 200);
+    }
 }

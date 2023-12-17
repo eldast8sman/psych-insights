@@ -505,6 +505,7 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/dashboard/activities', 'activities')->name('dashboard.actiity');
         Route::get('/dashboard/my-stats', 'my_stat')->name('dashboard.myStat');
         Route::get('/dashboard/my-progress', 'my_progress');
+        Route::get('/dashboard/days-in-a-row', 'days_in_a_row')->name('dashboard.daysInARow');
     });
 });
 

@@ -309,6 +309,7 @@ class ListenAndLearnController extends Controller
                 'listen_and_learn_id' => $learn->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();

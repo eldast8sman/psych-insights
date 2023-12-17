@@ -305,6 +305,7 @@ class AudioController extends Controller
                 'audio_id' => $audio->id,
                 'frequency' => 1
             ]);
+            self::complete_resource($this->user->id);
         } else {
             $opened->frequency += 1;
             $opened->save();
