@@ -229,7 +229,6 @@ class AuthController extends Controller
             } elseif($last_date < $yesterday){
                 $user->present_streak = 1;
                 $user->total_logins += 1;
-                $user->total_logins += 1;
             }
             if($user->present_streak > $user->longest_streak){
                 $user->longest_streak = $user->present_streak;
@@ -445,7 +444,6 @@ class AuthController extends Controller
                 $user->total_logins += 1;
             } elseif($last_date < $yesterday){
                 $user->present_streak = 1;
-                $user->total_logins += 1;
                 $user->total_logins += 1;
             }
             if($user->present_streak > $user->longest_streak){

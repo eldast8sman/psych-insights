@@ -108,4 +108,17 @@ class DashboardController extends Controller
             'data' => $activities
         ], 200);
     }
+
+    public function milestones(){
+        $data = [
+            'three_consecutive_days' => ($this->user->longest_streak >= 3) ? true : false,
+            'three_goals_completion' => ($this->user->goals_completed >= 3) ? true : false,
+            'three_resources_opened' => ($this->user->resources_completed >= 3) ? true : false
+        ];
+        return response([
+            'status' => 'success',
+            'message' => 'Milestones fetched successfully',
+            'data' => $data
+        ], 200);
+    }
 }
