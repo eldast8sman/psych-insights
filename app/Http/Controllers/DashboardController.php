@@ -44,7 +44,7 @@ class DashboardController extends Controller
         return response([
             'insightful_days' => $this->user->total_logins,
             'total_checkins' => ActivityLog::where('user_id', $this->user->id)->where('activity', 'checkin')->count(),
-            'total_audios' => OpenedAudio::where('user_id')->count(),
+            'total_audios' => OpenedAudio::where('user_id', $this->user->id)->count(),
             'longest_streak' => $this->user->longest_streak
         ], 200);
     }
