@@ -50,6 +50,7 @@ jobs:
           script: |
             cd /home/psycsboi
             cd backend_dev
+            git stash
             git pull origin development
             composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
             php artisan migrate
