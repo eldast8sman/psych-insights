@@ -107,7 +107,6 @@ class BlogController extends Controller
                 ]);
             }
         }
-        $blog->update_dependencies();
 
         return response([
             'status' => 'success',
