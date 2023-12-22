@@ -102,7 +102,7 @@ class BlogController extends Controller
                 BlogCategoryBlog::create([
                     'blog_category_id' => $cat_id,
                     'blog_id' => $blog->id,
-                    'blog_status' => $blog->status,
+                    'blog_status' => 1,
                     'blog_created' => $blog->created_at
                 ]);
             }
