@@ -24,7 +24,7 @@ class StoreDassQuestionOptionsRequest extends FormRequest
         return [
             'options' => 'required|array',
             'options.*.option' => 'required|string|unique:dass_question_options,option',
-            'options.*.value' => 'required|integer|min:0'
+            'options.*.value' => 'required|integer|min:0|unique:dass_question_options,value'
         ];
     }
 }
