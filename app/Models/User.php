@@ -61,7 +61,8 @@ class User extends Authenticatable implements JWTSubject
         'longest_streak',
         'total_logins',
         'resources_completed',
-        'goals_completed'
+        'goals_completed',
+        'last_country'
     ];
 
     /**

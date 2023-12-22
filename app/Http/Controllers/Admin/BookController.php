@@ -130,9 +130,6 @@ class BookController extends Controller
         return $book;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreBookRequest $request)
     {
         $all = $request->except(['book_cover', 'categories']);

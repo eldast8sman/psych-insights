@@ -8,12 +8,15 @@ use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\UserCategoryLog;
 use App\Models\FavouriteResource;
+use App\Models\UserIPAddress;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Stevebauman\Location\Facades\Location;
 
 class Controller extends BaseController
 {
@@ -82,5 +85,35 @@ class Controller extends BaseController
         $user = User::find($user_id);
         $user->resources_completed += 1;
         $user->save();
+    }
+
+    public static function check_ip(Request $request, $user_id){
+        $ip_address = $request->ip();       
+
+        if(!empty($ip_address)){
+            $user = User::find($user_id);
+            $address = UserIPAddress::where('user_id', $user_id)->where('ip_address', $ip_address)->first();
+            if(!empty($address)){
+                $address->frequency += 1;
+                $address->save();
+
+                $user->last_country = $address->country;
+                $user->save();
+            } else {
+                $position = Location::get();
+                if($position){
+                    $address = UserIPAddress::create([
+                        'user_id' => $user_id,
+                        'ip_address' => $ip_address,
+                        'country' => $position->countryName,
+                        'location_details' => json_encode($position),
+                        'frequency' => 1
+                    ]);
+
+                    $user->last_country = $address->country;
+                    $user->save();
+                }
+            }
+        }
     }
 }
