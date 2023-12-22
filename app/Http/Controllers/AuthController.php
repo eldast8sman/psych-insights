@@ -108,6 +108,8 @@ class AuthController extends Controller
             $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
         }
 
+        self::check_ip($request, $user->id);
+
         $user = self::user_details($user);
         $user->authorization = $login;
 
@@ -262,6 +264,7 @@ class AuthController extends Controller
 
     public static function user_details(User $user) : User
     {
+        $user = User::find($user->id);
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;
@@ -325,6 +328,8 @@ class AuthController extends Controller
             $user->daily_tip_id = $daily_tip->id;
             $user->save();
         }
+        self::check_ip($request, $user->id);
+
         $user = self::user_details($user);
         $user->authorization = $auth;
 
@@ -467,6 +472,7 @@ class AuthController extends Controller
             'expiry' => auth('user-api')->factory()->getTTL() * 60
         ];
 
+        self::check_ip($request, $user->id);
         $user = self::user_details($user);
         $user->authorization = $auth;
 

@@ -24,7 +24,7 @@ class StoreBasicQuestionOptionsRequest extends FormRequest
         return [
             'options' => 'required|array',
             'options.*.option' => 'required|string|unique:basic_question_options,option',
-            'options.*.value' => 'required|integer|min:1'
+            'options.*.value' => 'required|integer|min:1|unique:basic_question_options,value'
         ];
     }
 }

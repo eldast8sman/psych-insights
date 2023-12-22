@@ -33,7 +33,8 @@ class UserController extends Controller
                 'total_users' => $total_count,
                 'premium_users' => $premium_count,
                 'basic_users' => $basic_count,
-                'deactivated_users' => $deactivated_count
+                'deactivated_users' => $deactivated_count,
+                'total_checkins' => ActivityLog::where('activity', 'checkin')->count()
             ]
         ], 200);
     }
@@ -79,6 +80,7 @@ class UserController extends Controller
                 $user->profile_photo = null;
             }
         }
+        $user->checkins = ActivityLog::where('user_id', $user->id)->where('activity', 'checkin')->count();
 
         return response([
             'status' => 'success',
@@ -109,6 +111,7 @@ class UserController extends Controller
             $user->profile_photo = null;
         }
         $user->recent_activity = ActivityLog::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
+        $user->checkins = ActivityLog::where('user_id', $user->id)->where('activity', 'checkin')->count();
 
         return response([
             'status' => 'success',
@@ -124,6 +127,25 @@ class UserController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Operation successful'
+        ], 200);
+    }
+
+    public function country_total(){
+        $countries_users = [];
+
+        $countries = User::orderBy('last_country')->distinct('last_country')->get(['last_country']);
+        foreach($countries as $country){
+            $users = User::where('last_country', $country->last_country)->count();
+            $countries_users[] = [
+                'country' => $country->last_country,
+                'no_of_users' => $users
+            ];
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Country of Users fetched successfully',
+            'data' => $countries_users
         ], 200);
     }
 }
