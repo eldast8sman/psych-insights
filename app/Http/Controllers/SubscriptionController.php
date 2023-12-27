@@ -56,6 +56,7 @@ class SubscriptionController extends Controller
             }
         } else {
             $bonanza = $package->first_time_promo;
+            $next_date = true;
         }
         $promo_percent = 0;
         if(!empty($promo_code)){
