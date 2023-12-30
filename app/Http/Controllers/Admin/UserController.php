@@ -73,8 +73,8 @@ class UserController extends Controller
                 if(($current_sub->status == 1) and ($current_sub->grace_end >= date('Y-m-d'))){
                     $subscription = SubscriptionPackage::find($current_sub->subscription_package_id);
                     $user->subscription_package = $subscription->package;
-                    $user->start_date = $current_sub->start_date;
-                    $user->end_date = $current_sub->end_date;
+                    // $user->start_date = $current_sub->start_date;
+                    // $user->end_date = $current_sub->end_date;
                 } else {
                     $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
                 }
