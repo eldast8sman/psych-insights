@@ -76,7 +76,7 @@ class UserController extends Controller
                     // $user->start_date = $current_sub->start_date;
                     // $user->end_date = $current_sub->end_date;
                 } else {
-                    $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
+                    // $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
                 }
             }
             if(!empty($user->profile_photo)){
