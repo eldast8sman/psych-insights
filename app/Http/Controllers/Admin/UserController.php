@@ -79,8 +79,9 @@ class UserController extends Controller
             } else {
                 $user->profile_photo = null;
             }
+            $user->recent_activity = ActivityLog::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
+            $user->checkins = ActivityLog::where('user_id', $user->id)->where('activity', 'checkin')->count();
         }
-        $user->checkins = ActivityLog::where('user_id', $user->id)->where('activity', 'checkin')->count();
 
         return response([
             'status' => 'success',
