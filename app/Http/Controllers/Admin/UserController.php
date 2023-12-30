@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\ActivityLog;
 use App\Models\FileManager;
 use Illuminate\Http\Request;
+use App\Models\UserDeactivation;
 use App\Models\CurrentSubscription;
 use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
@@ -61,6 +62,11 @@ class UserController extends Controller
         foreach($users as $user){
             $current_sub = CurrentSubscription::where('user_id', $user->id)->first();
             $user->start_date = date('Y-m-d', strtotime($user->created_at));
+            if($user->deactivated == 1){
+                $user->end_date = date('Y-m-d', strtotime(UserDeactivation::where('user_id', $user->id)->first()->created_at));
+            } else {
+                $user->end_date = null;
+            }
             $user->end_date = date('Y-m-d');
             $user->subscription_package = 'Basic';
             if(!empty($current_sub)){
