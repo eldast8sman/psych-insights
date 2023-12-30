@@ -67,7 +67,6 @@ class UserController extends Controller
             } else {
                 $user->end_date = null;
             }
-            $user->end_date = date('Y-m-d');
             $user->subscription_package = 'Basic';
             if(!empty($current_sub)){
                 if(($current_sub->status == 1) and ($current_sub->grace_end >= date('Y-m-d'))){
