@@ -309,7 +309,7 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Dashboard loaded successfully',
             'data' => [
-                'total_revenue' => number_format($total_revenue, 2),
+                'total_revenue' => $total_revenue,
                 'total_users' => $total_users,
                 'premium_users' => $premium_users,
                 'basic_users' => $basic_users,
