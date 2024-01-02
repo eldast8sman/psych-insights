@@ -353,8 +353,9 @@ class LearnAndDoController extends Controller
         if($opened_strategies->count() < 1){
             return response([
                 'status' => 'failed',
-                'message' => 'No Opened Strategy'
-            ], 404);
+                'message' => 'No Opened Strategy',
+                'data' => $opened_strategies->paginate($limit)
+            ], 200);
         }
 
         $learns = [];

@@ -339,8 +339,9 @@ class ReadAndReflectController extends Controller
         if($opened_strategies->count() < 1){
             return response([
                 'status' => 'failed',
-                'message' => 'No Opened Strategy'
-            ], 404);
+                'message' => 'No Opened Strategy',
+                'data' => []
+            ], 200);
         }
 
         $reads = [];
