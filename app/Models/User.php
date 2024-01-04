@@ -62,7 +62,8 @@ class User extends Authenticatable implements JWTSubject
         'total_logins',
         'resources_completed',
         'goals_completed',
-        'last_country'
+        'last_country',
+        'signup_country'
     ];
 
     /**

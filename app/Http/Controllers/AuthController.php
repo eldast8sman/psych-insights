@@ -306,6 +306,7 @@ class AuthController extends Controller
         $user->next_question_date = !empty($last_answer) ? $last_answer->next_question : date('Y-m-d');
         $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', date('Y-m-d'));
         $user->daily_question = ($answered->count() < 1) ? true : false;
+        $user->incomplete_answers = self::fetch_temp_answer($user->id);
 
         return $user;
     }

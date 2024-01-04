@@ -340,7 +340,7 @@ class ReadAndReflectController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'No Opened Strategy',
-                'data' => []
+                'data' => $opened_strategies->paginate($limit)
             ], 200);
         }
 
