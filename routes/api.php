@@ -355,12 +355,16 @@ Route::middleware('auth:user-api')->group(function(){
         Route::post('/basic-questions/answer', 'answer_basic_question')->name('basicQuestion.answer');
         Route::get('/interests', 'fetch_interests')->name('interest.fetch');
         Route::post('/interests', 'set_interests')->name('interest.set');
+        Route::post('/basic-questions/temp-answers', 'answer_temp')->name('basicQuestion.tempAnswer.store');
+        Route::get('/basic-questions/temp-answers', 'fetch_basic_temp_answer')->name('basicQuestion.tempAnswer.fetch');
     });
 
     Route::controller(ControllerDassQuestionController::class)->group(function(){
         Route::get('/dass-questions', 'fetch_questions')->name('dassQuestion.fetch');
         Route::post('/dass-questions/answer', 'answer_dass_questions')->name('dassQuestion.answer');
         Route::get('/distress-scores', 'distress_scores')->name('distressScore');
+        Route::post('/dass-questions/temp-answers', 'answer_temp')->name('dassQuestion.tempAnswer.store');
+        Route::get('/dass-questions/temp-answers', 'fetch_dass_temp_answer')->name('dassQuestion.tempAnswer.fetch');
     });
 
     Route::controller(ControllersDailyQuestionController::class)->group(function(){

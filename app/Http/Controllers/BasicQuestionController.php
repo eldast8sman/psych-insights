@@ -98,6 +98,8 @@ class BasicQuestionController extends Controller
             ], 409);
         }
 
+        self::delete_temp_answer($this->user->id);
+
         $total_score = 0;
         $k10_score = 0;
         $category_scores = [];
@@ -349,6 +351,44 @@ class BasicQuestionController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Interest set successfully'
+        ], 200);
+    }
+
+    public function answer_temp(AnswerBasicQuestionRequest $request){
+        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+        $fetch = false;
+        if($last_answer->count() < 1){
+            $fetch = true;
+            $new = true;
+        } else {
+            $last_answer = $last_answer->first();
+            $today = date('Y-m-d');
+
+            if($today >= $last_answer->next_question){
+                $fetch = true;
+            }
+            $new = false;
+        }
+
+        if(!$fetch){
+            return response([
+                'status' => 'failed',
+                'message' => 'It\'s not yet time to answer this questionnaire'
+            ], 409);
+        }
+        
+        self::temp_answer($this->user->id, 'Basic Questions', $request->answers);
+        return response([
+            'status' => 'success',
+            'message' => 'Answers saved successfully'
+        ]);
+    }
+
+    public function fetch_basic_temp_answer(){
+        return response([
+            'status' => 'success',
+            'message' => 'Answers fetched successfully',
+            'data' => self::fetch_temp_answer_by_type($this->user->id, 'Basic Questions')
         ], 200);
     }
 }

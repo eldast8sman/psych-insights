@@ -111,6 +111,8 @@ class DassQuestionController extends Controller
             ], 409);
         }
 
+        self::delete_temp_answer($this->user->id);
+
         $total_score = 0;
         $k10_score = 0;
         $category_scores = [];
@@ -318,6 +320,48 @@ class DassQuestionController extends Controller
             'status' => 'success',
             'message' => 'Latest Distress Score fetched successfully',
             'data' => $scores
+        ], 200);
+    }
+
+    public function answer_temp(AnswerDassQuestionRequest $request){
+        if(!$this->check_validity()){
+            return response([
+                'status' => 'failed',
+                'message' => 'Not Authorised'
+            ], 409);
+        }
+        $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+        $fetch = false;
+        if($last_answer->count() < 1){
+            $fetch = true;
+        } else {
+            $last_answer = $last_answer->first();
+            $today = date('Y-m-d');
+
+            if($today >= $last_answer->next_question){
+                $fetch = true;
+            }
+        } 
+
+        if(!$fetch){
+            return response([
+                'status' => 'failed',
+                'message' => 'It\'s not yet time to answer this questionnaire'
+            ], 409);
+        }
+        
+        self::temp_answer($this->user->id, 'Dass21 Questions', $request->answers);
+        return response([
+            'status' => 'success',
+            'message' => 'Answers saved successfully'
+        ]);
+    }
+
+    public function fetch_dass_temp_answer(){
+        return response([
+            'status' => 'success',
+            'message' => 'Answers fetched successfully',
+            'data' => self::fetch_temp_answer_by_type($this->user->id, 'Dass21 Questions')
         ], 200);
     }
 }

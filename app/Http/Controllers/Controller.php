@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\UserCategoryLog;
 use App\Models\FavouriteResource;
+use App\Models\TempAnswer;
 use App\Models\UserIPAddress;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -98,6 +99,9 @@ class Controller extends BaseController
                 $address->save();
 
                 $user->last_country = $address->country;
+                if(empty($user->signup_country)){
+                    $user->signup_country = $user->last_country;
+                }
                 $user->save();
             } else {
                 $position = Location::get();
@@ -111,9 +115,54 @@ class Controller extends BaseController
                     ]);
 
                     $user->last_country = $address->country;
+                    if(empty($user->signup_country)){
+                        $user->signup_country = $user->last_country;
+                    }
                     $user->save();
                 }
             }
         }
+    }
+
+    public static function temp_answer($user_id, $type, $answers) : void
+    {
+        $temp_answer = TempAnswer::where('user_id', $user_id)->first();
+        if(empty($temp_answer)){
+            $temp_answer =  TempAnswer::create([
+                'user_id' => $user_id,
+                'question_type' => $type,
+                'answers' => json_encode($answers)
+            ]);
+        } else {
+            $temp_answer->question_type = $type;
+            $temp_answer->answers = json_encode($answers);
+            $temp_answer->save();
+        }
+    }
+
+    public static function delete_temp_answer($user_id) : void
+    {
+        $temp = TempAnswer::where('user_id', $user_id)->first();
+        if(!empty($temp)){
+            $temp->delete();
+        }
+    }
+
+    public static function fetch_temp_answer($user_id){
+        $temp = TempAnswer::where('user_id', $user_id)->first(['question_type', 'answers']);
+        if(!empty($temp)){
+            $temp->answers = json_decode($temp->answers);
+        }
+
+        return $temp;
+    }
+
+    public static function fetch_temp_answer_by_type($user_id, $type){
+        $temp = TempAnswer::where('user_id', $user_id)->where('question_type', $type)->first(['question_type', 'answers']);
+        if(!empty($temp)){
+            $temp->answers = json_decode($temp->answers);
+        }
+
+        return $temp;
     }
 }
