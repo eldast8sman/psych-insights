@@ -21,7 +21,8 @@ class ReadAndReflect extends Model
         'subscription_level',
         'favourite_count',
         'opened_count',
-        'status'
+        'status',
+        'published'
     ];
 
     public function getSlugOptions(): SlugOptions

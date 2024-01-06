@@ -262,6 +262,7 @@ Route::prefix('admin')->group(function(){
             Route::put('/read-and-reflects/reflections/{reflection}', 'update_reflection')->name('admin.readAndReflect.reflection.update');
             Route::delete('/read-and-reflects/reflections/{reflection}', 'delete_reflection')->name('admin.readAndReflect.reflection.delete');
             Route::post('/read-and-reflects/{reflection}', 'update')->name('admin.readAndReflect.update');
+            Route::get('/read-and-reflects/{read}/publish', 'publish')->name('admin.readAndReflect.publish');
             Route::delete('/read-and-reflects/{reflection}', 'destroy')->name('admin.readAndReflect.delete');
         });
 
@@ -274,6 +275,7 @@ Route::prefix('admin')->group(function(){
             Route::delete('/listen-and-learns/audios/{audio}', 'delete_audio')->name('admin.listenAndLearn.audio.delete');
             Route::get('/listen-and-learns/{learn}', 'show')->name('admin.listenAndLearn.show');
             Route::post('/listen-and-learns/{learn}', 'update')->name('admin.listenAndLearn.update');
+            Route::get('/listen-and-learns/{learn}/publish', 'publish')->name('admin.listenAndLearn.publish');
             Route::delete('/listen-and-learns/{learn}', 'destroy')->name('admin.listenAndLearn.delete');
         });
 
@@ -291,6 +293,7 @@ Route::prefix('admin')->group(function(){
             Route::put('/learn-and-dos/questions/{question}', 'update_question')->name('admin.learnAndDo.question.update');
             Route::delete('/learn-and-dos/activities/{activity}', 'destroy_activity')->name('admin.learnAndD0.activity.delete');
             Route::delete('learn-and-dos/questions/{question}', 'destroy_question')->name('admin.learnAndDo.question.delete');
+            Route::get('/learn-and-dos/{learn}/publish', 'publish')->name('admin.learnAndDo.publish');
             Route::delete('/learn-and-dos/{learn}', 'destroy')->name('admin.learnAndDo.delete');
         });
 

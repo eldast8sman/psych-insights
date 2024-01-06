@@ -135,6 +135,7 @@ class ListenAndLearnController extends Controller
         }
         $all['photo'] = $upload->id;
         $all['categories'] = join(',', $request->categories);
+        $all['published'] = 0;
 
         if(!$learn = ListenAndLearn::create($all)){
             if(isset($all['photo'])){
@@ -274,6 +275,17 @@ class ListenAndLearnController extends Controller
             'status' => 'success',
             'message' => 'Listen and Learn Strategy updated successfully',
             'data' => self::listen_and_learn($learn)
+        ], 200);
+    }
+
+    public function publish(ListenAndLearn $learn){
+        $learn->published = ($learn->published == 0) ? 1 : 0;
+        $learn->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Operation successful',
+            'data' => $learn
         ], 200);
     }
 
