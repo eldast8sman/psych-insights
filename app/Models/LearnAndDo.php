@@ -23,7 +23,8 @@ class LearnAndDo extends Model
         'activity_overview',
         'favourite_count',
         'opened_count',
-        'status'
+        'status',
+        'published'
     ];
 
     public function getSlugOptions(): SlugOptions

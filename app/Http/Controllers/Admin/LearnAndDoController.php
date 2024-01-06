@@ -147,6 +147,7 @@ class LearnAndDoController extends Controller
         }
         $all['photo'] = $upload->id;
         $all['categories'] = join(',', $request->categories);
+        $all['published'] = 0;
 
         if(!$learn = LearnAndDo::create($all)){
             if(isset($all['photo'])){
@@ -345,6 +346,17 @@ class LearnAndDoController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Activity Question deleted successfully'
+        ], 200);
+    }
+
+    public function publish(LearnAndDo $learn){
+        $learn->published = ($learn->published == 0) ? 1 : 0;
+        $learn->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Operation successful',
+            'data' => $learn
         ], 200);
     }
 

@@ -45,7 +45,7 @@ class ListenAndLearnController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $learns = ListenAndLearn::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $learns = ListenAndLearn::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($learns as $learn){
                 if(count($strategies_id) < $first_limit){
                     $categories = explode(',', $learn->categories);
@@ -62,7 +62,7 @@ class ListenAndLearnController extends Controller
                 foreach($opened_strategies as $opened_strategy){
                     if(count($strategies_id) < $first_limit){
                         $learn = ListenAndLearn::find($opened_strategy);
-                        if(!empty($learn) and ($learn->status == 1) and ($learn->subscription_level <= $level)){
+                        if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1) and ($learn->subscription_level <= $level)){
                             $categories = explode(',', $learn->categories);
                             if(in_array($cat_id, $categories)){
                                 $strategies_id[] = $learn;
@@ -76,7 +76,7 @@ class ListenAndLearnController extends Controller
             }
 
             $counting = count($strategies_id);
-            if(($counting < $limit) and (ListenAndLearn::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+            if(($counting < $limit) and (ListenAndLearn::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
                 $s_learns = ListenAndLearn::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($strategies_id)){
                     foreach($strategies_id as $strategy_id){
@@ -100,7 +100,7 @@ class ListenAndLearnController extends Controller
                     foreach($opened_strategies as $opened_strategy){
                         if(count($strategies_id) < $limit){
                             $learn = ListenAndLearn::find($opened_strategy);
-                            if(!empty($learn) and ($learn->status == 1) and ($learn->subscription_level <= $level)){
+                            if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1) and ($learn->subscription_level <= $level)){
                                 $categories = explode(',', $learn->categories);
                                 if(in_array($sec_cat_id, $categories)){
                                     $strategies_id[] = $learn;
@@ -115,7 +115,7 @@ class ListenAndLearnController extends Controller
             }
 
             $counted = count($strategies_id);
-            if(($counted < $limit) and (ListenAndLearn::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
+            if(($counted < $limit) and (ListenAndLearn::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
                 $other_learns = ListenAndLearn::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($strategies_id)){
                     foreach($strategies_id as $strategy_id){
@@ -221,7 +221,7 @@ class ListenAndLearnController extends Controller
         if(empty($search)){
             foreach($rec_learns as $rec_learn){
                 $learn = ListenAndLearn::find($rec_learn->listen_and_learn_id);
-                if(!empty($learn) and ($learn->status == 1)){
+                if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1)){
                     $learns[] = $this->fetch_strategy($learn, $this->user->id);
                 }
             }
@@ -279,7 +279,7 @@ class ListenAndLearnController extends Controller
         }
 
         $learn = ListenAndLearn::find($rec_learn->listen_and_learn_id);
-        if(empty($learn) or ($learn->status != 1)){
+        if(empty($learn) or ($learn->status != 1) or ($learn->published != 1)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'
@@ -356,7 +356,7 @@ class ListenAndLearnController extends Controller
         if(empty($search)){
             foreach($opened_learns as $opened_learn){
                 $learn = ListenAndLearn::find($opened_learn->listen_and_learn_id);
-                if(!empty($learn) and ($learn->status == 1)){
+                if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1)){
                     $learns[] = $this->fetch_strategy($learn, $this->user->id);
                 }
             }
@@ -382,7 +382,7 @@ class ListenAndLearnController extends Controller
 
                 foreach($keys as $key){
                     $learn = ListenAndLearn::find($key);
-                    if(!empty($learn) and ($learn->status == 1)){
+                    if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1)){
                         $learns[] = $this->fetch_strategy($learn, $this->user->id);
                     }
                 }
@@ -414,7 +414,7 @@ class ListenAndLearnController extends Controller
         }
 
         $learn = ListenAndLearn::where('slug', $slug)->first();
-        if(empty($learn) or ($learn->status != 1)){
+        if(empty($learn) or ($learn->status != 1) or ($learn->published != 1)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'
@@ -489,7 +489,7 @@ class ListenAndLearnController extends Controller
         if(empty($search)){
             foreach($fav_learns as $fav_learn){
                 $learn = ListenAndLearn::find($fav_learn->resource_id);
-                if(!empty($learn) and ($learn->status == 1)){
+                if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1)){
                     $learns[] = $this->fetch_strategy($learn, $this->user->id);
                 }
             }
@@ -515,7 +515,7 @@ class ListenAndLearnController extends Controller
 
                 foreach($keys as $key){
                     $learn = ListenAndLearn::find($key);
-                    if(!empty($learn) and ($learn->status == 1)){
+                    if(!empty($learn) and ($learn->status == 1) and ($learn->published == 1)){
                         $learns[] = $this->fetch_strategy($learn, $this->user->id);
                     }
                 }
@@ -547,7 +547,7 @@ class ListenAndLearnController extends Controller
         }
 
         $learn = ListenAndLearn::where('slug', $slug)->first();
-        if(empty($learn) or ($learn->status != 1)){
+        if(empty($learn) or ($learn->status != 1) or ($learn->published != 1)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'

@@ -46,7 +46,7 @@ class ReadAndReflectController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $reads = ReadAndReflect::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $reads = ReadAndReflect::where('status', 1)->where('pubished', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
             foreach($reads as $read){
                 if(count($strategies_id) < $first_limit){
                     $categories = explode(',', $read->categories);
@@ -63,7 +63,7 @@ class ReadAndReflectController extends Controller
                 foreach($opened_strategies as $opened_strategy){
                     if(count($strategies_id) < $first_limit){
                         $read = ReadAndReflect::find($opened_strategy);
-                        if(!empty($read) and ($read->status == 1) and ($read->subscription_level <= $level)){
+                        if(!empty($read) and ($read->status == 1) and($read->published == 1) and ($read->subscription_level <= $level)){
                             $categories = explode(',', $read->categories);
                             if(in_array($cat_id, $categories)){
                                 $strategies_id[] = $read;
@@ -77,7 +77,7 @@ class ReadAndReflectController extends Controller
             }
 
             $counting = count($strategies_id);
-            if(($counting < $limit) and (ReadAndReflect::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
+            if(($counting < $limit) and (ReadAndReflect::where('status', 1)->where('pubished', 1)->where('subscription_level', '<=', $level)->count() > $counting)){
                 $s_reads = ReadAndReflect::where('status', 1)->where('subscription_level', '<=', $level);
                 if(!empty($strategies_id)){
                     foreach($strategies_id as $strategy_id){
@@ -101,7 +101,7 @@ class ReadAndReflectController extends Controller
                     foreach($opened_strategies as $opened_strategy){
                         if(count($strategies_id) < $limit){
                             $read = ReadAndReflect::find($opened_strategy);
-                            if(!empty($read) and ($read->status == 1) and ($read->subscription_level <= $level)){
+                            if(!empty($read) and ($read->status == 1) and ($read->published == 1) and ($read->subscription_level <= $level)){
                                 $categories = explode(',', $read->categories);
                                 if(in_array($sec_cat_id, $categories)){
                                     $strategies_id[] = $read;
@@ -116,8 +116,8 @@ class ReadAndReflectController extends Controller
             }
 
             $counted = count($strategies_id);
-            if(($counted < $limit) and (ReadAndReflect::where('status', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
-                $other_reads = ReadAndReflect::where('status', 1)->where('subscription_level', '<=', $level);
+            if(($counted < $limit) and (ReadAndReflect::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->count() > $counted)){
+                $other_reads = ReadAndReflect::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level);
                 if(!empty($strategies_id)){
                     foreach($strategies_id as $strategy_id){
                         $other_reads = $other_reads->where('id', '<>', $strategy_id->id);
@@ -214,7 +214,7 @@ class ReadAndReflectController extends Controller
         if(empty($search)){
             foreach($rec_reads as $rec_read){
                 $read = ReadAndReflect::find($rec_read->read_and_reflect_id);
-                if(!empty($read) and ($read->status == 1)){
+                if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                     $reads[] = $this->fetch_strategy($read, $this->user->id);
                 }
             }
@@ -240,7 +240,7 @@ class ReadAndReflectController extends Controller
 
                 foreach($keys as $key){
                     $read = ReadAndReflect::find($key);
-                    if(!empty($read) and ($read->status == 1)){
+                    if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                         $reads[] = $this->fetch_strategy($read, $this->user->id);
                     }
                 }
@@ -272,7 +272,7 @@ class ReadAndReflectController extends Controller
         }
 
         $read = ReadAndReflect::find($rec_read->read_and_reflect_id);
-        if(empty($read) or ($read->status != 1)){
+        if(empty($read) or ($read->status != 1) or ($read->published != 1)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'
@@ -349,7 +349,7 @@ class ReadAndReflectController extends Controller
         if(empty($search)){
             foreach($opened_reads as $opened_read){
                 $read = ReadAndReflect::find($opened_read->read_and_reflect_id);
-                if(!empty($read) and ($read->status == 1)){
+                if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                     $reads[] = $this->fetch_strategy($read, $this->user->id);
                 }
             }
@@ -375,7 +375,7 @@ class ReadAndReflectController extends Controller
 
                 foreach($keys as $key){
                     $read = ReadAndReflect::find($key);
-                    if(!empty($read) and ($read->status == 1)){
+                    if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                         $reads[] = $this->fetch_strategy($read, $this->user->id);
                     }
                 }
@@ -407,7 +407,7 @@ class ReadAndReflectController extends Controller
         }
 
         $read = ReadAndReflect::where('slug', $slug)->first();
-        if(empty($read) or ($read->status != 1)){
+        if(empty($read) or ($read->status != 1) or ($read->published != 1)){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'
@@ -482,7 +482,7 @@ class ReadAndReflectController extends Controller
         if(empty($search)){
             foreach($fav_reads as $fav_read){
                 $read = ReadAndReflect::find($fav_read->resource_id);
-                if(!empty($read) and ($read->status == 1)){
+                if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                     $reads[] = $this->fetch_strategy($read, $this->user->id);
                 }
             }
@@ -508,7 +508,7 @@ class ReadAndReflectController extends Controller
 
                 foreach($keys as $key){
                     $read = ReadAndReflect::find($key);
-                    if(!empty($read) and ($read->status == 1)){
+                    if(!empty($read) and ($read->status == 1) and ($read->published == 1)){
                         $reads[] = $this->fetch_strategy($read, $this->user->id);
                     }
                 }
@@ -540,7 +540,7 @@ class ReadAndReflectController extends Controller
         }
 
         $read = ReadAndReflect::where('slug', $slug)->first();
-        if(empty($read) or ($read->status != 1)){
+        if(empty($read) or ($read->status != 1)  or $read->published != 1){
             return response([
                 'status' => 'failed',
                 'message' => 'No Strategy was fetched'

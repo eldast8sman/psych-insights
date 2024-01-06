@@ -126,6 +126,7 @@ class ReadAndReflectController extends Controller
         }
         $all['photo'] = $upload->id;
         $all['categories'] = join(',', $request->categories);
+        $all['published'] = 0;
 
         if(!$reflection = ReadAndReflect::create($all)){
             if(isset($all['photo'])){
@@ -253,6 +254,17 @@ class ReadAndReflectController extends Controller
             'status' => 'success',
             'message' => 'Read and Reflect Strategy updated successfully',
             'data' => $this->read_and_reflect($reflection)
+        ], 200);
+    }
+
+    public function publish(ReadAndReflect $read){
+        $read->published = ($read->published == 0) ? 1 : 0;
+        $read->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Operation successful',
+            'data' => $read
         ], 200);
     }
 
