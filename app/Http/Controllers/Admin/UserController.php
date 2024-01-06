@@ -10,6 +10,7 @@ use App\Models\UserDeactivation;
 use App\Models\CurrentSubscription;
 use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
+use App\Models\PaymentPlan;
 
 class UserController extends Controller
 {
@@ -68,14 +69,17 @@ class UserController extends Controller
                 $user->end_date = null;
             }
             $user->subscription_package = 'Basic';
+            $user->subscription_duration = 'N/A';
             if(!empty($current_sub)){
                 if(($current_sub->status == 1) and ($current_sub->grace_end >= date('Y-m-d'))){
                     $subscription = SubscriptionPackage::find($current_sub->subscription_package_id);
                     $user->subscription_package = $subscription->package;
-                    // $user->start_date = $current_sub->start_date;
-                    // $user->end_date = $current_sub->end_date;
-                } else {
-                    // $user->end_date = date('Y-m-d', strtotime($current_sub->end_date) + (60 * 60 * 24));
+                    $payment_plan = PaymentPlan::find($current_sub->payment_plan_id);
+                    $period = ucfirst($payment_plan->duration_type);
+                    if($payment_plan->duration > 1){
+                        $period = $period."s";
+                    }
+                    $user->subscription_duration = $payment_plan->duration.' '.$period;
                 }
             }
             if(!empty($user->profile_photo)){
