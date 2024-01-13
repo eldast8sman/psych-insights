@@ -322,6 +322,7 @@ Route::prefix('admin')->group(function(){
 
         Route::controller(BlogController::class)->group(function(){
             Route::get('/blogs', 'index')->name('admin.blog.index');
+            Route::get('/blog-summary', 'summary')->name('summary');
             Route::post('/blogs', 'store')->name('admin.blog.store');
             Route::get('/blogs/{blog}', 'show')->name('admin.blog.show');
             Route::post('/blogs/{blog}', 'update')->name('admin.blog.update');
