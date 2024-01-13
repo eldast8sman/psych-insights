@@ -14,7 +14,8 @@ class SelfReflectionCategory extends Model
     protected $fillable = [
         'category',
         'slug',
-        'details'
+        'details',
+        'published'
     ];
 
     public function getSlugOptions(): SlugOptions

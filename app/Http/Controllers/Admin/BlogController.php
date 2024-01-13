@@ -216,4 +216,18 @@ class BlogController extends Controller
             'message' => 'Blog deleted successfully'
         ], 200);
     }
+
+    public function summary(){
+        $blogs = Blog::count();
+        $categories = BlogCategory::count();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Blog Summary fetched successfully',
+            'data' => [
+                'blogs' => $blogs,
+                'categories' => $categories
+            ]
+        ], 200);
+    }
 }

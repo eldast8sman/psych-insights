@@ -50,7 +50,7 @@ class SelfReflectionController extends Controller
     }
 
     public function index(){
-        $categories = SelfReflectionCategory::orderBy('category', 'asc');
+        $categories = SelfReflectionCategory::where('published', 1)->orderBy('category', 'asc');
         if($categories->count() < 1){
             return response([
                 'status' => 'failed',
