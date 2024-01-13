@@ -306,7 +306,8 @@ Route::prefix('admin')->group(function(){
             Route::post('/self-reflections/questions/{question}/options', 'store_option')->name('admin.selfReflection.question.option.store');
             Route::put('/self-reflections/options/{option}', 'update_option')->name('admin.selfReflection.option.update');
             Route::put('/self-reflections/questions/{question}', 'update_question')->name('admin.selfReflection.question.update');
-            Route::put('self-reflections/{category}', 'update')->name('admin.selfReflection.update');
+            Route::put('/self-reflections/{category}', 'update')->name('admin.selfReflection.update');
+            Route::get('/self-reflections/{category}/publish', 'publish')->name('admin.selfReflection.publish');
             Route::delete('/self-reflections/options/{option}', 'destroy_option')->name('admin.selfReflection.option.delete');
             Route::delete('/self-reflections/questions/{question}', 'destroy_question')->name('admin.selfReflection.question.delete');
             Route::delete('/self-reflections/{category}', 'destroy')->name('admin.selfReflection.delete');
