@@ -76,7 +76,9 @@ class SelfReflectionController extends Controller
             ], 409);
         }
 
-        if(!$category = SelfReflectionCategory::create($request->all())){
+        $all = $request->all();
+        $all['pubished'] = 0;
+        if(!$category = SelfReflectionCategory::create($all)){
             return response([
                 'status' => 'failed',
                 'message' => 'Category not created'
@@ -179,6 +181,17 @@ class SelfReflectionController extends Controller
         return response([
             'status' => 'success',
             'message' => 'Self Reflection Category updated successfully',
+            'data' => self::category($category)
+        ], 200);
+    }
+
+    public function publish(SelfReflectionCategory $category){
+        $category->published = ($category->published == 0) ? 1 : 0;
+        $category->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Operation successful',
             'data' => self::category($category)
         ], 200);
     }
