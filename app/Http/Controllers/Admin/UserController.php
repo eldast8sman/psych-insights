@@ -158,4 +158,19 @@ class UserController extends Controller
             'data' => $countries_users
         ], 200);
     }
+
+    public function closed_accounts(){
+        $limit = !empty($_GET['limit']) ? (string)$_GET['limit'] : 10;
+        $users = UserDeactivation::orderBy('created_at', 'desc')->paginate($limit);
+
+        foreach($users as $user){
+            $user->user = User::find($user->user_id);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Closed Accounts fetched successfully',
+            'data' => $users
+        ], 200);
+    }
 }

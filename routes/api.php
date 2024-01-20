@@ -226,6 +226,7 @@ Route::prefix('admin')->group(function(){
             Route::get('/users/{user}', 'show')->name('admin.user.show');
             Route::get('/users/{user}/activation', 'user_activation')->name('admin.user.activation');
             Route::get('/user-countries', 'country_total')->name('admin.userCountries');
+            Route::get('/closed-accounts', 'closed_accounts')->name('admin.closedAccounts');
         });
 
         Route::controller(InterestController::class)->group(function(){
