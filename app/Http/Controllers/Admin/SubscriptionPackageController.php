@@ -27,11 +27,10 @@ class SubscriptionPackageController extends Controller
     }
 
     public function subscribers(){
-        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
-
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10; 
         
-
-        $sub_history = CurrentSubscription::where('status', 1)->where('grace_end', '>=', date('Y-m-d'))->orderBy('grace_end', 'desc')->orderBy('end_date', 'asc');
+        $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+        $sub_history = CurrentSubscription::where('status', 1)->where('grace_end', '>=', date('Y-m-d'))->where('subscription_package_id', '<>', $free_trial->id)->orderBy('grace_end', 'desc')->orderBy('end_date', 'asc');
         if($sub_history->count() < 1){
             return response([
                 'status' => 'failed',
