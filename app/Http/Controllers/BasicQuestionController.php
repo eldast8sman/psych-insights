@@ -16,6 +16,7 @@ use App\Models\QuestionAnswerSummary;
 use App\Http\Requests\SetInterestRequest;
 use App\Models\BasicQuestionSpecialOption;
 use App\Http\Requests\AnswerBasicQuestionRequest;
+use App\Models\PaymentPlan;
 
 class BasicQuestionController extends Controller
 {
@@ -248,7 +249,8 @@ class BasicQuestionController extends Controller
         if(!empty($current)){
             $package = SubscriptionPackage::find($current->subscription_package_id);
             if($package->free_trial == 1){
-                if(((strtolower($package->duration_type) == 'week') and ($package->duration < 2)) or ((strtolower($package->durtion_type) == 'day') and ($package->duration < 14))){
+                $plan = PaymentPlan::where('subscription_package_id', $package->id)->first();
+                if(((strtolower($plan->duration_type) == 'week') and ($plan->duration < 2)) or ((strtolower($plan->durtion_type) == 'day') and ($plan->duration < 14))){
                     $next_question = date('Y-m-d', strtotime($current->end_date.' 01:00:00') + (60 * 60 * 24));                    
                 }
             }
