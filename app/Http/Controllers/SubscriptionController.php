@@ -44,20 +44,14 @@ class SubscriptionController extends Controller
             return false;
         }
 
-        $next_date =  false;
+       
         $histories = SubscriptionHistory::where('user_id', $user_id)->where('subscription_package_id', $package->id);
         if($histories->count() > 0){
             $bonanza = $package->subsequent_promo;
-            $history = $histories->first();
-            if($type == "subscribe"){
-                if($history->end_date <  date('Y-m-d')){
-                    $next_date = true;
-                }
-            }
         } else {
             $bonanza = $package->first_time_promo;
-            $next_date = true;
         }
+        
         $promo_percent = 0;
         if(!empty($promo_code)){
             $promo = PromoCode::find($promo_code);
@@ -137,6 +131,14 @@ class SubscriptionController extends Controller
         ]);
 
         $current = CurrentSubscription::where('user_id', $user_id)->first();
+        $next_date =  false;
+        if(empty($current)){
+            $next_date = true;
+        } else {
+            if(($current->end_date < date('Y-m-d')) and ($type == 'subscribe')){
+                $next_date = true;
+            }
+        }
         if($type == "subscribe"){
             $data = [
                 'user_id' => $user_id,
