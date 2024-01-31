@@ -249,7 +249,7 @@ class SubscriptionController extends Controller
 
                     $scope = explode(',', $promo_code->scope);
                     if(($promo_code->usage_limit > $usage) and (in_array($type, $scope) or in_array('all', $scope))){
-                        $data['promo_code'] = $promo_code;
+                        $data['promo_code'] = $promo_code->promo_code;
                         $data['promo_code_percent'] = $promo_code->percentage_off;
                         $price_off = ($promo_code->percentage_off / 100) * $amount;
                         $data['promo_code_price'] = $price_off;
@@ -275,7 +275,7 @@ class SubscriptionController extends Controller
 
                     $scope = explode(',', $promo_code->scope);
                     if(($promo_code->usage_limit > $usage) and (in_array($type, $scope) or in_array('all', $scope))){
-                        $data['promo_code'] = $promo_code;
+                        $data['promo_code'] = $promo_code->promo_code;
                         $data['promo_code_percent'] = $promo_code->percentage_off;
                         $price_off = ($promo_code->percentage_off / 100) * $amount;
                         $data['promo_code_price'] = $price_off;
