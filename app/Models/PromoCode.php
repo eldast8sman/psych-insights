@@ -14,6 +14,7 @@ class PromoCode extends Model
         'scope',
         'percentage_off',
         'usage_limit',
+        'total_limit',
         'status'
     ];
 }

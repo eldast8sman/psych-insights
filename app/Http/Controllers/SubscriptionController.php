@@ -244,16 +244,20 @@ class SubscriptionController extends Controller
             if(!empty($promo_code)){
                 $promo_code = PromoCode::where('promo_code', $promo_code)->first();
                 if(!empty($promo_code)){
+                    $total_used = UsedPromoCode::where('promo_code_id', $promo_code->id)->get();
+                    $total_usage = !empty($total_used) ? $total_used->sum('frequency') : 0;
                     $used = UsedPromoCode::where('user_id', $user_id)->where('promo_code_id', $promo_code->id)->first();
                     $usage = !empty($used) ? $used->frequency : 0;
 
-                    $scope = explode(',', $promo_code->scope);
-                    if(($promo_code->usage_limit > $usage) and (in_array($type, $scope) or in_array('all', $scope))){
-                        $data['promo_code'] = $promo_code->promo_code;
-                        $data['promo_code_percent'] = $promo_code->percentage_off;
-                        $price_off = ($promo_code->percentage_off / 100) * $amount;
-                        $data['promo_code_price'] = $price_off;
-                        $amount -= $price_off;
+                    if(($promo_code->total_limit == -1) or ($total_usage < $promo_code->total_limit)){
+                        $scope = explode(',', $promo_code->scope);
+                        if((($promo_code->usage_limit == -1) or ($promo_code->usage_limit > $usage)) and (in_array($type, $scope) or in_array('all', $scope))){
+                            $data['promo_code'] = $promo_code->promo_code;
+                            $data['promo_code_percent'] = $promo_code->percentage_off;
+                            $price_off = ($promo_code->percentage_off / 100) * $amount;
+                            $data['promo_code_price'] = $price_off;
+                            $amount -= $price_off;
+                        }
                     }
                 }
             }
@@ -270,16 +274,20 @@ class SubscriptionController extends Controller
             if(!empty($promo_code)){
                 $promo_code = PromoCode::where('promo_code', $promo_code)->first();
                 if(!empty($promo_code)){
+                    $total_used = UsedPromoCode::where('promo_code_id', $promo_code->id)->get();
+                    $total_usage = !empty($total_used) ? $total_used->sum('frequency') : 0;
                     $used = UsedPromoCode::where('user_id', $user_id)->where('promo_code_id', $promo_code->id)->first();
                     $usage = !empty($used) ? $used->frequency : 0;
 
-                    $scope = explode(',', $promo_code->scope);
-                    if(($promo_code->usage_limit > $usage) and (in_array($type, $scope) or in_array('all', $scope))){
-                        $data['promo_code'] = $promo_code->promo_code;
-                        $data['promo_code_percent'] = $promo_code->percentage_off;
-                        $price_off = ($promo_code->percentage_off / 100) * $amount;
-                        $data['promo_code_price'] = $price_off;
-                        $amount -= $price_off;
+                    if(($promo_code->total_limit == -1) or ($total_usage < $promo_code->total_limit)){
+                        $scope = explode(',', $promo_code->scope);
+                        if((($promo_code->usage_limit == -1) or ($promo_code->usage_limit > $usage)) and (in_array($type, $scope) or in_array('all', $scope))){
+                            $data['promo_code'] = $promo_code->promo_code;
+                            $data['promo_code_percent'] = $promo_code->percentage_off;
+                            $price_off = ($promo_code->percentage_off / 100) * $amount;
+                            $data['promo_code_price'] = $price_off;
+                            $amount -= $price_off;
+                        }
                     }
                 }
             }
