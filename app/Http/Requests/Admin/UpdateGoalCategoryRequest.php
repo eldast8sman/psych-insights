@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePromoCodeRequest extends FormRequest
+class UpdateGoalCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,8 @@ class StorePromoCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'promo_code' => 'required|string|unique:promo_codes,promo_code',
-            'percentage_off' => 'required|numeric|min:1|max:100',
-            'usage_limit' => 'required|integer|min:1',
-            'total_limit' => 'required|integer|min:-1'
+            'category' => 'required|string',
+            'goal_setting_overview' => 'required|string'
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePromoCodeRequest;
 use App\Http\Requests\Admin\UpdatePromoCodeRequest;
 use App\Models\PromoCode;
+use App\Models\UsedPromoCode;
 use Illuminate\Http\Request;
 
 class PromoCodeController extends Controller
@@ -46,6 +47,13 @@ class PromoCodeController extends Controller
         $codes = $codes->paginate($limit);
         foreach($codes as $code){
             $code->scope = explode(',', $code->scope);
+            $useds = UsedPromoCode::where('promo_code_id', $code->id)->get();
+            if(empty($useds)){
+                $total_used = 0;
+            } else {
+                $total_used = $useds->sum('frequency');
+            }
+            $code->total_used = $total_used;
         }
 
         return response([
@@ -65,6 +73,7 @@ class PromoCodeController extends Controller
             'scope' => (isset($request->scope) && !empty($request->scope)) ? join(',', $request->scope) : '',
             'percentage_off' => $request->percentage_off,
             'usage_limit' => $request->usage_limit,
+            'total_limit' => $request->total_limit,
             'status' => 1
         ]);
 
@@ -83,6 +92,13 @@ class PromoCodeController extends Controller
     public function show(PromoCode $code)
     {
         $code->scope = explode(',', $code->scope);
+        $useds = UsedPromoCode::where('promo_code_id', $code->id)->get();
+        if(empty($useds)){
+            $total_used = 0;
+        } else {
+            $total_used = $useds->sum('frequency');
+        }
+        $code->total_used = $total_used;
 
         return response([
             'status' => 'success',
@@ -100,6 +116,7 @@ class PromoCodeController extends Controller
         $code->scope = (isset($request->scope) && !empty($request->scope)) ? join(',', $request->scope) : '';
         $code->percentage_off = $request->percentage_off;
         $code->usage_limit = $request->usage_limit;
+        $code->total_limit = $request->total_limit;
         $code->save();
 
         $code->scope = explode(',', $code->scope);

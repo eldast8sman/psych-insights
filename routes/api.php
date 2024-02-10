@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\DassQuestionController;
 use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
+use App\Http\Controllers\Admin\GoalController;
 use App\Http\Controllers\Admin\ListenAndLearnController;
 use App\Http\Controllers\Admin\ReadAndReflectController;
 use App\Http\Controllers\Admin\SelfReflectionController;
@@ -330,6 +331,20 @@ Route::prefix('admin')->group(function(){
             Route::post('/blogs/{blog}', 'update')->name('admin.blog.update');
             Route::get('/blogs/{blog}/activation', 'activation')->name('admin.blog.activation');
             Route::delete('/blogs/{blog}', 'destroy')->name('admin.blog.delete');
+        });
+
+        Route::controller(GoalController::class)->group(function(){
+            Route::get('/goals', 'index')->name('admin.goal.index');
+            Route::post('/goals', 'store')->name('admin.goal.store');
+            Route::post('/goals/{category}/reflections', 'store_reflections')->name('admin.goal.reflection.store');
+            Route::post('/goals/{category}/questions', 'store_goal_questions')->name('admin.goal.question.store');
+            Route::put('/goals/reflections/{reflection}', 'update_reflection')->name('admin.goal.reflection.update');
+            Route::put('/goals/questions/{question}', 'update_goal_question')->name('admin.goal.question.update');
+            Route::delete('/goals/reflections/{reflection}', 'destroy_reflection')->name('admin.goal.reflection.delete');
+            Route::delete('/goals/questions/{question}', 'destroy_goal_question')->name('admin.goal.question.delete');
+            Route::get('/goals/{category}', 'show')->name('admin.goal.show');
+            Route::put('/goals/{category}', 'update')->name('admin.goal.update');
+            Route::delete('/goals/{category}', 'destroy')->name('admin.goal.delete');
         });
     });
 });

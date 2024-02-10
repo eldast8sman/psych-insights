@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PromoCode extends Model
+class GoalReflection extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'promo_code',
-        'scope',
-        'percentage_off',
-        'usage_limit',
-        'total_limit',
-        'status'
+        'goal_category_id',
+        'type',
+        'title',
+        'pre_text',
+        'post_text',
+        'min',
+        'max'
     ];
 }

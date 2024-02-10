@@ -24,7 +24,8 @@ class UpdatePromoCodeRequest extends FormRequest
         return [
             'promo_code' => 'required|string',
             'percentage_off' => 'required|numeric|min:1|max:100',
-            'usage_limit' => 'required|integer|min:1'
+            'usage_limit' => 'required|integer|min:1',
+            'total_limit' => 'required|integer|min:-1'
         ];
     }
 }
