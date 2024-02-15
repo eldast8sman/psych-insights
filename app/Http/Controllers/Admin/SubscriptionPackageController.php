@@ -83,7 +83,8 @@ class SubscriptionPackageController extends Controller
             'percentage' => ($total_users > 0) ? (100 - $percent_total) : "No User"
         ];
 
-        $recent_subscribers = CurrentSubscription::orderBy('updated_at', 'desc')->get();
+        $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+        $recent_subscribers = CurrentSubscription::where('subscription_package_id', '<>', $free_trial->id)->orderBy('grace_end', 'desc')->orderBy('updated_at', 'desc')->get();
         if(!empty($recent_subscribers)){
             foreach($recent_subscribers as $subscriber){
                 $subscriber->subscriber = User::find($subscriber->user_id)->name;
