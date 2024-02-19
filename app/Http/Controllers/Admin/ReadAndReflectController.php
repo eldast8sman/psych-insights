@@ -16,7 +16,7 @@ use App\Http\Requests\Admin\UpdateReadAndReflectRequest;
 class ReadAndReflectController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {

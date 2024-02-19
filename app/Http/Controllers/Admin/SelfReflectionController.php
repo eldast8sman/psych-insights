@@ -15,7 +15,7 @@ use App\Http\Requests\Admin\UpdateSelfReflectionQuestionRequest;
 class SelfReflectionController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {

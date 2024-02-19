@@ -16,7 +16,7 @@ use App\Models\FileManager;
 class AudioController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {
