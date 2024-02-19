@@ -45,6 +45,7 @@ use App\Http\Controllers\ReadAndReflectController as UserReadAndReflectControlle
 use App\Http\Controllers\DassQuestionController as ControllerDassQuestionController;
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
+use App\Http\Controllers\GoalController as ControllersGoalController;
 use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionController;
 
 /*
@@ -344,6 +345,7 @@ Route::prefix('admin')->group(function(){
             Route::delete('/goals/questions/{question}', 'destroy_goal_question')->name('admin.goal.question.delete');
             Route::get('/goals/{category}', 'show')->name('admin.goal.show');
             Route::put('/goals/{category}', 'update')->name('admin.goal.update');
+            Route::get('/goals/{category}/publish', 'publish')->name('admin.goal.publish');
             Route::delete('/goals/{category}', 'destroy')->name('admin.goal.delete');
         });
     });
@@ -532,7 +534,17 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/dashboard/my-stats', 'my_stat')->name('dashboard.myStat');
         Route::get('/dashboard/my-progress', 'my_progress');
         Route::get('/dashboard/days-in-a-row', 'days_in_a_row')->name('dashboard.daysInARow');
-        Route::get('/dashboard/milestones', 'milestones')->name('dashboars.milestones');
+        Route::get('/dashboard/milestones', 'milestones')->name('dashboard.milestones');
+    });
+
+    Route::controller(ControllersGoalController::class)->group(function(){
+        Route::get('/goals', 'index')->name('goal.index');
+        Route::get('/goals/{slug}', 'show')->name('goal.shw');
+        Route::post('/goals/{slug}/answer-reflections', 'answer_reflection')->name('goal.answer_reflections');
+        Route::post('/goals/{slug}/set-goals', 'set_goals')->name('goal.set_goals');
+        Route::get('/previous-reflections', 'previous_reflections')->name('previousReflection.index');
+        Route::get('/previous-goals', 'previous_goals')->name('previousGoal.index');
+        Route::get('/all-goal-reminders', 'all_reminders')->name('allGoalReminder.index');
     });
 });
 
