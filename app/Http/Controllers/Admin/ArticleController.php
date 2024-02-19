@@ -15,7 +15,7 @@ use App\Models\OpenedArticle;
 class ArticleController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {

@@ -15,7 +15,7 @@ use App\Models\OpenedVideo;
 class VideoController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {

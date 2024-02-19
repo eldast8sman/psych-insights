@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 class GoalController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {

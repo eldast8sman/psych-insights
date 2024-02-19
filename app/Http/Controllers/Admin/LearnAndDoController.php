@@ -19,7 +19,7 @@ use App\Http\Requests\Admin\UpdateLearnAndDoRequest;
 class LearnAndDoController extends Controller
 {
     private $user;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function __construct()
     {
