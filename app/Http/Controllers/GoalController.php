@@ -246,6 +246,8 @@ class GoalController extends Controller
         $user->goals_completed += 1;
         $user->save();
 
+        self::complete_goal($this->user->id, $category->category);
+
         return response([
             'status' => 'success',
             'message' => 'Goal set successfully',

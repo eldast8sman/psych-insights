@@ -9,6 +9,7 @@ use App\Models\ActivityLog;
 use App\Models\UserCategoryLog;
 use App\Models\FavouriteResource;
 use App\Models\TempAnswer;
+use App\Models\UserGoalMilestone;
 use App\Models\UserIPAddress;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -86,6 +87,20 @@ class Controller extends BaseController
         $user = User::find($user_id);
         $user->resources_completed += 1;
         $user->save();
+    }
+
+    public static function complete_goal($user_id, $category) : void
+    {
+        $milestone = UserGoalMilestone::where('user_id', $user_id)->where('category', $category)->first();
+        if(empty($milestone)){
+            UserGoalMilestone::create([
+                'user_id' => $user_id,
+                'category' => $category
+            ]);
+        } else {
+            $milestone->frequency += 1;
+            $milestone->save();
+        }
     }
 
     public static function check_ip(Request $request, $user_id){
