@@ -340,7 +340,7 @@ class PodcastController extends Controller
             ], 200);
         }
 
-        $books = [];
+        $podcasts = [];
         $opened_podcasts = $opened_podcasts->get();
         if(empty($search)){
             foreach($opened_podcasts as $opened_podcast){

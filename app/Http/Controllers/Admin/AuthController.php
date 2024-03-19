@@ -20,6 +20,7 @@ use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\ForgotPasswordRequest;
 use App\Http\Requests\Admin\ActivateAccountRequest;
+use App\Http\Requests\Admin\UpdateProfileRequest;
 
 class AuthController extends Controller
 {
@@ -258,6 +259,19 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Password changed successfully',
             'data' => $admin
+        ], 200);
+    }
+
+    public function update(UpdateProfileRequest $request){
+        $user = Admin::find(self::user()->id);
+        $user->name = $request->name;
+        $user->password = $request->password;
+        $user->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'data' => $user
         ], 200);
     }
 

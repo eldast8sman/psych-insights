@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\OpenedAudio;
 use App\Models\UserCategoryLog;
+use App\Models\UserGoalMilestone;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -113,8 +114,20 @@ class DashboardController extends Controller
         $data = [
             'three_consecutive_days' => ($this->user->longest_streak >= 3) ? true : false,
             'three_goals_completion' => ($this->user->goals_completed >= 3) ? true : false,
-            'three_resources_opened' => ($this->user->resources_completed >= 3) ? true : false
+            'three_resources_opened' => ($this->user->resources_completed >= 3) ? true : false,
+            'completed_health_goal' => (UserGoalMilestone::where('user_id', $this->user->id)->where('category', 'like', '%health%')->count() > 0) ? true : false,
+            'completed_work_goal' => (UserGoalMilestone::where('user_id', $this->user->id)->where('category', 'like', '%work%')->count() > 0) ? true : false,
+            'completed_relationship_goal' => (UserGoalMilestone::where('user_id', $this->user->id)->where('category', 'like', '%relationship%')->count() > 0) ? true : false,
+            'completed_personal_development_goal' => (UserGoalMilestone::where('user_id', $this->user->id)->where('category', 'like', '%personal development%')->count() > 0) ? true : false,
+            'all_goals_completed' => (UserGoalMilestone::where('user_id', $this->user->id)->count() > 4) ? true : false,
+            'completed_leisure_goal' => (UserGoalMilestone::where('user_id', $this->user->id)->where('category', 'like', '%leisure%')->count() > 0) ? true : false,
+            '28_insightful_days' => ($this->user->total_logins >= 28) ? true : false,
+            '14_insightful_days' => ($this->user->total_logins >= 14) ? true : false,
+            '56_insightful_days' => ($this->user->total_logins >= 56) ? true : false,
+            '112_insightful_daya' => ($this->user->total_logins >= 112) ? true : false,
+            '40_journals_created' => (ActivityLog::where('user_id', $this->user->id)->where('activity', 'store_journal')->count() >= 40) ? true : false
         ];
+
         return response([
             'status' => 'success',
             'message' => 'Milestones fetched successfully',

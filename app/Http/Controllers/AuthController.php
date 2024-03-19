@@ -37,7 +37,7 @@ use App\Http\Requests\UploadProfilePhotoRequest;
 class AuthController extends Controller
 {
     private $errors;
-    private $file_disk = 'public';
+    private $file_disk = 's3';
 
     public function store(StoreUserRequest $request){
         if(!$request->terms){
