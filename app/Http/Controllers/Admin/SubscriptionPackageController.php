@@ -422,7 +422,7 @@ class SubscriptionPackageController extends Controller
     }
 
     public function fetch_basic_package(){
-        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'read_and_reflect_limit', 'listen_and_learn_limit', 'learn_and_do_limit']);
+        $package = SubscriptionPackage::where('free_package', 1)->first(['podcast_limit', 'article_limit', 'audio_limit', 'video_limit', 'book_limit', 'read_and_reflect_limit', 'listen_and_learn_limit', 'learn_and_do_limit']);
 
         return response([
             'status' => 'success',
