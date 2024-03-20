@@ -10,6 +10,7 @@ use App\Models\UserDeactivation;
 use App\Models\CurrentSubscription;
 use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\FileManagerController;
 use App\Models\PaymentPlan;
 
 class UserController extends Controller
@@ -164,7 +165,9 @@ class UserController extends Controller
         $users = UserDeactivation::orderBy('created_at', 'desc')->paginate($limit);
 
         foreach($users as $user){
-            $user->user = User::find($user->user_id);
+            $d_user = User::find($user->user_id);
+            $d_user->profile_photo = !empty($d_user->profile_photo) ? FileManagerController::fetch_file($d_user->profile_photo)->url : "";
+            $user->user = $d_user;
         }
 
         return response([
