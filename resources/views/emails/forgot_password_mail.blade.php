@@ -16,7 +16,7 @@
         <td style="font-size: 14px">
           <p style="margin: 40px 0px">Hello {{ $name }},</p>
           <p style="margin-bottom: 40px">
-            We received a request to reset the password for your PsychInsights account. If you initiated this request, please click on the link below to set a new password:
+            We received a request to reset the password for your PsychInsights account. If you initiated this request, please enter the code below to set a new password:
           </p>
         </td>
       </tr>
@@ -29,7 +29,7 @@
     <table width="100%">
       <tr>
         <td style="text-align: center">
-          <a
+          {{-- <a
             href="{{ env('FRONTEND_URL') }}/?forgetToken={{ $token }}"
             style="
               color: #ffffff;
@@ -39,7 +39,8 @@
               text-decoration: none;
             "
             >Reset Password</a
-          >
+          > --}}
+          <strong>{{ $token }}</strong>
         </td>
       </tr>
     </table>

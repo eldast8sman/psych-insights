@@ -23,7 +23,8 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string|exists:users,token',
+            'email' => 'required|string|email|exists:users,email',
+            'token' => 'required|string',
             'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()->symbols()]
         ];
     }
