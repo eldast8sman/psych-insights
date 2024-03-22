@@ -91,11 +91,11 @@ class Controller extends BaseController
 
     public static function complete_goal($user_id, $category) : void
     {
-        $milestone = UserGoalMilestone::where('user_id', $user_id)->where('category', $category)->first();
+        $milestone = UserGoalMilestone::where('user_id', $user_id)->where('goal_category', $category)->first();
         if(empty($milestone)){
             UserGoalMilestone::create([
                 'user_id' => $user_id,
-                'category' => $category
+                'goal_category' => $category
             ]);
         } else {
             $milestone->frequency += 1;
