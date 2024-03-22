@@ -63,11 +63,11 @@ class AuthController extends Controller
             ], 409);
         }
 
-        $token = Str::random(20).time();
+        $token = mt_rand(111111, 999999);
 
         EmailVerificationToken::create([
             'user_id' => $user->id,
-            'token' => $token,
+            'token' => Crypt::encryptString($token),
             'token_expiry' => date('Y-m-d H:i:s', time() + (60 * 15))
         ]);
 
@@ -123,19 +123,33 @@ class AuthController extends Controller
     }
 
     public function verify_email(VerifyEmailRequest $request){
-        $token = EmailVerificationToken::where('token', $request->token)->first();
-        if(empty($token)){
+        $user = User::find(self::user()->id);
+        if($user->email_verified == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'Account already verified'
+            ], 409);
+        }
+
+        $found = false;
+
+        $tokens = EmailVerificationToken::where('user_id', $user->id)->orderBy('created_at', 'desc');
+        if($tokens->count() < 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong Verification Token'
+            ], 409);
+        }
+        foreach($tokens->get() as $token){
+            if((Crypt::decryptString($token->token) == $request->token) and ($token->token_expiry >= date('Y-m-d H:i:s'))){
+                $found = true;
+                break;
+            }
+        }
+        if(!$found){
             return response([
                 'status' => 'failed',
                 'message' => 'Wrong Token'
-            ], 409);   
-        }
-
-        if($token->token_expiry < date('Y-m-d H:i:s')){
-            $token->delete();
-            return response([
-                'status' => 'failed',
-                'message' => 'Expired Token'
             ], 409);
         }
 
@@ -150,15 +164,7 @@ class AuthController extends Controller
             }
         }
 
-        $token = auth('user-api')->login($user);
-        $auth = [
-            'token' => $token,
-            'type' => 'Bearer',
-            'expiry' => auth('user-api')->factory()->getTTL() * 60
-        ];
-
         $user = self::user_details($user);
-        $user->authorization = $auth;
 
         self::log_activity($user->id, 'activate_email');
 
@@ -178,11 +184,11 @@ class AuthController extends Controller
             ], 409);
         }
 
-        $token = Str::random(20).time();
+        $token = mt_rand(111111, 999999);
 
         EmailVerificationToken::create([
             'user_id' => $user->id,
-            'token' => $token,
+            'token' => Crypt::encryptString($token),
             'token_expiry' => date('Y-m-d H:i:s', time() + (60 * 15))
         ]);
 
@@ -356,13 +362,14 @@ class AuthController extends Controller
 
     public function forgot_password(ForgotPasswordRequest $request){
         $user = User::where('email', $request->email)->first();
-        $user->token = Str::random(20).time();
+        $token = mt_rand(111111, 999999);
+        $user->token = Crypt::encryptString($token);
         $user->token_expiry = date('Y-m-d H:i:s', time() + (60 * 10));
         $user->save();
 
         $names = explode(' ', $user->name);
         $first_name = $names[0];
-        Mail::to($user)->send(new ForgotPasswordMail($first_name, $user->token));
+        Mail::to($user)->send(new ForgotPasswordMail($first_name, $token));
 
         self::log_activity($user->id, "forgot_password");
 
@@ -373,14 +380,20 @@ class AuthController extends Controller
     }
 
     public function reset_password(ResetPasswordRequest $request){
-        $user = User::where('token', $request->token)->first();
+        $user = User::where('email', $request->email)->first();
+        if(Crypt::decryptString($user->token) != $request->token){
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong OTP'
+            ], 409);
+        }
         if($user->token_expiry < date('Y-m-d H:i:s')){
             $user->token = null;
             $user->token_expiry = null;
             $user->save();
             return response([
                 'status' => 'failed',
-                'message' => 'Password Reset Link has expired'
+                'message' => 'OTP expired'
             ], 409);
         }
         $user->password = Hash::make($request->password);

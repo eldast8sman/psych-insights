@@ -34,7 +34,7 @@
     <table width="100%">
       <tr>
         <td style="text-align: center">
-          <a
+          {{-- <a
             href="{{ env('FRONTEND_URL') }}/?verifyToken={{ $token }}"
             style="
               color: #ffffff;
@@ -44,7 +44,8 @@
               text-decoration: none;
             "
             >Verify email</a
-          >
+          > --}}
+          <strong>{{ $token }}</strong>
         </td>
       </tr>
     </table>
