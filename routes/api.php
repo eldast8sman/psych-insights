@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\BasicQuestionController;
 use App\Http\Controllers\Admin\DailyQuestionController;
 use App\Http\Controllers\Admin\GoalController;
 use App\Http\Controllers\Admin\ListenAndLearnController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ReadAndReflectController;
 use App\Http\Controllers\Admin\SelfReflectionController;
 use App\Http\Controllers\Admin\SubscriptionPackageController;
@@ -67,6 +68,7 @@ Route::prefix('admin')->group(function(){
         Route::post('/login', 'login')->name('admin.login');
         Route::post('/forgot-password', 'forgot_password')->name('admin.forgotPassword');
         Route::post('/reset-password', 'reset_password')->name('admin.resetPassword');
+        Route::get('/add-notification-settings', 'add_notification_settings');
     });
 
 
@@ -348,6 +350,13 @@ Route::prefix('admin')->group(function(){
             Route::put('/goals/{category}', 'update')->name('admin.goal.update');
             Route::get('/goals/{category}/publish', 'publish')->name('admin.goal.publish');
             Route::delete('/goals/{category}', 'destroy')->name('admin.goal.delete');
+        });
+
+        Route::controller(NotificationController::class)->group(function(){
+            Route::get('/notification-settings', 'fetch_setting')->name('admin.motificationSetting.fetch');
+            Route::put('/notification-settings', 'update_setting')->name('admin.notificationSetting.update');
+            Route::get('/notification-count', 'notification_count')->name('admin.notificationCCount');
+            Route::get('/notifications', 'index')->name('admin.notification.index');
         });
     });
 });

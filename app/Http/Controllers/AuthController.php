@@ -33,6 +33,8 @@ use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\DeactivateAccountRequest;
 use App\Http\Requests\UploadProfilePhotoRequest;
+use App\Models\Admin\AdminNotification;
+use App\Models\Admin\NotificationSetting;
 
 class AuthController extends Controller
 {
@@ -93,6 +95,20 @@ class AuthController extends Controller
         $names = explode(' ', $user->name);
         $first_name = $names[0];
         Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+
+        $not_settings = NotificationSetting::where('new_user_notification', 1);
+        if($not_settings->count() > 0){
+            foreach($not_settings->get() as $not_setting){
+                AdminNotification::create([
+                    'admin_id' => $not_setting->admin_id,
+                    'title' => 'New User',
+                    'body' => 'A New User by the name '.$user->name.' just signed up',
+                    'page' => 'users',
+                    'identifier' => $user->id,
+                    'opened' => 0
+                ]);
+            }
+        }
 
         if(!$login = $this->user_login($request->email, $request->password)){
             return response([
@@ -594,9 +610,23 @@ class AuthController extends Controller
 
         $all = $request->all();
         $all['user_id'] = $user->id;
-        UserDeactivation::create($all);
+        $deactivation = UserDeactivation::create($all);
 
         auth('user-api')->logout();
+
+        $not_settings = NotificationSetting::where('account_deactivation_notification', 1);
+        if($not_settings->count() > 0){
+            foreach($not_settings->get() as $setting){
+                AdminNotification::create([
+                    'admin_id' => $setting->admin_id,
+                    'title' => 'Account Deactivation',
+                    'body' => $user->name.' has just deactiated his/her account',
+                    'page' => 'deactivated_users',
+                    'identifier' => $deactivation->id,
+                    'opened' => 0
+                ]);
+            }
+        }
 
         return response([
             'status' => 'success',

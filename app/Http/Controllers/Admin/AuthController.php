@@ -21,6 +21,8 @@ use App\Http\Requests\Admin\ChangePasswordRequest;
 use App\Http\Requests\Admin\ForgotPasswordRequest;
 use App\Http\Requests\Admin\ActivateAccountRequest;
 use App\Http\Requests\Admin\UpdateProfileRequest;
+use App\Models\Admin\NotificationSetting;
+use Illuminate\Notifications\Events\NotificationSent;
 
 class AuthController extends Controller
 {
@@ -340,5 +342,16 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Logged out successfully'
         ], 200);
+    }
+
+    public function add_notification_settings(){
+        $admins = Admin::all();
+        foreach($admins as $admin){
+            if(empty(NotificationSetting::where('admin_id', $admin->id)->first())){
+                NotificationSetting::create(['admin_id' => $admin->id]);
+            }
+        }
+
+        echo "Done";
     }
 }

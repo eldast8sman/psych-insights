@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Http\Requests\Admin\UpdateAdminRequest;
+use App\Models\Admin\NotificationSetting;
 
 class AdminController extends Controller
 {
@@ -53,6 +54,8 @@ class AdminController extends Controller
             $admin->token = base64_encode($admin->id."PsychInsights".Str::random(20));
             $admin->token_expiry = date('Y-m-d H:i:s', time() + (60 * 60 * 24));
             $admin->save();
+
+            NotificationSetting::create(['admin_id' => $admin->id]);
 
             Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
             return response([
