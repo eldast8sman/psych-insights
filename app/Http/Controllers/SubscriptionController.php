@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PromoCode;
-use App\Models\PaymentPlan;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\UsedPromoCode;
-use App\Models\StripeCustomer;
+use App\Http\Requests\CalculateSubscriptionAmountRequest;
+use App\Http\Requests\CompleteSubscriptionPaymentRequest;
+use App\Http\Requests\InitiateSubscriptionRequest;
+use App\Http\Requests\OldCardSubscriptionRequest;
+use App\Models\Admin\AdminNotification;
+use App\Models\Admin\NotificationSetting;
 use App\Models\CurrentSubscription;
+use App\Models\PaymentPlan;
+use App\Models\PromoCode;
+use App\Models\QuestionAnswerSummary;
+use App\Models\StripeCustomer;
 use App\Models\StripePaymentIntent;
 use App\Models\StripePaymentMethod;
 use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
-use App\Models\QuestionAnswerSummary;
 use App\Models\SubscriptionPaymentAttempt;
-use App\Http\Requests\OldCardSubscriptionRequest;
-use App\Http\Requests\InitiateSubscriptionRequest;
-use App\Http\Requests\CalculateSubscriptionAmountRequest;
-use App\Http\Requests\CompleteSubscriptionPaymentRequest;
+use App\Models\UsedPromoCode;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
@@ -173,6 +176,37 @@ class SubscriptionController extends Controller
                 'auto_renew' => $auto_renew,
                 'grace_end' => $grace_end
             ]);
+        }
+
+        $user = User::find($user_id);
+        if($type == 'subscribe'){
+            $not_settings = NotificationSetting::where('new_subscriber_notification', 1);
+            if($not_settings->count() > 0){
+                foreach($not_settings->get() as $setting){
+                    AdminNotification::create([
+                        'admin_id' => $setting->admin_id,
+                        'title' => 'New Subscriber',
+                        'body' => $user->name.' just did a Subscription',
+                        'page' => 'subscribers',
+                        'identifier' => $current->id,
+                        'opened' => 0
+                    ]);
+                }
+            }
+        } elseif($type == 'renew_subscription'){
+            $not_settings = NotificationSetting::where('subscription_renewal_notification', 1);
+            if($not_settings->count() > 0){
+                foreach($not_settings->get() as $setting){
+                    AdminNotification::create([
+                        'admin_id' => $setting->admin_id,
+                        'title' => 'Subscription Renewal',
+                        'body' => $user->name.' just renewed their Subscription',
+                        'page' => 'subscribers',
+                        'identifier' => $current->id,
+                        'opened' => 0
+                    ]);
+                }
+            }
         }
 
         return true;
