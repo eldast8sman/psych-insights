@@ -306,13 +306,13 @@ class AuthController extends Controller
         if(!empty($user->daily_quote_id)){
             $user->daily_quote = DailyQuote::where('id', $user->daily_quote_id)->first(['quote', 'author']);
         } else {
-            $user->daily_quote = "";
+            $user->daily_quote = null;
         }
 
         if(!empty($user->daily_tip_id)){
             $user->daily_tip = DailyTip::where('id', $user->daily_tip_id)->first(['tip']);
         } else {
-            $user->daily_tip = "";
+            $user->daily_tip = null;
         }
 
         unset($user->daily_quote_id);
