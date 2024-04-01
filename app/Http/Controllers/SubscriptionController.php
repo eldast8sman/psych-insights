@@ -154,7 +154,7 @@ class SubscriptionController extends Controller
                 'grace_end' => $grace_end
             ];
             if(empty($current)){
-                CurrentSubscription::create($data);
+                $current = CurrentSubscription::create($data);
             } else {
                 $current->update($data);
             }
