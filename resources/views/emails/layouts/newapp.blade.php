@@ -19,7 +19,6 @@
       img {
         border: 0;
       }
-
       .wrapper {
         width: 100%;
         table-layout: fixed;
@@ -38,6 +37,33 @@
       @media screen and (max-width: 600px) {
       }
     </style>
+
+    {{-- <script>
+      const BASE_URL = "https://backend-dev.psychinsightsapp.com/api";
+      const token = window.location.search.split("=")[1];
+
+      async function verifyEmail(e) {
+        // e.preverntDefault();
+        const response = await fetch(`${BASE_URL}/verify-email`, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ token: token }),
+        });
+        const output = await response.json();
+        console.log(output);
+        if (response.ok) {
+          window.location.replace("./thank-you.html");
+        } else {
+          window.location.replace("./error.html");
+        }
+      }
+
+      const verifyBtn = document.querySelector(".verify-btn");
+
+      verifyBtn.addEventListener("click", verifyEmail);
+    </script> --}}
   </head>
 
   <body>
@@ -56,7 +82,7 @@
                     "
                   >
                     <a
-                      href="https://psychinsightsapp.com"
+                      href="#"
                       style="
                         display: flex;
                         align-items: center;
@@ -98,21 +124,7 @@
                       color: #000000;
                     "
                   >
-                    <p
-                      style="
-                        font-size: 40px;
-                        font-weight: 500;
-                        text-align: center;
-                      "
-                    >
-                      Verify your email
-                    </p>
-
-                    <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.svg"
-                      alt="checked-icon"
-                      width="50px"
-                    />
+                    @yield('title')
                   </div>
                   <p
                     style="
@@ -122,7 +134,7 @@
                       font-size: 14px;
                     "
                   >
-                    Please verify email to secure your account
+                    @yield('subtitle')
                   </p>
                 </td>
               </tr>
@@ -130,63 +142,7 @@
           </td>
         </tr>
 
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td style="font-size: 14px">
-                  <h1 style="text-align: center; color: #000000">
-                    You’re almost there! <br />
-                    Just confirm your email
-                  </h1>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td style="font-size: 14px">
-                  <p style="margin: 40px 0px">Hello [User's First name],</p>
-                  <p style="margin-top: -20px">
-                    You’ve successfully created a Psych Insights account. To
-                    activate your account please enter this code.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td style="text-align: center">
-                  <p>Your code:</p>
-                  <span
-                    style="
-                      margin-top: -10px;
-                      color: #ffffff;
-                      padding: 15px 55px;
-                      background: #207384;
-                      border-radius: 10px;
-                      text-decoration: none;
-                      letter-spacing: 10px;
-                      font-size: 25px;
-                      font-weight: bold;
-                    "
-                  >
-                    123455
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+        @yield('content')
 
         <tr>
           <td>

@@ -1,11 +1,18 @@
-@extends('emails.layouts.app')
+@extends('emails.layouts.newapp')
 
 @section('title')
-  Reset Your Password
+<p style="font-size: 40px; font-weight: 500">
+  Forgot password?
+</p>
+<img
+  src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.svg"
+  alt="padlock-icon"
+  width="50px"
+/>
 @endsection
 
 @section('subtitle')
-  Please reset your Password to access your Account
+  Reset Your Psych Insights Password
 @endsection
 
 @section('content')
@@ -14,9 +21,12 @@
     <table width="100%">
       <tr>
         <td style="font-size: 14px">
-          <p style="margin: 40px 0px">Hello {{ $name }},</p>
-          <p style="margin-bottom: 40px">
-            We received a request to reset the password for your PsychInsights account. If you initiated this request, please enter the code below to set a new password:
+          <p style="margin: 30px 0px">
+            Hello <span>{{ $name }}</span>,
+          </p>
+          <p style="margin-bottom: 40px; text-align: center">
+            To set up a new password to your Psych Insights account,
+            enter this code on your device.
           </p>
         </td>
       </tr>
@@ -29,38 +39,21 @@
     <table width="100%">
       <tr>
         <td style="text-align: center">
-          {{-- <a
-            href="{{ env('FRONTEND_URL') }}/?forgetToken={{ $token }}"
+          <p>Your code:</p>
+          <span
             style="
               color: #ffffff;
               padding: 15px 55px;
               background: #207384;
-              border-radius: 30px;
+              border-radius: 10px;
               text-decoration: none;
+              letter-spacing: 10px;
+              font-size: 25px;
+              font-weight: bold;
             "
-            >Reset Password</a
-          > --}}
-          <strong>{{ $token }}</strong>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td style="font-size: 14px">
-          <p style="margin-top: 40px">
-            If you didn't request a password reset, please disregard this email. It's a good practice to periodically update your password to ensure your account's security.
-            <br>
-            Remember, PsychInsights will never ask you for your password through email or any other unsolicited communication. Always ensure you're communicating directly with our community.
-          </p>
-          <p>
-            Warm regards, <br />
-            The PsychInsights Team
-          </p>
+          >
+            {{ $token }}
+          </span>
         </td>
       </tr>
     </table>

@@ -1,7 +1,21 @@
-@extends('emails.layouts.app')
+@extends('emails.layouts.newapp')
 
 @section('title')
+  <p
+  style="
+    font-size: 40px;
+    font-weight: 500;
+    text-align: center;
+  "
+  >
   Verify your email
+  </p>
+
+  <img
+    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.svg"
+    alt="checked-icon"
+    width="50px"
+  />
 @endsection
 
 @section('subtitle')
@@ -14,14 +28,27 @@
     <table width="100%">
       <tr>
         <td style="font-size: 14px">
-          <p style="margin: 40px 0px">Hello {{ $name }},</p>
-          <p style="margin-bottom: 40px">
-            Welcome to PsychInsights! We are dedicated to optimizing
-            your mental well-being for you to live a better life, and
-            we're excited to have you on board. Before you can fully
-            access our community, please verify your email address to
-            ensure the security and authenticity of your account by
-            entering this token on the Email Verification.
+          <h1 style="text-align: center; color: #000000">
+            You’re almost there! <br />
+            Just confirm your email
+          </h1>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <table width="100%">
+      <tr>
+        <td style="font-size: 14px">
+          <p style="margin: 40px 0px">
+            Hello <span>{{ $name }}</span>,
+          </p>
+          <p style="margin-top: -20px">
+            You’ve successfully created a Psych Insights account. To
+            activate your account please enter this code.
           </p>
         </td>
       </tr>
@@ -34,40 +61,22 @@
     <table width="100%">
       <tr>
         <td style="text-align: center">
-          {{-- <a
-            href="{{ env('FRONTEND_URL') }}/?verifyToken={{ $token }}"
+          <p>Your code:</p>
+          <span
             style="
+              margin-top: -10px;
               color: #ffffff;
               padding: 15px 55px;
               background: #207384;
-              border-radius: 30px;
+              border-radius: 10px;
               text-decoration: none;
+              letter-spacing: 10px;
+              font-size: 25px;
+              font-weight: bold;
             "
-            >Verify email</a
-          > --}}
-          <strong>{{ $token }}</strong>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td style="font-size: 14px">
-          <p style="margin-top: 40px">
-            If you did not request this email, it's possible that
-            someone entered your email address by mistake. If that's the
-            case, you can simply ignore this message. Thank you for
-            choosing PsychInsights. We're here to support you on your
-            journey to better mental health.
-          </p>
-          <p>
-            Warm regards, <br />
-            The PsychInsights Team
-          </p>
+          >
+            {{ $token }}
+          </span>
         </td>
       </tr>
     </table>
