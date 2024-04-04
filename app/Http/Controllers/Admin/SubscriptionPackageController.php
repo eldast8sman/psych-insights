@@ -84,7 +84,7 @@ class SubscriptionPackageController extends Controller
         ];
 
         $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
-        $recent_subscribers = CurrentSubscription::where('subscription_package_id', '<>', $free_trial->id)->orderBy('grace_end', 'desc')->orderBy('updated_at', 'desc')->get();
+        $recent_subscribers = CurrentSubscription::where('subscription_package_id', '<>', $free_trial->id)->orderBy('updated_at', 'desc')->orderBy('grace_end', 'desc')->get();
         if(!empty($recent_subscribers)){
             foreach($recent_subscribers as $subscriber){
                 $subscriber->subscriber = User::find($subscriber->user_id)->name;
