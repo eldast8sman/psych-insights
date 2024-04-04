@@ -267,7 +267,7 @@ class AuthController extends Controller
     public function update(UpdateProfileRequest $request){
         $user = Admin::find(self::user()->id);
         $user->name = $request->name;
-        $user->password = $request->password;
+        $user->email = $request->email;
         $user->save();
 
         return response([
