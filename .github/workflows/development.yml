@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  push:
+    branches: [development]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - uses: actions/checkout@v2
+        with: 
+          node-version: 16
+#      - uses: mirromutth/mysql-action@v1.1
+#        with:
+#          mysql database: schoolar_app
+#          mysql user: schoolar_app
+#          mysql password: password
+      - name: Copy .env
+        run: cp .env.example .env
+      - name: Install composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Setup Project
+        run: |
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan key:generate
+          php artisan jwt:secret
+      - name: Directory Permissions
+        run: chmod 755 -R storage bootstrap/cache
+#      - name: Run Unit tests
+#        env:
+#          APP_ENV: testing
+#          DB_CONNECTION: test.sqlite
+#          DB_USERNAME: laravel_test_user
+#          DB_PASSWORD: super_secret
+#          DB_DATABASE: test.sqlite
+#        run: ./vendor/bin/phpunit
+      - name: Deploy to Server
+        if: ${{ success() }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            cd /home/psycsboi
+            cd backend_dev
+            git stash
+            git pull origin development
+            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+            php artisan migrate
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan view:clear
+#            php artisan storage:link
+#            git pull origin main
+#            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+#            php artisan storage:link
+#            php artisan key:generate
+#            php artisan jwt:secret
+#            php -r "file_exists('.env') || copy('.env.example', '.env');"
+#            git clone --single-branch --branch development https://github.com/eldast8sman/psych-insights.git backend_dev
