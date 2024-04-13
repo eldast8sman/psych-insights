@@ -93,7 +93,7 @@
                       title="PsychInsights"
                     >
                       <img
-                        src="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/%F0%9F%A6%86+emoji+_white+heavy+check+mark_.png"
+                        src="https://psychwebfile.s3.eu-north-1.amazonaws.com/logo.png"
                         alt="Psych-logo"
                       />
                       <h2>PsychInsights</h2>
