@@ -71,7 +71,7 @@ class NotificationController extends Controller
 
     public function index(){
         $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
-        // $notifications = AdminNotification::where('opened', 0)->where('admin_id', $this->user->id)->paginate($limit);
+        $notifications = AdminNotification::where('opened', 0)->where('admin_id', $this->user->id)->paginate($limit);
         foreach($notifications as $notification){
             $url = "";
             if($notification->page == 'user'){
@@ -101,6 +101,4 @@ class NotificationController extends Controller
             'data' => $notifications
         ], 200);
     }
-
-    public g
 }
