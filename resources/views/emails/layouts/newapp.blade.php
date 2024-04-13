@@ -93,7 +93,7 @@
                       title="PsychInsights"
                     >
                       <img
-                        src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo.svg"
+                        src="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/%F0%9F%A6%86+emoji+_white+heavy+check+mark_.png"
                         alt="Psych-logo"
                       />
                       <h2>PsychInsights</h2>
@@ -192,12 +192,12 @@
                   <a
                     href="https://www.tiktok.com/@_psychinsights_?_t=8igxYC9rlr8&_r=1"
                     class="tiktolk"
-                    >TikTok</a
+                    ><img src="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/logos_tiktok-icon.png" /></a
                   >
                   <a
                     href="https://www.instagram.com/_psych_insights_?igsh=aXd1bHB0eWJvYTBy"
                     class="instagram"
-                    >Instagram</a
+                    ><img sr="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/Group.png" /></a
                   >
                 </td>
               </tr>
