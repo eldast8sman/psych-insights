@@ -289,7 +289,7 @@ class GoalController extends Controller
 
         $answers = UserGoalAnswer::where('user_id', $this->user->id);
         if(!empty($slug)){
-            $category = GoalCategory::whre('slug', $slug)->first();
+            $category = GoalCategory::where('slug', $slug)->first();
             if(!empty($category)){
                 $answers = $answers->where('goal_category_id', $category->id);
             }
