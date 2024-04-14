@@ -325,7 +325,7 @@ class GoalController extends Controller
         
         $reminders = $reminders->paginate($limit);
         foreach($reminders as $reminder){
-            $reminder->category = GoalCategory::find($reminder->goal_category_id)->category;
+            $reminder->category = !empty($categ = GoalCategory::find($reminder->goal_category_id)) ? $categ->category : "";
         }
 
         return response([
