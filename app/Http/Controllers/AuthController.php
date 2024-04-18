@@ -225,7 +225,7 @@ class AuthController extends Controller
             return false;
         }
         if($user->status != 1){
-            $this->errors = 'User Account has been rendered inactive. Please contact the Admin';
+            $this->errors = 'Your account has been temporarily disabled. Kindly contact our customer support to get it back reinstated';
             return false;
         }
         if(!$token = auth('user-api')->attempt([
