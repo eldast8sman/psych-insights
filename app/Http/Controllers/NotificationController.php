@@ -9,8 +9,10 @@ use App\Models\SubscriptionHistory;
 use App\Models\User;
 use App\Models\UserGoalReminder;
 use App\Services\PushNotificationService;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
+use PDO;
 
 class NotificationController extends Controller
 {
@@ -26,6 +28,47 @@ class NotificationController extends Controller
             $this->errors = $e->getMessage();
             return false;
         }
+    }
+
+    public function send(){
+        $user = User::find(1);
+        if(!empty($user->device_token)){
+            if($this->send_notification($user->device_token, 'Test', 'This is Test Notification')){
+                $message = "Notification Sent";
+            } else {
+                $message = $this->errors;
+            }
+        } else {
+            $message = "No Deice Token";
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => $message
+        ], 200);
+    }
+
+    public function check_inactivity(){
+        $fifteen_days = date('Y-m-d', time() - (60 * 60 * 24 * 15));
+        $users = User::where('last_login', '<', $fifteen_days.' 00:00:00');
+        if($users->count() < 0){
+            foreach($users->get() as $user){
+                if(!empty($user->device_token)){
+                    $date1 = new DateTime(date('Y-m-d', strtotime($user->last_login)));
+                    $date2 = new DateTime(date('Y-m-d'));
+
+                    $interval = $date1->diff($date2);
+
+                    $diff = $interval->format('%a days');
+
+                    $this->send_notification($user->device_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
+                }
+            }
+        }
+    }
+
+    public function assessment_reminder(){
+        
     }
 
     public function to_send(){

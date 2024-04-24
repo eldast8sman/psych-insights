@@ -63,7 +63,7 @@ use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionCo
 
 Route::prefix('cron-jobs')->group(function(){
     Route::controller(ControllersNotificationController::class)->group(function(){
-        Route::get('/send-notifications', 'to_send')->name('cron.send_notification');
+        Route::get('/send-notifications', 'send')->name('cron.send_notification');
     });
 });
 
