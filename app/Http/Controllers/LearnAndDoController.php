@@ -37,7 +37,7 @@ class LearnAndDoController extends Controller
             $op_strategies = OpenedLearnAndDo::where('user_id', $user_id)->orderBy('frequency', 'asc')->orderBy('updated_at', 'asc');
             if($op_strategies->count() > 0){
                 foreach($op_strategies as $op_strategy){
-                    $opened_strategies[] = $op_strategy->listen_and_learn_id;
+                    $opened_strategies[] = $op_strategy->learn_and_do_id;
                 }
             }
 
@@ -406,7 +406,7 @@ class LearnAndDoController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Opened Listen and Learn Strategies fetched successfully',
+            'message' => 'Opened Learn and Do Strategies fetched successfully',
             'data' => self::paginate_array($learns, $limit, $page)
         ], 200);
     }
@@ -571,7 +571,7 @@ class LearnAndDoController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Listen and Learn Strategy fetched successfully',
+            'message' => 'Learn and Do Strategy fetched successfully',
             'data' => $this->fetch_strategy($learn, $this->user->id)
         ], 200);
     }
