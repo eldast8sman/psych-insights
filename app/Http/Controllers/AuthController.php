@@ -325,6 +325,7 @@ class AuthController extends Controller
         }
 
         $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
+        $user->dass_question = empty(QuestionAnswerSummary::where('user_id', $user->id)->where('question_type', 'dass_question')->first()) ? 'first' : 'subsequent';
         $user->next_question_date = !empty($last_answer) ? $last_answer->next_question : date('Y-m-d');
         $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', date('Y-m-d'));
         $user->daily_question = ($answered->count() < 1) ? true : false;
