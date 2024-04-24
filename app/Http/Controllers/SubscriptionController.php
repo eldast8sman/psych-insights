@@ -6,6 +6,7 @@ use App\Http\Requests\CalculateSubscriptionAmountRequest;
 use App\Http\Requests\CompleteSubscriptionPaymentRequest;
 use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\OldCardSubscriptionRequest;
+use App\Jobs\SubscriptionAutoRenewal;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
 use App\Models\CurrentSubscription;
@@ -664,7 +665,7 @@ class SubscriptionController extends Controller
 
         $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
 
-        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
+        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription_renewal", $promo_code);
 
         $stripe = new StripeController();
         $customer = StripeCustomer::where('user_id', $this->user->id);
@@ -770,7 +771,7 @@ class SubscriptionController extends Controller
 
         $promo_code = !empty($request->promo_code) ? (string)$request->promo_code : "";
 
-        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription", $promo_code);
+        $amount_array = $this->calculate_total_payment($payment_plan->id, $this->user->id, "subscription_renewal", $promo_code);
 
         $method = StripePaymentMethod::find($request->payment_method_id);
         if($method->user_id != $this->user->id){

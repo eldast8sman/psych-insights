@@ -169,7 +169,11 @@ class VideoController extends Controller
             $video->photo = FileManagerController::fetch_file($video->photo);
         }
         if(!empty($video->video_file)){
-            $video->video = FileManagerController::fetch_file($video->video_file);
+            if(is_numeric($video->video_file)){
+                $video->video = FileManagerController::fetch_file($video->video_file);
+            } else {
+                $video->video = $video->video_file;
+            }
         }
 
         if(!empty($video->categories)){

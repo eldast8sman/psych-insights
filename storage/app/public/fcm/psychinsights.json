@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "psychinsights-1710102066849",
+  "private_key_id": "d7c5f4b4fe4a8b5d17e9639488916e4655f4840c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCpd3VnM52bs3N8\n5NOpaRvFVfVgGsukm2yHxDd7JB0xgA8J0+lCsA0+INXF17wcuMjEKe7SGkZUCN8s\nm0r8fzA9Ekhe74IUwuGZsCpBKIVvdPS+cUsu5sCQ+h/9Lo9OeDXlJ/CGXXO0ReYW\ndcF0VUsZE2BlkJ01KQSevKu5edUvlqEcrGKsQ++iIFuIyclq1EWGrzlC9r/BEqng\nJCH268QBUlivJWBJyR1yLl5hcZHuEw+I4JgaW+xXO20f1pKkESfgiyiPTXPgfIKp\n9gCVpMa9dx8Lh6zdHom/OCWf7q3UlTE0VL+GuaVG5+jd5ChBLI3Q3CpjaGbYgpFy\nsl6scHSPAgMBAAECggEAG7cX7NJnYXpQ62lIZ97y9ew6eUa4l7RRj3IFjtlCVaui\nCf3txVnMjfofFsBTGVwWfY/ME/F3H1w6FO4ALq5QbH8ryyxJg8K21Fntdy2SMRRu\nyHdNOp+Yzme8c+g5ngrmlD0wHDwhZadphgfTz9uj22HXXz+Y7ljwfVN8PupldWbc\n6oe7wnSzutQqMOHoozqcmp+/TztLf7BVooqvSr/NnS3Epku5Or4v3OzPOTiAhIij\nPvgmtTweyxt7igs3ORh69hwuot4rZFbgJLgxsmTy+QBJIN++FRyCK+GUsVd86UKL\noYmNDznE+Y434hG5JVOXBITT4JX4jRa2OZ/L1lsOpQKBgQDtPj39Ar1HA+JGe/Mn\nmRVk3JeDVuwBwKOWprPEneO8jGUJ8/EatkhkmgJISeVK473hyIcRqlfn8wTjFxOl\nYX8+uEEMBRXVFULHZZooaguq1ktocdX6NorZjgJGvDOQqXMQp6cIHhcRVGnq5tC8\nIi/lF9z+DIWCNuMd+exKhPIwiwKBgQC23W62b4jwb0WV5RqWaDibG0onFpHzrMkn\nBQ9llOReW4xgK2bKkBrwXZyflmDRTtSNkvuzro3KkbTu9VRCOvY5nmVUhTrh3qpM\n6Nk2j3nyV0NrcofC6WRixtJw4e9sXj9gZTFe13ncl7rP10dh35JL3Ub+MTlJ5qW0\nkL/dmyIojQKBgQCqsmgDjV8Go6LBOBnB2gFsqtNRKs9wi1yo3pTl2PytAw8H1D8c\nCx+XUsBlptWVxrsuowucCEZrm41en5IBIl9dj1EuBtKomD2OHmqGvZZbewiSw6VD\n/M52rhixMGShp2olB5vE2XGbhHMZEq4JT0fKvBrDp9q/0CIlxVbgXzuq9QKBgHfz\nRkU7Yls80itiDg+tK7xqqTh8sJ5jr8r9obzjbu2KJcmLjrC+2DzlWvC/5qBFkl2P\nlbWmgXHoJAQ/Ptb28D6ZbSSFBDvXIGS0tI76jGZv4VSg2vb6u5OjkbTkL3YpWG81\n0a3BsDkH+k2NjFBiJAfJjWD+DvMv7XBFJuYJdd2dAoGAQVMrcb9EiLMiP8pu4T25\ns5SgA6LbWocSUf2/4oqjLMRId6ov5nDq9jhYgRKmYCyC1yLQNPmdfDD90S7ZXNPV\nK84d5bQBQ8goi4VaFSXPioQeyQ1PDG2yMgi0PPMZGJXKecgcI2mQBTiDp2mueRk4\nDCY6KfgY1l6l/7OGaqBGQFc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fth37@psychinsights-1710102066849.iam.gserviceaccount.com",
+  "client_id": "101192179549212348312",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fth37%40psychinsights-1710102066849.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

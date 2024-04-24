@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -12,7 +13,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function(){
+            $notification = new NotificationController();
+            $notification->to_send();
+        })->everySixHours();
+
+        $schedule->call(function(){
+            NotificationController::check_subscriptions();
+        })->everySixHours();
     }
 
     /**

@@ -351,6 +351,14 @@ class AuthController extends Controller
             $user->daily_tip_id = $daily_tip->id;
             $user->save();
         }
+        if($request->device_token != $user->device_token){
+            $user->device_token = $request->device_token;
+            $user->save();
+        }
+        if($request->web_token != $user->web_token){
+            $user->web_token = $request->web_token;
+            $user->save();
+        }
         self::check_ip($request, $user->id);
 
         $user = self::user_details($user);

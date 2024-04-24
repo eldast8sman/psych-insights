@@ -29,7 +29,7 @@ class StoreVideoRequest extends FormRequest
             'categories.*' => 'required|integer|exists:categories,id',
             'duration' => 'integer|nullable',
             'photo' => 'file|mimes:png,jpg,jpeg,gif|max:500|nullable',
-            'video_file' => 'required|file|mimes:mp4,mpeg4,avi,mkv,mov|max:100000',
+            'video_file' => 'string|nullable',
             'release_date' => 'date|nullable'
         ];
     }

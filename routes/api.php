@@ -47,6 +47,7 @@ use App\Http\Controllers\DassQuestionController as ControllerDassQuestionControl
 use App\Http\Controllers\BasicQuestionController as ControllersBasicQuestionController;
 use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionController;
 use App\Http\Controllers\GoalController as ControllersGoalController;
+use App\Http\Controllers\NotificationController as ControllersNotificationController;
 use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionController;
 
 /*
@@ -60,6 +61,12 @@ use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionCo
 |
 */
 
+Route::prefix('cron-jobs')->group(function(){
+    Route::controller(ControllersNotificationController::class)->group(function(){
+        Route::get('/send-notifications', 'to_send')->name('cron.send_notification');
+    });
+});
+
 Route::prefix('admin')->group(function(){
     Route::controller(AuthController::class)->group(function(){
         Route::post('/add-temp-admin', 'storeAdmin')->name('admin.addTempAdmin');
@@ -70,8 +77,6 @@ Route::prefix('admin')->group(function(){
         Route::post('/reset-password', 'reset_password')->name('admin.resetPassword');
         Route::get('/add-notification-settings', 'add_notification_settings');
     });
-
-
 
     Route::middleware('auth:admin-api')->group(function(){
         Route::controller(AuthController::class)->group(function(){
