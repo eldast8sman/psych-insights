@@ -35,7 +35,7 @@ class NotificationController extends Controller
         NotificationJob::dispatch(1, 'test');
     }
 
-    public function check_inactivity(){
+    public static function check_inactivity(){
         $fifteen_days = date('Y-m-d', time() - (60 * 60 * 24 * 15));
         $users = User::where('last_login', '<', $fifteen_days.' 00:00:00');
         if($users->count() < 0){
@@ -45,7 +45,7 @@ class NotificationController extends Controller
         }
     }
 
-    public function assessment_reminder(){
+    public static function assessment_reminder(){
         $users = User::where('next_assessment', '<=', date('Y-m-d'));
         if($users->count() > 0){
             foreach($users->get() as $user){
@@ -54,7 +54,7 @@ class NotificationController extends Controller
         }
     }
 
-    public function daily_reminder(){
+    public static function daily_reminder(){
         $users = User::where('next_daily_question', '<=', date('Y-m-d'));
         if($users->count() > 0){
             foreach($users->get() as $user){
