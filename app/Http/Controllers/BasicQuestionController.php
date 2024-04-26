@@ -304,6 +304,10 @@ class BasicQuestionController extends Controller
         ReadAndReflectController::recommend_strategies($read_and_reflect_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         LearnAndDoController::recommend_strategies($learn_and_do_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
 
+        $user = User::find($this->user->id);
+        $user->next_assessment = $answer_summary->next_question;
+        $user->save();
+        
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 
         if($new){

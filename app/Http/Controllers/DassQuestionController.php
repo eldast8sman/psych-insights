@@ -12,6 +12,7 @@ use App\Models\PremiumCategoryScoreRange;
 use Illuminate\Http\Request;
 use App\Models\QuestionAnswerSummary;
 use App\Models\SubscriptionPackage;
+use App\Models\User;
 
 class DassQuestionController extends Controller
 {
@@ -280,6 +281,10 @@ class DassQuestionController extends Controller
         ReadAndReflectController::recommend_strategies($read_and_reflect_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
         LearnAndDoController::recommend_strategies($learn_and_do_limit, $this->user->id, $highest_cat_id, $second_highest_cat_id, $package->level);
 
+        $user = User::find($this->user->id);
+        $user->next_assessment = $next_question;
+        $user->save();
+        
         self::log_activity($this->user->id, "answered_dass21_question", "question_answer_summaries", $answer_summary->id);
 
         return response([

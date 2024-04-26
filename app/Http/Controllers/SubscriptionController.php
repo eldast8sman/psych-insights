@@ -167,6 +167,9 @@ class SubscriptionController extends Controller
                 if($next_date){
                     $answer_summary->next_question = $today;
                     $answer_summary->save();
+                    $user = User::find($user_id);
+                    $user->next_assessment = $today;
+                    $user->save();
                 }
             }
         } elseif($type == "renew_subscription"){

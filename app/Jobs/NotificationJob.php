@@ -3,9 +3,13 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\NotificationController as ControllersNotificationController;
+use App\Models\CurrentSubscription;
 use App\Models\GoalCategory;
+use App\Models\SubscriptionPackage;
 use App\Models\User;
 use App\Models\UserGoalReminder;
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,13 +21,78 @@ class NotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $id;
+    public $type;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($id)
+    public function __construct($user_id, $type)
     {
-        $this->id = $id;
+        $this->id = $user_id;
+        $this->type = $type;
+    }
+
+    public function send_inactive_notification(){
+        $user = User::find($this->id);
+        if(!empty($user->device_token) or !empty($user->web_token)){
+            $date1 = new DateTime(date('Y-m-d', strtotime($user->last_login)));
+            $date2 = new DateTime(date('Y-m-d'));
+
+            $interval = $date1->diff($date2);
+
+            $diff = $interval->format('%a days');
+
+            $not = new ControllersNotificationController();
+            if(!empty($user->device_token)){
+                $not->send_notification($user->device_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
+            }
+            if(!empty($user->web_token)){
+                $not->send_notification($user->web_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
+            }
+        }
+    }
+
+    public function assessment_reminder(){
+        $user = User::find($this->id);
+        if(!empty($user->device_token) or !empty($user->web_token)){
+            $current = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'desc')->first();
+            if(!empty($current)){
+                $package = SubscriptionPackage::find($current->subscription_package_id);
+                if($package->free_trial != 1){
+                    $type = "Dass21 Assessment";
+                } else {
+                    $type = "K10 Assessment";
+                }
+            } else {
+                $type = "K10 Assessment";
+            }
+            
+            $title = "Assessment Reminder";
+            $message = "This is to remind you that you are to partake in the {$type} today";
+            
+            $not = new ControllersNotificationController();
+            if(!empty($user->device_token)){
+                $not->send_notification($user->device_token, $title, $message);
+            }
+            if(!empty($user->web_token)){
+                $not->send_notification($user->web_token, $title, $message);
+            }
+        }
+    }
+
+    public function daily_question_reminder(){
+        $user = User::find($this->id);
+        if(!empty($user->device_token) or !empty($user->web_token)){
+            $title = "Daily Assessment";
+            $body = "You are yet to check in today. Please login to the App to answer your daily assessment Questions";
+
+            $not = new ControllersNotificationController();
+            if(!empty($user->device_token)){
+                $not->send_notification($user->device_token, $title, $body);
+            } else {
+                $not->send_notification($user->web_token, $title, $body);
+            }
+        }
     }
 
     /**
@@ -31,37 +100,12 @@ class NotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $to_send = UserGoalReminder::find($this->id);
-        $user = User::find($to_send->user_id);
-        $goal = GoalCategory::find($to_send->goal_category_id);
-        $data = [
-            'reminder_time' => $to_send->next_reminder
-        ];
-
-        $not = new NotificationController();
-        if(!empty($user->device_token)){
-            if($not->send_notification($user->device_token, $goal->category, $to_send->reminder, $data)){
-                $messages[] = "Notification Sent";
-                if($to_send->reminder_type == 'recurring'){
-                    $to_send->next_reminder = date('Y-m-d H:i:s', strtotime($to_send->next_reminder) + (60 * 60 * 24 * 7));
-                    $to_send->save();
-                } else {
-                    $to_send->status = 0;
-                    $to_send->save();
-                }
-            }
-        }
-        if(!empty($user->web_token)){
-            if($not->send_notification($user->web_token, $goal->category, $to_send->reminder, $data)){
-                $messages[] = "Notification Sent";
-                if($to_send->reminder_type == 'recurring'){
-                    $to_send->next_reminder = date('Y-m-d H:i:s', strtotime($to_send->next_reminder) + (60 * 60 * 24 * 7));
-                    $to_send->save();
-                } else {
-                    $to_send->status = 0;
-                    $to_send->save();
-                }
-            }
+        if($this->type == 'inactive'){
+            $this->send_inactive_notification();
+        } elseif($this->type == 'next_assessment'){
+            $this->assessment_reminder();
+        } elseif($this->type == 'next_daily_question'){
+            $this->daily_question_reminder();
         }
     }
 }

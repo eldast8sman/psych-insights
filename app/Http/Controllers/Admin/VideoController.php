@@ -265,7 +265,9 @@ class VideoController extends Controller
     {
         $video->delete();
         if(!empty($video->video_file)){
-            FileManagerController::delete($video->video_file);
+            if(is_numeric($video->video_file)){
+                FileManagerController::delete($video->video_file);
+            }
         }
         if(!empty($video->photo)){
             FileManagerController::delete($video->photo);
