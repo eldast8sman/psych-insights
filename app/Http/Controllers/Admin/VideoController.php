@@ -29,7 +29,9 @@ class VideoController extends Controller
             $video->photo = FileManagerController::fetch_file($video->photo);
         }
         if(!empty($video->video_file)){
-            $video->video_file = FileManagerController::fetch_file($video->video_file);
+            if(is_numeric($video->video_file)){
+                $video->video_file = FileManagerController::fetch_file($video->video_file);
+            }
         }
 
         if(!empty($video->categories)){
@@ -136,16 +138,7 @@ class VideoController extends Controller
      */
     public function store(StoreVideoRequest $request)
     {
-        $all = $request->except(['video_file', 'photo', 'categories']);
-        if(!empty($request->video_file)){
-            if(!$upload = FileManagerController::upload_file($request->video_file, env('FILE_DISK', $this->file_disk))){
-                return response([
-                    'status' => 'failed',
-                    'message' => 'Video file could not be uploaded'
-                ], 500);
-            }
-            $all['video_file'] = $upload->id;
-        }
+        $all = $request->except(['photo', 'categories']);
         if(!empty($request->photo)){
             if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
                 if(isset($all['video_file']) && !empty($all['video_file'])){
@@ -202,17 +195,7 @@ class VideoController extends Controller
      */
     public function update(UpdateVideoRequest $request, Video $video)
     {
-        $all = $request->except(['video_file', 'photo', 'categories']);
-        if(!empty($request->video_file)){
-            if(!$upload = FileManagerController::upload_file($request->video_file, env('FILE_DISK', $this->file_disk))){
-                return response([
-                    'status' => 'failed',
-                    'message' => 'Video file could not be uploaded'
-                ], 500);
-            }
-            $all['video_file'] = $upload->id;
-            $old_video = $video->video_file;
-        }
+        $all = $request->except(['photo', 'categories']);
         if(!empty($request->photo)){
             if(!$upload = FileManagerController::upload_file($request->photo, env('FILE_DISK', $this->file_disk))){
                 if(isset($all['video_file']) && !empty($all['video_file'])){
@@ -282,7 +265,9 @@ class VideoController extends Controller
     {
         $video->delete();
         if(!empty($video->video_file)){
-            FileManagerController::delete($video->video_file);
+            if(is_numeric($video->video_file)){
+                FileManagerController::delete($video->video_file);
+            }
         }
         if(!empty($video->photo)){
             FileManagerController::delete($video->photo);

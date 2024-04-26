@@ -261,7 +261,7 @@ class GoalController extends Controller
 
         $answers = GoalReflectionAnswer::where('user_id', $this->user->id);
         if(!empty($slug)){
-            $category = GoalCategory::whre('slug', $slug)->first();
+            $category = GoalCategory::where('slug', $slug)->first();
             if(!empty($category)){
                 $answers = $answers->where('goal_category_id', $category->id);
             }
@@ -289,7 +289,7 @@ class GoalController extends Controller
 
         $answers = UserGoalAnswer::where('user_id', $this->user->id);
         if(!empty($slug)){
-            $category = GoalCategory::whre('slug', $slug)->first();
+            $category = GoalCategory::where('slug', $slug)->first();
             if(!empty($category)){
                 $answers = $answers->where('goal_category_id', $category->id);
             }
@@ -325,7 +325,7 @@ class GoalController extends Controller
         
         $reminders = $reminders->paginate($limit);
         foreach($reminders as $reminder){
-            $reminder->category = GoalCategory::find($reminder->goal_category_id)->category;
+            $reminder->category = !empty($categ = GoalCategory::find($reminder->goal_category_id)) ? $categ->category : "Deleted Category";
         }
 
         return response([

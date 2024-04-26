@@ -63,7 +63,11 @@ class User extends Authenticatable implements JWTSubject
         'resources_completed',
         'goals_completed',
         'last_country',
-        'signup_country'
+        'signup_country',
+        'device_token',
+        'web_token',
+        'next_daily_question',
+        'next_assessment'
     ];
 
     /**
@@ -76,7 +80,9 @@ class User extends Authenticatable implements JWTSubject
         'token',
         'token_expiry',
         'verification_token',
-        'verification_token_expiry'
+        'verification_token_expiry',
+        'device_token',
+        'web_token'
     ];
 
     /**
