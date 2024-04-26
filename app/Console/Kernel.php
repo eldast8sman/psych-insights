@@ -14,18 +14,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->call(function(){
-            $notification = new NotificationController();
-            $notification->test_notification();
-        })->everyMinute();
-        
-        $schedule->call(function(){
-            $notification = new NotificationController();
-            $notification->to_send();
-        })->everySixHours();
-
-        $schedule->call(function(){
             NotificationController::check_subscriptions();
-        })->everySixHours();
+            NotificationController::assessment_reminder();
+            NotificationController::check_inactivity();
+            NotificationController::daily_reminder();
+        })->timezone('Australia/Sydney')
+        ->dailyAt('08:00')->dailyAt('19:00');
     }
 
     /**
