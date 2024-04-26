@@ -15,6 +15,11 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function(){
             $notification = new NotificationController();
+            $notification->test_notification();
+        })->everyMinute();
+        
+        $schedule->call(function(){
+            $notification = new NotificationController();
             $notification->to_send();
         })->everySixHours();
 
