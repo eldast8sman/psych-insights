@@ -31,22 +31,8 @@ class NotificationController extends Controller
         }
     }
 
-    public function send(){
-        $user = User::find(1);
-        if(!empty($user->device_token)){
-            if($this->send_notification($user->device_token, 'Test', 'This is Test Notification')){
-                $message = "Notification Sent";
-            } else {
-                $message = $this->errors;
-            }
-        } else {
-            $message = "No Deice Token";
-        }
-
-        return response([
-            'status' => 'success',
-            'message' => $message
-        ], 200);
+    public function test_notification(){
+        NotificationJob::dispatch(1, 'test');
     }
 
     public function check_inactivity(){
