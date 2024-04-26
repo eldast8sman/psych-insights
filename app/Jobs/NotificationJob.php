@@ -80,6 +80,12 @@ class NotificationJob implements ShouldQueue
         }
     }
 
+    public function notification_test(){
+        $not = new ControllersNotificationController();
+        $token = 'cd8nblkbR-CQFR04p-bMAT:APA91bGvrtEhlF8lwKDcjntArpDJ-RoU4gqoJbqbHT6LBml7CxdwP-Tp11qXqQMUgFDmmPrqZvEVOmV7EqTf2sK6XGss9of93u-WVv8kT6Yeu1VsTwdj-dwpyW14UcAY_BE1ypaHmSvV';
+        $not->send_notification($token, "Test", "Notification Test");
+    }
+
     public function daily_question_reminder(){
         $user = User::find($this->id);
         if(!empty($user->device_token) or !empty($user->web_token)){
@@ -106,6 +112,8 @@ class NotificationJob implements ShouldQueue
             $this->assessment_reminder();
         } elseif($this->type == 'next_daily_question'){
             $this->daily_question_reminder();
+        } elseif($this->type == 'test'){
+            $this->notification_test();
         }
     }
 }
