@@ -20,6 +20,3 @@ yarn-error.log
 /.vscode
 env.json
 retrieve_env.py
-supervisor.config
-supervisor
-supervisor/*
