@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\DailyQuestion;
 use App\Models\DailyQuestionAnswer;
 use App\Models\DailyQuestionOption;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DailyQuestionController extends Controller
@@ -125,6 +126,10 @@ class DailyQuestionController extends Controller
 
         $answer_summary->answers = $answers;
         $answer_summary->category_scores = $categ_scores;
+
+        $user = User::find($this->user->id);
+        $user->next_daily_question = date('Y-m-d', time() + (60 * 60 * 24));
+        $user->save();
 
         self::log_activity($this->user->id, "checkin", "daily_question_answers", $answer_summary->id);
 

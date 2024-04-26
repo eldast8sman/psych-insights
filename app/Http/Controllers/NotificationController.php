@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotificationJob;
 use App\Jobs\SubscriptionAutoRenewal;
 use App\Models\CurrentSubscription;
 use App\Models\GoalCategory;
@@ -53,22 +54,27 @@ class NotificationController extends Controller
         $users = User::where('last_login', '<', $fifteen_days.' 00:00:00');
         if($users->count() < 0){
             foreach($users->get() as $user){
-                if(!empty($user->device_token)){
-                    $date1 = new DateTime(date('Y-m-d', strtotime($user->last_login)));
-                    $date2 = new DateTime(date('Y-m-d'));
-
-                    $interval = $date1->diff($date2);
-
-                    $diff = $interval->format('%a days');
-
-                    $this->send_notification($user->device_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
-                }
+                NotificationJob::dispatch($user->id, 'inactive');
             }
         }
     }
 
     public function assessment_reminder(){
-        
+        $users = User::where('next_assessment', '<=', date('Y-m-d'));
+        if($users->count() > 0){
+            foreach($users->get() as $user){
+                NotificationJob::dispatch($user->id, 'next_assessment');
+            }
+        }
+    }
+
+    public function daily_reminder(){
+        $users = User::where('next_daily_question', '<=', date('Y-m-d'));
+        if($users->count() > 0){
+            foreach($users->get() as $user){
+                NotificationJob::dispatch($user->id, 'next_daily_question');
+            }
+        }
     }
 
     public function to_send(){
