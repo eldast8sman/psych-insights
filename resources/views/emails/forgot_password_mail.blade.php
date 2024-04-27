@@ -5,7 +5,7 @@
   Forgot password?
 </p>
 <img
-  src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.svg"
+  src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.png"
   alt="padlock-icon"
   width="50px"
 />
