@@ -12,7 +12,7 @@
   </p>
 
   <img
-    src="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/%F0%9F%A6%86+emoji+_white+heavy+check+mark_.png"
+    src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/white-instagram.png"
     alt="checked-icon"
     width="50px"
   />

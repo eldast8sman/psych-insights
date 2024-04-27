@@ -93,13 +93,13 @@
                       title="PsychInsights"
                     >
                       <img
-                        src="https://psychwebfile.s3.eu-north-1.amazonaws.com/logo.png"
+                        src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo+(1).png"
                         alt="Psych-logo"
                       />
                       <h2>PsychInsights</h2>
                     </a>
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.svg"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.png"
                       alt="line"
                     />
                   </div>
@@ -197,7 +197,7 @@
                   <a
                     href="https://www.instagram.com/_psych_insights_?igsh=aXd1bHB0eWJvYTBy"
                     class="instagram"
-                    ><img sr="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/Group.png" /></a
+                    ><img sr="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/white-instagram.png" /></a
                   >
                 </td>
               </tr>

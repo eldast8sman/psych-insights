@@ -22,7 +22,7 @@ class ForgotPasswordMail extends Mailable
     public function __construct($name, $token)
     {
         $this->name = $name;
-        $this->link = env('ADMIN_URL').'/reset-password/'.$token;
+        $this->link = env('ADMIN_URL').'/reset_password/'.$token;
     }
 
     /**
