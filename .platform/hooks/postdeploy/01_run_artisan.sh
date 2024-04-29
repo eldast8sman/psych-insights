@@ -22,4 +22,4 @@ cp /tmp/psychinsightsapp.json storage/app/public/fcm/psychinsightsapp.json
 php artisan migrate
 php artisan config:clear
 php artisan cache:clear
-php artisan view:clears
+php artisan view:clear
