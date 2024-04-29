@@ -9,7 +9,17 @@ cat /tmp/env.json | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /var/app/curren
 # Navigate to the Laravel app directory
 cd /var/app/current
 
+# Download psychinsightsapp.json file from S3 bucket
+aws s3 cp s3://psychenv/psychinsightsapp.json /tmp/psychinsightsapp.json
+
+# Create directory if it doesn't exist
+mkdir -p storage/app/public/fcm
+
+# Copy psychinsightsapp.json to storage/app/public/fcm folder
+cp /tmp/psychinsightsapp.json storage/app/public/fcm/psychinsightsapp.json
+
 # Run Laravel Artisan commands
 php artisan migrate
 php artisan config:clear
 php artisan cache:clear
+php artisan view:clears

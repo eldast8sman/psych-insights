@@ -87,7 +87,7 @@ class NotificationController extends Controller
                             $to_send->status = 0;
                             $to_send->save();
                         }
-                    } else {
+                    } else { 
                         $messages[] = $this->errors;
                     }
                 }

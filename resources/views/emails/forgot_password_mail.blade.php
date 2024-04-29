@@ -1,21 +1,46 @@
 @extends('emails.layouts.newapp')
 
-@section('title')
-<p style="font-size: 40px; font-weight: 500">
-  Forgot password?
-</p>
-<img
-  src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.png"
-  alt="padlock-icon"
-  width="50px"
-/>
-@endsection
-
-@section('subtitle')
-  Reset Your Psych Insights Password
-@endsection
-
 @section('content')
+<tr>
+  <td>
+    <table width="100%">
+      <tr>
+        <td>
+          <div
+            style="
+              display: flex;
+              text-align: center;
+              align-items: center;
+              gap: 10px;
+              justify-content: center;
+              color: #000000;
+            "
+          >
+            <p style="font-size: 40px; font-weight: 500">
+              Forgot password?
+            </p>
+            <img
+              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.png"
+              alt="padlock-icon"
+              width="50px"
+            />
+          </div>
+          <p
+            style="
+              text-align: center;
+              color: #000000;
+              margin-top: -20px;
+              font-size: 14px;
+            "
+          >
+            Reset Your Psych Insights Password
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
 <tr>
   <td>
     <table width="100%">

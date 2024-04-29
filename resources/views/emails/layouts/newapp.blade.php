@@ -38,7 +38,8 @@
       }
     </style>
 
-    {{-- <script>
+    {{--
+    <script>
       const BASE_URL = "https://backend-dev.psychinsightsapp.com/api";
       const token = window.location.search.split("=")[1];
 
@@ -63,7 +64,8 @@
       const verifyBtn = document.querySelector(".verify-btn");
 
       verifyBtn.addEventListener("click", verifyEmail);
-    </script> --}}
+    </script>
+    --}}
   </head>
 
   <body>
@@ -103,39 +105,6 @@
                       alt="line"
                     />
                   </div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td>
-                  <div
-                    style="
-                      display: flex;
-                      text-align: center;
-                      align-items: center;
-                      gap: 10px;
-                      justify-content: center;
-                      color: #000000;
-                    "
-                  >
-                    @yield('title')
-                  </div>
-                  <p
-                    style="
-                      text-align: center;
-                      color: #000000;
-                      margin-top: -20px;
-                      font-size: 14px;
-                    "
-                  >
-                    @yield('subtitle')
-                  </p>
                 </td>
               </tr>
             </table>
@@ -192,13 +161,15 @@
                   <a
                     href="https://www.tiktok.com/@_psychinsights_?_t=8igxYC9rlr8&_r=1"
                     class="tiktolk"
-                    ><img src="https://psychinsights-env-files.s3.eu-north-1.amazonaws.com/logos_tiktok-icon.png" /></a
-                  >
+                    ><img
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logos_tiktok-icon.png"
+                  /></a>
                   <a
                     href="https://www.instagram.com/_psych_insights_?igsh=aXd1bHB0eWJvYTBy"
                     class="instagram"
-                    ><img sr="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/white-instagram.png" /></a
-                  >
+                    ><img
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/intagram%2C.png"
+                  /></a>
                 </td>
               </tr>
             </table>
