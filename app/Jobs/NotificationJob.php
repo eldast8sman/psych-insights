@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\NotificationController as ControllersNotificationController;
 use App\Models\CurrentSubscription;
 use App\Models\GoalCategory;
+use App\Models\Notification;
 use App\Models\SubscriptionPackage;
 use App\Models\User;
 use App\Models\UserGoalReminder;
@@ -77,6 +78,15 @@ class NotificationJob implements ShouldQueue
             if(!empty($user->web_token)){
                 $not->send_notification($user->web_token, $title, $message);
             }
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => $title,
+                'body' => $message,
+                'model' => 'daily_questions',
+                'read' => 0,
+                'status' => 1
+            ]);
         }
     }
 
@@ -98,6 +108,15 @@ class NotificationJob implements ShouldQueue
             } else {
                 $not->send_notification($user->web_token, $title, $body);
             }
+
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => $title,
+                'body' => $body,
+                'model' => 'daily_questions',
+                'read' => 0,
+                'status' => 1
+            ]);
         }
     }
 

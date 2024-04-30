@@ -8,6 +8,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Mail\SubscriptionAutoRenewalFailure;
 use App\Mail\SubscriptionExpiry;
 use App\Models\CurrentSubscription;
+use App\Models\Notification;
 use App\Models\PaymentPlan;
 use App\Models\StripeCustomer;
 use App\Models\StripePaymentIntent;
@@ -44,6 +45,15 @@ class SubscriptionAutoRenewal implements ShouldQueue
         $current->status = 2;
         $current->save();
 
+        Notification::create([
+            'user_id' => $current->user_id,
+            'title' => 'Expired Subscription',
+            'data' => 'Your Subscription has expired. To contnue enyoing unrestricted access, you should subscribe now',
+            'model' => 'subcription',
+            'read' => 0,
+            'status' => 1
+        ]);
+
         $user = User::find($current->user_id);
         Mail::to($user)->send(new SubscriptionExpiry($user->name));
     }
@@ -77,6 +87,7 @@ class SubscriptionAutoRenewal implements ShouldQueue
         }
         if(!$charged){
             Mail::to($user)->send(new SubscriptionAutoRenewalFailure($user->name, $errors));
+            $message = "Failure";
         } else {
             $internal_ref = 'SUB_'.Str::random(20).time();
             $intent = StripePaymentIntent::create([
@@ -121,10 +132,25 @@ class SubscriptionAutoRenewal implements ShouldQueue
                 $intent->save();
 
                 Controller::log_activity($user->id, "complete_subscription", "subscription_payment_attempts", $attempt->id);
+                $message = "Success";
             } else {
+                $errors = $sub->errors;
+                $message = "Failure";
                 Mail::to($user)->send(new SubscriptionAutoRenewalFailure($user->name, $sub->errors));
             }
         }
+
+        $title = ($message == "Failure") ? "Subscription Auto Renewal Failed" : "Subscription Auto Renewed successfully";
+        $body = ($message == "Failure") ? "We were able to carry out your Subscription Auto Renewal due to this reason: \"{$errors}\"" : "The Auto Renewal of your Subscription has been carried out successfully. Contiue to enjoy unrestricted access on the platform";
+
+        Notification::create([
+            'user_id' => $user->id,
+            'title' => $title,
+            'body' => $body,
+            'model' => 'subscription',
+            'read' => 0,
+            'status' => 1
+        ]);
     }
 
     /**

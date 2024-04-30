@@ -49,6 +49,7 @@ use App\Http\Controllers\DailyQuestionController as ControllersDailyQuestionCont
 use App\Http\Controllers\GoalController as ControllersGoalController;
 use App\Http\Controllers\NotificationController as ControllersNotificationController;
 use App\Http\Controllers\SelfReflectionController as ControllersSelfReflectionController;
+use App\Http\Controllers\UserNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -560,6 +561,16 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/previous-reflections', 'previous_reflections')->name('previousReflection.index');
         Route::get('/previous-goals', 'previous_goals')->name('previousGoal.index');
         Route::get('/all-goal-reminders', 'all_reminders')->name('allGoalReminder.index');
+        Route::get('goal-reminders/{reminder}/cancel', 'cancel_reminder')->name('cancelGoalReminder');
+    });
+
+    Route::controller(UserNotificationController::class)->group(function(){
+        Route::post('/notifications', 'store');
+        Route::get('/notifications', 'index')->name('notification.index');
+        Route::get('/notifications/count', 'notification_count')->name('notification.count');
+        Route::get('/notifications/{notification}/mark-as-read', 'mark_as_read')->name('notification.markAsRead');
+        Route::get('/notifications/mark-all-as-read', 'mark_all_as_read')->name('mark_all_as_read');
+        Route::get('/notifications/{notification}/cancel', 'cancel')->name('notification.cancel');
     });
 });
 
