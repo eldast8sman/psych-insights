@@ -334,4 +334,21 @@ class GoalController extends Controller
             'data' => $reminders
         ], 200);
     }
+
+    public function cancel_reminder(UserGoalReminder $reminder) {
+        if($reminder->user_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No User Reminder was fetched'
+            ], 409);
+        }
+
+        $reminder->status = 0;
+        $reminder->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Reminder successfully cancelled'
+        ], 200);
+    }
 }
