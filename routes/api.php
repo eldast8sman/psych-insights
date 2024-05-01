@@ -571,6 +571,7 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/notifications/{notification}/mark-as-read', 'mark_as_read')->name('notification.markAsRead');
         Route::get('/notifications/mark-all-as-read', 'mark_all_as_read')->name('mark_all_as_read');
         Route::get('/notifications/{notification}/cancel', 'cancel')->name('notification.cancel');
+        Route::get('/notifications/test', 'test_notification')->name('notification.test');
     });
 });
 
