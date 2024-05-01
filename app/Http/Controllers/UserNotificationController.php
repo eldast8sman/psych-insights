@@ -77,6 +77,30 @@ class UserNotificationController extends Controller
         ], 200);
     }
 
+    public function test_notification(){
+        $title = "Psych Insights";
+        $body = "Push Notification Test";
+        
+        if(!empty($this->user->device_token)){
+            $not = new NotificationController();
+            $not->send_notification($this->user->device_token, $title, $body);
+
+            Notification::create([
+                'user_id' => $this->user->id,
+                'title' => $title,
+                'body' => $body,
+                'model' => 'test_notification',
+                'read' => 0,
+                'status' => 1
+            ]);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Notification sent'
+        ], 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
