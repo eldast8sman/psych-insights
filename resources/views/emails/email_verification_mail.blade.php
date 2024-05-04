@@ -25,11 +25,6 @@
             >
               Verify your email
             </p>
-            <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/checked.png"
-              alt="padlock-icon"
-              width="50px"
-            />
           </div>
           <p
             style="
@@ -70,7 +65,7 @@
           <p style="margin: 40px 0px">
             Hello <span>{{ $name }}</span>,
           </p>
-          <p style="margin-top: -20px">
+          <p style="margin-top: -20px; text-align: center">
             You’ve successfully created a Psych Insights account. To
             activate your account please enter this code.
           </p>

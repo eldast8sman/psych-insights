@@ -37,35 +37,6 @@
       @media screen and (max-width: 600px) {
       }
     </style>
-
-    {{--
-    <script>
-      const BASE_URL = "https://backend-dev.psychinsightsapp.com/api";
-      const token = window.location.search.split("=")[1];
-
-      async function verifyEmail(e) {
-        // e.preverntDefault();
-        const response = await fetch(`${BASE_URL}/verify-email`, {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ token: token }),
-        });
-        const output = await response.json();
-        console.log(output);
-        if (response.ok) {
-          window.location.replace("./thank-you.html");
-        } else {
-          window.location.replace("./error.html");
-        }
-      }
-
-      const verifyBtn = document.querySelector(".verify-btn");
-
-      verifyBtn.addEventListener("click", verifyEmail);
-    </script>
-    --}}
   </head>
 
   <body>
@@ -100,10 +71,6 @@
                       />
                       <h2>PsychInsights</h2>
                     </a>
-                    <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/line.png"
-                      alt="line"
-                    />
                   </div>
                 </td>
               </tr>
@@ -115,17 +82,9 @@
 
         <tr>
           <td>
-            <table width="90%" style="margin: auto">
+            <table width="90%" style="margin-top: 20px">
               <tr>
-                <td
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    font-size: 14px;
-                    margin-top: 30px;
-                  "
-                >
+                <td style="text-align: center">
                   <p>
                     Not you? Contact
                     <a href="" style="color: #207384">Support</a>

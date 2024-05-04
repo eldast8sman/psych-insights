@@ -230,7 +230,7 @@ class GoalController extends Controller
                 UserGoalReminder::create([
                     'user_id' => $this->user->id,
                     'goal_category_id' => $category->id,
-                    'reminder' => $reminder['reminder'],
+                    'reminder' => (isset($reminder['reminder']) and !empty($reminder['reminder'])) ? $reminder['reminder'] : $category->category." Reminder",
                     'reminder_day' => $reminder['reminder_day'],
                     'reminder_time' => $reminder['reminder_time'],
                     'reminder_type' => $reminder_type,

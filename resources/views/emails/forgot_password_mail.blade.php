@@ -6,25 +6,16 @@
     <table width="100%">
       <tr>
         <td>
-          <div
+          <p
             style="
-              display: flex;
               text-align: center;
-              align-items: center;
-              gap: 10px;
-              justify-content: center;
+              font-size: 40px;
+              font-weight: 500;
               color: #000000;
             "
           >
-            <p style="font-size: 40px; font-weight: 500">
-              Forgot password?
-            </p>
-            <img
-              src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/padlock.png"
-              alt="padlock-icon"
-              width="50px"
-            />
-          </div>
+            Forgot password?
+          </p>
           <p
             style="
               text-align: center;
@@ -46,10 +37,10 @@
     <table width="100%">
       <tr>
         <td style="font-size: 14px">
-          <p style="margin: 30px 0px">
+          <p style="margin-top: 30px">
             Hello <span>{{ $name }}</span>,
           </p>
-          <p style="margin-bottom: 40px; text-align: center">
+          <p style="margin-bottom: 20px; text-align: center">
             To set up a new password to your Psych Insights account,
             enter this code on your device.
           </p>
