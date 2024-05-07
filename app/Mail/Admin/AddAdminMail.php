@@ -22,7 +22,7 @@ class AddAdminMail extends Mailable
     public function __construct($name, $token)
     {
         $this->name = $name;
-        $this->link = env('ADMIN_URL').'/admin-verify.html?token='.$token;
+        $this->link = env('ADMIN_URL').'/admin_verify/'.$token;
     }
 
     /**
