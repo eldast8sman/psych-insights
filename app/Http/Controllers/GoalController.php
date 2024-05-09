@@ -149,7 +149,7 @@ class GoalController extends Controller
             ], 404);
         }
 
-        $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->first();
+        $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->orderBy('id', 'desc')->first();
         if(!empty($next_answer)){
             if(($next_answer->next_date > date('Y-m-d')) and ($next_answer->goal_set == 1)){
                 return response([
