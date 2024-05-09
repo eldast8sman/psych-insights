@@ -152,7 +152,8 @@ class SubscriptionController extends Controller
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'auto_renew' => $auto_renew,
-                'grace_end' => $grace_end
+                'grace_end' => $grace_end,
+                'status' => 1
             ];
             if(empty($current)){
                 $current = CurrentSubscription::create($data);
