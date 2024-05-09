@@ -289,7 +289,7 @@ class DassQuestionController extends Controller
 
         return response([
             'status' => 'success',
-            'message' => 'Basic Question answered',
+            'message' => 'Dass Questions answered',
             'data' => $answer_summary
         ], 200);
     }
