@@ -48,7 +48,7 @@ class SubscriptionAutoRenewal implements ShouldQueue
         Notification::create([
             'user_id' => $current->user_id,
             'title' => 'Expired Subscription',
-            'data' => 'Your Subscription has expired. To contnue enyoing unrestricted access, you should subscribe now',
+            'body' => 'Your Subscription has expired. To contnue enyoing unrestricted access, you should subscribe now',
             'model' => 'subcription',
             'read' => 0,
             'status' => 1
@@ -141,7 +141,7 @@ class SubscriptionAutoRenewal implements ShouldQueue
         }
 
         $title = ($message == "Failure") ? "Subscription Auto Renewal Failed" : "Subscription Auto Renewed successfully";
-        $body = ($message == "Failure") ? "We were able to carry out your Subscription Auto Renewal due to this reason: \"{$errors}\"" : "The Auto Renewal of your Subscription has been carried out successfully. Contiue to enjoy unrestricted access on the platform";
+        $body = ($message == "Failure") ? "We were not able to carry out your Subscription Auto Renewal due to this reason: \"{$errors}\"" : "The Auto Renewal of your Subscription has been carried out successfully. Contiue to enjoy unrestricted access on the platform";
 
         Notification::create([
             'user_id' => $user->id,

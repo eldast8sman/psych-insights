@@ -19,7 +19,7 @@
           <p style="margin-bottom: 40px">
             Your Subscription on the PsychInsights application has expired.
             <br />
-            To get unlimited access to available resources and functionalities on the App, you can subscribe to out Premium Plan
+            To get unlimited access to available resources and functionalities on the App, you can subscribe to our Premium Plan
           </p>
         </td>
       </tr>
