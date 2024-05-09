@@ -36,7 +36,7 @@ class LearnAndDoController extends Controller
             $opened_strategies = [];
             $op_strategies = OpenedLearnAndDo::where('user_id', $user_id)->orderBy('frequency', 'asc')->orderBy('updated_at', 'asc');
             if($op_strategies->count() > 0){
-                foreach($op_strategies as $op_strategy){
+                foreach($op_strategies->get() as $op_strategy){
                     $opened_strategies[] = $op_strategy->learn_and_do_id;
                 }
             }
