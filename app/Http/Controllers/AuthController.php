@@ -511,6 +511,24 @@ class AuthController extends Controller
             'expiry' => auth('user-api')->factory()->getTTL() * 60
         ];
 
+        $daily_quote = DailyQuote::inRandomOrder()->first();
+        if(!empty($daily_quote)){
+            $user->daily_quote_id = $daily_quote->id;
+            $user->save();
+        }
+        if(!empty($daily_tip = DailyTip::inRandomOrder()->first())){
+            $user->daily_tip_id = $daily_tip->id;
+            $user->save();
+        }
+        if($request->device_token != $user->device_token){
+            $user->device_token = $request->device_token;
+            $user->save();
+        }
+        if($request->web_token != $user->web_token){
+            $user->web_token = $request->web_token;
+            $user->save();
+        }
+
         self::check_ip($request, $user->id);
         $user = self::user_details($user);
         $user->authorization = $auth;

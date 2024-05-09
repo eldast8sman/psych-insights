@@ -16,7 +16,10 @@ use App\Models\QuestionAnswerSummary;
 use App\Http\Requests\SetInterestRequest;
 use App\Models\BasicQuestionSpecialOption;
 use App\Http\Requests\AnswerBasicQuestionRequest;
+use App\Models\Admin\Admin;
+use App\Models\Admin\AdminNotification;
 use App\Models\PaymentPlan;
+use Exception;
 
 class BasicQuestionController extends Controller
 {
@@ -311,12 +314,30 @@ class BasicQuestionController extends Controller
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 
         if($new){
-            $gpt = new ChatGPTController();
-            $name = explode(' ', $this->user->name);
-            $name = $name[0];
+            try {
+                $gpt = new ChatGPTController();
+                $name = explode(' ', $this->user->name);
+                $name = $name[0];
 
-            $welcome_message = $gpt->welcome_message($name, $distress_level);
-            $answer_summary->welcome_message = $welcome_message;
+                $welcome_message = $gpt->welcome_message($name, $distress_level);
+                $answer_summary->welcome_message = $welcome_message;
+            } catch(Exception $e){
+                $answer_summary->welcome_message = "Welcome to Psych Insights";
+
+                $admins = Admin::where('role', 'super')->get();
+                if(!empty($admins)){
+                    foreach($admins as $admin){
+                        AdminNotification::create([
+                            'admin_id' => $admin->id,
+                            'title' => "OPEN AI KEY",
+                            'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
+                            'page' => 'home',
+                            'identifier' => 1,
+                            'opened' => 0
+                        ]);
+                    }
+                }
+            }
         }
 
         return response([
