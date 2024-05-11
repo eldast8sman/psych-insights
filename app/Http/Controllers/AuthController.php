@@ -330,6 +330,7 @@ class AuthController extends Controller
         $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', date('Y-m-d'));
         $user->daily_question = ($answered->count() < 1) ? true : false;
         $user->incomplete_answers = self::fetch_temp_answer($user->id);
+        $user->first_time_dass = (QuestionAnswerSummary::where('user_id', $user->id)->where('question_type', 'dass_question')->count() < 1) ? true : false;
 
         return $user;
     }
@@ -470,7 +471,38 @@ class AuthController extends Controller
                 'password' => Hash::make(Str::random(30)),
                 'email_verified' => 1
             ]);
+
+            $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+            if(!empty($free_trial)){
+                $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
+                $sub = new SubscriptionController();
+                $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
+            }
+
+            $stripe = new StripeController();
+            if($customer = $stripe->create_customer($user->name, $user->email)){
+                StripeCustomer::create([
+                    'user_id' => $user->id,
+                    'customer_id' => $customer->id,
+                    'customer_data' => json_encode($customer)
+                ]);
+            }
+
+            $not_settings = NotificationSetting::where('new_user_notification', 1);
+            if($not_settings->count() > 0){
+                foreach($not_settings->get() as $not_setting){
+                    AdminNotification::create([
+                        'admin_id' => $not_setting->admin_id,
+                        'title' => 'New User',
+                        'body' => 'A New User by the name '.$user->name.' just signed up',
+                        'page' => 'users',
+                        'identifier' => $user->id,
+                        'opened' => 0
+                    ]);
+                }
+            }
         }
+        
         $token = auth('user-api')->login($user);
         $user->prev_login = !empty($user->last_login) ? $user->last_login : date('Y-m-d H:i:s');
         $user->last_login = date('Y-m-d H:i:s');
@@ -495,15 +527,6 @@ class AuthController extends Controller
             }
         }
         $user->save();
-
-        $stripe = new StripeController();
-        if($customer = $stripe->create_customer($user->name, $user->email)){
-            StripeCustomer::create([
-                'user_id' => $user->id,
-                'customer_id' => $customer->id,
-                'customer_data' => json_encode($customer)
-            ]);
-        }
 
         $auth = [
             'token' => $token,
