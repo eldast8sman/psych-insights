@@ -10,22 +10,18 @@
 
 @section('content')
 
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td style="font-size: 14px">
-          <p style="margin: 40px 0px">Hello {{ $name }},</p>
-          <p style="margin-bottom: 40px">
-            Your Subscription on the PsychInsights application has expired.
-            <br />
-            To get unlimited access to available resources and functionalities on the App, you can subscribe to our Premium Plan
-          </p>
-        </td>
-      </tr>
-    </table>
+<tr> 
+  <td style="font-size: 14px"> 
+    <p style="margin: 40px 0px">Hello {{ $name }},</p>
+    <p style="margin-bottom: 40px">
+      Hello! We've noticed your Psych Insights Premium Subscription has expired. 
+      <br />
+      To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
+      Don’t let your progress stall—continue your journey with us today! 
+    </p>
   </td>
 </tr>
+
 
 <tr>
   <td>
