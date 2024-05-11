@@ -17,9 +17,10 @@
         <td style="font-size: 14px">
           <p style="margin: 40px 0px">Hello {{ $name }},</p>
           <p style="margin-bottom: 40px">
-            The Auto Renewal of your Subscription on PsychInsghts failed.
-            <br />
-            <strong>Reason: </strong><i>{{ $message }}</i>
+            Oops! There was an issue with auto-renewing your subscription to PsychInsights.
+            Please update your payment details to continue enjoying seamless access to all our features without interruption. 
+            <br /> 
+            <strong>Reason: </strong><i>{{ $message }}</i> 
           </p>
         </td>
       </tr>

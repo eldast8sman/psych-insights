@@ -45,10 +45,10 @@ class NotificationJob implements ShouldQueue
 
             $not = new ControllersNotificationController();
             if(!empty($user->device_token)){
-                $not->send_notification($user->device_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
+                $not->send_notification($user->device_token, 'We Miss You at PsychInsights', "Hey, we’ve noticed you’ve been inactive for '.$diff.' Just checking in to make sure everything's okay. We're here when you're ready to come back!");
             }
             if(!empty($user->web_token)){
-                $not->send_notification($user->web_token, 'Inactivity', 'Hey, You have been inactive for '.$diff.' Hope all is well?');
+                $not->send_notification($user->web_token, 'We Miss You at PsychInsights', "Hey, we’ve noticed you’ve been inactive for '.$diff.' Just checking in to make sure everything's okay. We're here when you're ready to come back!");
             }
         }
     }
@@ -69,7 +69,7 @@ class NotificationJob implements ShouldQueue
             }
             
             $title = "Assessment Reminder";
-            $message = "This is to remind you that you are to partake in the {$type} today";
+            $message = "Hey, just a quick reminder to complete the {$type} when you can so that we can provide you with your new personalised resources. Dive in when you're ready!";
             
             $not = new ControllersNotificationController();
             if(!empty($user->device_token)){
@@ -99,8 +99,8 @@ class NotificationJob implements ShouldQueue
     public function daily_question_reminder(){
         $user = User::find($this->id);
         if(!empty($user->device_token) or !empty($user->web_token)){
-            $title = "Daily Assessment";
-            $body = "You are yet to check in today. Please login to the App to answer your daily assessment Questions";
+            $title = "Daily Check-in";
+            $body = "Don't forget to complete your daily check-in today! Take a few moments to reflect on how you’re feeling and track your overall well-being.";
 
             $not = new ControllersNotificationController();
             if(!empty($user->device_token)){
