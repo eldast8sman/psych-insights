@@ -36,33 +36,6 @@
       @media screen and (max-width: 600px) {
       }
     </style>
-
-    <script>
-      const BASE_URL = "https://backend-dev.psychinsightsapp.com/api";
-      const token = window.location.search.split("=")[1];
-
-      async function verifyEmail(e) {
-        // e.preverntDefault();
-        const response = await fetch(`${BASE_URL}/verify-email`, {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ token: token }),
-        });
-        const output = await response.json();
-        console.log(output);
-        if (response.ok) {
-          window.location.replace("./thank-you.html");
-        } else {
-          window.location.replace("./error.html");
-        }
-      }
-
-      const verifyBtn = document.querySelector(".verify-btn");
-
-      verifyBtn.addEventListener("click", verifyEmail);
-    </script>
   </head>
 
   <body>
