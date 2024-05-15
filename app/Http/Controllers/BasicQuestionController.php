@@ -31,6 +31,19 @@ class BasicQuestionController extends Controller
         $this->user = AuthController::user();
     }
 
+    private function welcome_messages($name, $diagnosis) : array
+    {
+        return [
+            "Welcome, {$name}!<br /> We're delighted to have you join us on the Psych Insights App. 
+            <br><br>
+            Our analysis suggests that you might be facing '{$diagnosis}'. We're here to support you on your mental health journey. 
+            <br><br>
+            Dive into our carefully curated resources designed just for you. Explore mental health strategies, insightful articles, engaging podcasts, soothing audio sessions, informative videos, and enriching books—all aimed at enhancing your mental well-being. 
+            <br><br>
+            Remember, you're not alone. Take your time to browse through these resources, and rest assured that we're here to help you every step of the way."
+        ];
+    }
+
     public function fetch_questions(){
         $last_answer = QuestionAnswerSummary::where('user_id', $this->user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         $fetch = false;
@@ -322,7 +335,9 @@ class BasicQuestionController extends Controller
                 $welcome_message = $gpt->welcome_message($name, $distress_level);
                 $answer_summary->welcome_message = $welcome_message;
             } catch(Exception $e){
-                $answer_summary->welcome_message = "Welcome to Psych Insights";
+                $messages = $this->welcome_messages($this->user->name, $distress_level);
+                $key = mt_rand(0, (count($messages) - 1));
+                $answer_summary->welcome_message = $messages[$key];
 
                 $admins = Admin::where('role', 'super')->get();
                 if(!empty($admins)){
