@@ -29,8 +29,14 @@ class GoalController extends Controller
         $category->reflections = GoalReflection::where('goal_category_id', $category->id)->get();
         $category->goal_questions = GoalPlanQuestions::where('goal_category_id', $category->id)->get();
         $next_answer = NextGoalAnswer::where('user_id', $user_id)->where('goal_category_id', $category->id)->first();
-        $category->cannot_answer_until = !empty($next_answer) ? (string)$next_answer->next_date : ""; 
-
+        if(!empty($next_answer) and ($next_answer->next_date <= date('Y-m-d'))){
+            $next_answer->reflection_answered = 0;
+            $next_answer->goal_set = 0;
+            $next_answer->save();
+        }
+        $category->cannot_answer_until = (!empty($next_answer) and ($next_answer->next_date > date('Y-m-d'))) ? true : false; 
+        $category->reflection_answered = !empty($next_answer) ? $next_answer->reflection_answered : 0;
+        $category->goal_set = !empty($next_answer) ? $next_answer->goal_set : 0;
         return $category;
     }
 
@@ -131,6 +137,11 @@ class GoalController extends Controller
                 'goal_set' => 0,
                 'next_date' => $next_sunday
             ]);
+        } else {
+            $next_answer->next_date = $next_sunday;
+            $next_answer->reflection_answered = 1;
+            $next_answer->goal_set = 0;
+            $next_answer->save();
         }
 
         return response([
