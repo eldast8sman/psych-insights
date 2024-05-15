@@ -42,7 +42,7 @@
           </p>
           <p style="margin-bottom: 20px; text-align: center">
             To set up a new password to your Psych Insights account,
-            enter this code on your device.
+            enter this code on your device.
           </p>
         </td>
       </tr>
@@ -55,7 +55,7 @@
     <table width="100%">
       <tr>
         <td style="text-align: center">
-          <p>Your code:</p>
+          <p style="text-align: center">Your code:</p>
           <span
             style="
               color: #ffffff;
