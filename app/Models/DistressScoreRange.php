@@ -13,7 +13,8 @@ class DistressScoreRange extends Model
         'question_type',
         'min',
         'max',
-        'verdict'
+        'verdict',
+        'welcome_message'
     ];
 
     protected $hidden = [
