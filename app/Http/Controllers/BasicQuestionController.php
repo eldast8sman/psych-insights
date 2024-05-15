@@ -216,7 +216,8 @@ class BasicQuestionController extends Controller
             $percent_list[$key] = $percentage;
         }
 
-        $distress_level = DistressScoreRange::where('question_type', 'basic_question')->where('min', '<=', $k10_score)->where('max', '>=', $k10_score)->first()->verdict;
+        $range = DistressScoreRange::where('question_type', 'basic_question')->where('min', '<=', $k10_score)->where('max', '>=', $k10_score)->first();
+        $distress_level = $range->verdict;
 
         $uncomputeds = DailyQuestionAnswer::where('user_id', $this->user->id)->where('computed', 0);
         if($uncomputeds->count() > 0){
@@ -327,6 +328,9 @@ class BasicQuestionController extends Controller
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 
         if($new){
+            $welcome_message = $range->welcome_message;
+            $welcome_message = str_replace('[NAME!]', $this->user->name, $welcome_message);
+            $answer_summary->welcome_message = $welcome_message;
             try {
                 $gpt = new ChatGPTController();
                 $name = explode(' ', $this->user->name);

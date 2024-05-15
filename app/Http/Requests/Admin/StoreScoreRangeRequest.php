@@ -24,7 +24,8 @@ class StoreScoreRangeRequest extends FormRequest
         return [
             'min' => 'required|integer|min:0',
             'max' => 'required|integer',
-            'verdict' => 'required|string'
+            'verdict' => 'required|string',
+            'welcome_message' => 'required|string'
         ];
     }
 }
