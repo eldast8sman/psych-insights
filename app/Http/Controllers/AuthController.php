@@ -37,6 +37,7 @@ use App\Http\Requests\UploadProfilePhotoRequest;
 use App\Mail\ContactUsMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
+use App\Models\UserNotificationSetting;
 use Exception;
 
 class AuthController extends Controller
@@ -334,6 +335,16 @@ class AuthController extends Controller
         $user->daily_question = ($answered->count() < 1) ? true : false;
         $user->incomplete_answers = self::fetch_temp_answer($user->id);
         $user->first_time_dass = (QuestionAnswerSummary::where('user_id', $user->id)->where('question_type', 'dass_question')->count() < 1) ? true : false;
+        $notification_setting = UserNotificationSetting::where('user_id', $user->id)->first();
+        if(empty($notification_setting)){
+            $notification_setting = UserNotificationSetting::create([
+                'user_id' => $user->id,
+                'system_notification' => 1,
+                'goal_setting_notification' => 1,
+                'resource_notification' => 1
+            ]);
+        }
+        $user->notification_setting = $notification_setting;
 
         return $user;
     }
