@@ -1,44 +1,32 @@
-@extends('emails.layouts.app')
-
-@section('title')
-  Subscription Expiry
-@endsection
-
-@section('subtitle')
-  
-@endsection
+@extends('emails.layouts.newapp')
 
 @section('content')
-
-<tr> 
-  <td style="font-size: 14px"> 
-    <p style="margin: 40px 0px">Hello {{ $name }},</p>
-    <p style="margin-bottom: 40px">
-      Hello! We've noticed your Psych Insights Premium Subscription has expired. 
-      <br />
-      To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
-      Don’t let your progress stall—continue your journey with us today! 
-    </p>
-  </td>
-</tr>
-
 
 <tr>
   <td>
     <table width="100%">
       <tr>
-        <td style="text-align: center">
-          <a
-            href="{{ $link }}"
+        <td>
+          <p
             style="
-              color: #ffffff;
-              padding: 15px 55px;
-              background: #207384;
-              border-radius: 30px;
-              text-decoration: none;
+              text-align: center;
+              font-size: 40px;
+              font-weight: 500;
+              color: #000000;
             "
-            >Dashboard</a
           >
+            Subscription Expiry
+          </p>
+          <p
+            style="
+              text-align: center;
+              color: #000000;
+              margin-top: -20px;
+              font-size: 14px;
+            "
+          >
+            Your Subscription has expired
+          </p>
         </td>
       </tr>
     </table>
@@ -50,10 +38,38 @@
     <table width="100%">
       <tr>
         <td style="font-size: 14px">
-          <p>
-            Warm regards, <br />
-            The PsychInsights Team
+          <p style="margin-top: 30px">
+            Hello <span>{{ $name }}</span>,
           </p>
+          <p style="margin-bottom: 20px; text-align: center">
+            Hello! We've noticed your Psych Insights Premium Subscription has expired. 
+            <br />
+            To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
+            Don’t let your progress stall—continue your journey with us today! 
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <table width="100%">
+      <tr>
+        <td style="text-align: center">
+          <p style="text-align: center">Your code:</p>
+          <a
+            href="{{ $link }}"
+            style="
+              color: #ffffff;
+              padding: 15px 55px;
+              background: #207384;
+              border-radius: 30px;
+              text-decoration: none;
+            "
+            >Dashboard</a
+          >
         </td>
       </tr>
     </table>
