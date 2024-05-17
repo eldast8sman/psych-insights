@@ -30,11 +30,14 @@ use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ContactUsRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\DeactivateAccountRequest;
 use App\Http\Requests\UploadProfilePhotoRequest;
+use App\Mail\ContactUsMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -682,5 +685,20 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Account deactivated successfully'
         ], 200);
+    }
+
+    public function contact_us(ContactUsRequest $request){
+        try{
+            Mail::to('support@psychinsightsapp.com')->send(new ContactUsMail($request->message, $request->email, $request->name, $request->subject));
+            return response([
+                'status' => 'success',
+                'message' => 'Message sent successfully. You\'ll receive a reply from us soonest'
+            ], 200);
+        } catch(Exception $e){
+            return response([
+                'status' => 'failed',
+                'message' => 'There was an Error in sending the message'
+            ], 500);
+        }
     }
 }
