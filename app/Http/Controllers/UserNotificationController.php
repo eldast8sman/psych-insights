@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NotificationSettingRequest;
 use App\Models\Notification;
+use App\Models\UserNotificationSetting;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -101,35 +103,39 @@ class UserNotificationController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        Notification::factory(5)->create();
+    public function fetch_setting(){
+        $setting = UserNotificationSetting::where('user_id', $this->user->id)->first();
+        if(empty($setting)){
+            $setting = UserNotificationSetting::create([
+                'user_id' => $this->user->id,
+                'system_notification' => 1,
+                'goal_setting_notification' => 1,
+                'resource_notification' => 1
+            ], 200);
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'Notification Setting fetched succesfully',
+            'data' => $setting
+        ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Notification $notification)
-    {
-        //
-    }
+    public function update_setting(NotificationSettingRequest $request){
+        $setting = UserNotificationSetting::where('user_id', $this->user->id)->first();
+        $all = $request->all();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Notification $notification)
-    {
-        //
-    }
+        if(!empty($setting)){
+            $setting->update($all);
+        } else {
+            $all['user_id'] = $this->user->id;
+            $setting = UserNotificationSetting::create($all);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Notification $notification)
-    {
-        //
+        return response([
+            'status' => 'success',
+            'message' => 'Notification Setting updated successfully',
+            'data' => $setting
+        ], 200);
     }
 }
