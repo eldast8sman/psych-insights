@@ -375,6 +375,7 @@ Route::controller(ControllersAuthController::class)->group(function(){
     Route::post('/reset-password', 'reset_password')->name('reset_password');
     Route::get('/initiate-google-login', 'initiate_google_login')->name('initiate_google_login');
     Route::post('/google-login', 'google_login')->name('google_login');
+    Route::post('/contact-us-mail', 'contact_us')->name('contactUsMail');
 });
 
 Route::middleware('auth:user-api')->group(function(){
