@@ -40,29 +40,17 @@
 
   <body>
     <center class="wrapper">
-      <table class="main" width="100%" style="padding: 30px">
+      <table class="main" style="padding: 30px">
         <tr>
           <td>
             <table width="100%">
               <tr>
-                <td>
-                  <a
-                    href="https://psychinsightsapp.com/"
-                    style="
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      gap: 5px;
-                      text-decoration: none;
-                      color: #2e2f32;
-                    "
-                    title="PsychInsights"
-                  >
+                <td style="text-align: center">
+                  <a href="https://psychinsightsapp.com/" title="PsychInsights">
                     <img
-                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo+(1).png"
+                      src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo.png"
                       alt="Psych-logo"
                     />
-                    <span>PsychInsights</span>
                   </a>
                 </td>
               </tr>
@@ -70,80 +58,7 @@
           </td>
         </tr>
 
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td>
-                  <p
-                    style="
-                      text-align: center;
-                      font-size: 40px;
-                      font-weight: 500;
-                      color: #000000;
-                    "
-                  >
-                    Forgot password?
-                  </p>
-                  <p
-                    style="
-                      text-align: center;
-                      color: #000000;
-                      margin-top: -20px;
-                      font-size: 14px;
-                    "
-                  >
-                    Reset Your Psych Insights Password
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td style="font-size: 14px">
-                  <p style="margin-top: 30px">
-                    Hello <span>{{ $name }}</span>,
-                  </p>
-                  <p style="margin-bottom: 20px; text-align: center">
-                    To set up a new password to your Psych Insights account,
-                    enter this code on your device.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td style="text-align: center">
-                  <p style="text-align: center">Your code:</p>
-                  <span
-                    style="
-                      color: #ffffff;
-                      padding: 15px 55px;
-                      background: #207384;
-                      border-radius: 10px;
-                      text-decoration: none;
-                      letter-spacing: 10px;
-                      font-size: 25px;
-                      font-weight: bold;
-                    "
-                  >
-                    {{ $token }}
-                  </span>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+        @yield('content')
 
         <tr>
           <td>
@@ -152,11 +67,15 @@
                 <td style="text-align: center">
                   <p style="text-align: center">
                     Not you? Contact
-                    <a href="" style="color: #207384">Support</a>
+                    <a
+                      href="https://psychinsightsapp.com/contact.php"
+                      style="color: #207384"
+                      >Support</a
+                    >
                   </p>
                   <p style="text-align: center">
                     Want to know more about terms of use?<a
-                      href=""
+                      href="https://psychinsightsapp.com/terms.php"
                       style="color: #207384"
                       >Click here</a
                     >
@@ -176,10 +95,6 @@
                     background-color: #f0f1f9;
                     border-radius: 10px;
                     padding: 5px 0px;
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                    justify-content: center;
                     text-align: center;
                   "
                 >
