@@ -311,7 +311,7 @@ class BasicQuestionController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'Min cannot be higher than Max'
-            ], 409);
+            ], 408);
         }
 
         $all = $request->all();
