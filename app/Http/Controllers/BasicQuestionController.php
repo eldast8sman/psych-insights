@@ -331,30 +331,22 @@ class BasicQuestionController extends Controller
             $welcome_message = $range->welcome_message;
             $welcome_message = str_replace('[NAME!]', $this->user->name, $welcome_message);
             $answer_summary->welcome_message = $welcome_message;
-            try {
-                $gpt = new ChatGPTController();
-                $name = explode(' ', $this->user->name);
-                $name = $name[0];
+            $name = explode(' ', $this->user->name);
+            $messages = $this->welcome_messages($name[0], $distress_level);
+            $key = mt_rand(0, (count($messages) - 1));
+            $answer_summary->welcome_message = $messages[$key];
 
-                $welcome_message = $gpt->welcome_message($name, $distress_level);
-                $answer_summary->welcome_message = $welcome_message;
-            } catch(Exception $e){
-                $messages = $this->welcome_messages($this->user->name, $distress_level);
-                $key = mt_rand(0, (count($messages) - 1));
-                $answer_summary->welcome_message = $messages[$key];
-
-                $admins = Admin::where('role', 'super')->get();
-                if(!empty($admins)){
-                    foreach($admins as $admin){
-                        AdminNotification::create([
-                            'admin_id' => $admin->id,
-                            'title' => "OPEN AI KEY",
-                            'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
-                            'page' => 'home',
-                            'identifier' => 1,
-                            'opened' => 0
-                        ]);
-                    }
+            $admins = Admin::where('role', 'super')->get();
+            if(!empty($admins)){
+                foreach($admins as $admin){
+                    AdminNotification::create([
+                        'admin_id' => $admin->id,
+                        'title' => "OPEN AI KEY",
+                        'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
+                        'page' => 'home',
+                        'identifier' => 1,
+                        'opened' => 0
+                    ]);
                 }
             }
         }
