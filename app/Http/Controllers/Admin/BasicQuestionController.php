@@ -304,7 +304,7 @@ class BasicQuestionController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'A Score range CANNOT overlap another score range'
-            ]);
+            ], 409);
         }
 
         if($request->min > $request->max){
