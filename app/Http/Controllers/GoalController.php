@@ -330,7 +330,7 @@ class GoalController extends Controller
             return response([
                 'status' => 'failed',
                 'message' => 'You do not have any active reminder at this time',
-                'data' => []
+                'data' => null
             ], 200);
         }
         
