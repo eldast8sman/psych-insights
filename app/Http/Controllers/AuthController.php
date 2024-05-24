@@ -109,7 +109,8 @@ class AuthController extends Controller
                     'body' => 'A New User by the name '.$user->name.' just signed up',
                     'page' => 'users',
                     'identifier' => $user->id,
-                    'opened' => 0
+                    'opened' => 0,
+                    'status' => 1
                 ]);
             }
         }
@@ -511,7 +512,8 @@ class AuthController extends Controller
                         'body' => 'A New User by the name '.$user->name.' just signed up',
                         'page' => 'users',
                         'identifier' => $user->id,
-                        'opened' => 0
+                        'opened' => 0,
+                        'status' => 1
                     ]);
                 }
             }
@@ -687,7 +689,8 @@ class AuthController extends Controller
                     'body' => $user->name.' has just deactiated his/her account',
                     'page' => 'deactivated_users',
                     'identifier' => $deactivation->id,
-                    'opened' => 0
+                    'opened' => 0,
+                    'status' => 1
                 ]);
             }
         }

@@ -362,7 +362,10 @@ Route::prefix('admin')->group(function(){
             Route::get('/notification-settings', 'fetch_setting')->name('admin.motificationSetting.fetch');
             Route::put('/notification-settings', 'update_setting')->name('admin.notificationSetting.update');
             Route::get('/notification-count', 'notification_count')->name('admin.notificationCCount');
-            Route::get('/notifications', 'index')->name('admin.notification.index');
+            Route::get('/notifications', 'index')->name('admin.notification.index')->name('admin.notification.index');
+            Route::get('/notifications/{notification}/mark-as-read', 'mark_as_read')->name('admin.notification.maekAsRead');
+            Route::get('/notifications/mark-all-as-read', 'mark_all_as_read')->name('admin.notification.markAllAsRead');
+            Route::get('/notifications/{notification}/cancel', 'destroy')->name('admin.notification.cancel');
         });
     });
 });
