@@ -194,7 +194,8 @@ class SubscriptionController extends Controller
                         'body' => $user->name.' just did a Subscription',
                         'page' => 'subscribers',
                         'identifier' => $current->id,
-                        'opened' => 0
+                        'opened' => 0,
+                        'status' => 1
                     ]);
                 }
             }
@@ -208,7 +209,8 @@ class SubscriptionController extends Controller
                         'body' => $user->name.' just renewed their Subscription',
                         'page' => 'subscribers',
                         'identifier' => $current->id,
-                        'opened' => 0
+                        'opened' => 0,
+                        'status' => 1
                     ]);
                 }
             }

@@ -18,8 +18,7 @@ class Kernel extends ConsoleKernel
             NotificationController::assessment_reminder();
             NotificationController::check_inactivity();
             NotificationController::daily_reminder();
-        })->timezone('Australia/Sydney')
-        ->dailyAt('08:00')->dailyAt('19:00');
+        })->twiceDailyAt(8, 19);
     }
 
     /**

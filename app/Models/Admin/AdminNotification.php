@@ -15,6 +15,7 @@ class AdminNotification extends Model
         'body',
         'page',
         'identifier',
-        'opened'
+        'opened',
+        'status'
     ];
 }
