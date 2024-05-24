@@ -58,7 +58,7 @@ class NotificationController extends Controller
     }
 
     public function notification_count(){
-        $not_count = AdminNotification::where('admin_id', $this->user->id)->where('opened', 0)->count();
+        $not_count = AdminNotification::where('admin_id', $this->user->id)->where('status', 1)->where('opened', 0)->count();
 
         return response([
             'status' => 'success',
@@ -70,8 +70,8 @@ class NotificationController extends Controller
     }
 
     public function index(){
-        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
-        $notifications = AdminNotification::where('opened', 0)->where('admin_id', $this->user->id)->paginate($limit);
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $notifications = AdminNotification::where('status', 1)->where('admin_id', $this->user->id)->paginate($limit);
         foreach($notifications as $notification){
             $url = "";
             if($notification->page == 'user'){
@@ -99,6 +99,54 @@ class NotificationController extends Controller
             'status' => 'success',
             'message' => 'Notifications fetched successfully',
             'data' => $notifications
+        ], 200);
+    }
+
+    public function mark_as_read(AdminNotification $notification){
+        if($notification->admin_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Notification was fetched'
+            ]);
+        }
+        $notification->opened = 1;
+        $notification->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Notification successfully opened'
+        ], 200);
+    }
+
+    public function mark_all_as_read(){
+        $notifications = AdminNotification::where('admin_id', $this->user->id)->where('status', 1)->where('opened', 0);
+        if($notifications->count() > 0){
+            foreach($notifications->get() as $notification){
+                $notification->opened = 1;
+                $notification->save();
+            }
+        }
+
+        return response([
+            'status' => 'success',
+            'message' => 'All notifications marked as read'
+        ], 200);
+    }
+
+    public function destroy(AdminNotification $notification){
+        if($notification->admin_id != $this->user->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Notification was fetched'
+            ]);
+        }
+
+        $notification->status = 0;
+        $notification->save();
+
+        return response([
+            'status' => 'success',
+            'message' => 'Notification successfully cancelled'
         ], 200);
     }
 }

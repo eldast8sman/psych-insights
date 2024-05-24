@@ -345,7 +345,8 @@ class BasicQuestionController extends Controller
                         'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
                         'page' => 'home',
                         'identifier' => 1,
-                        'opened' => 0
+                        'opened' => 0,
+                        'status' => 1
                     ]);
                 }
             }
