@@ -14,6 +14,7 @@ use App\Models\StripeCustomer;
 use App\Models\StripePaymentIntent;
 use App\Models\StripePaymentMethod;
 use App\Models\SubscriptionHistory;
+use App\Models\SubscriptionPackage;
 use App\Models\SubscriptionPaymentAttempt;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -45,17 +46,29 @@ class SubscriptionAutoRenewal implements ShouldQueue
         $current->status = 2;
         $current->save();
 
+        $send_mail = true;
+
+        $package = SubscriptionPackage::find($current->subscription_package_id);
+        if($package->free_trial == 1){
+            $message = "Looks like your free trial period is over. Subscribe now to continue enjoying unrestricted access to all your favourite features. We're here to help you get back on track!";
+            $send_mail = false;
+        } else {
+            $message = "Looks like your subscription has expired. Subscribe now to continue enjoying unrestricted access to all your favourite features. We're here to help you get back on track!";
+        }
+
         Notification::create([
             'user_id' => $current->user_id,
             'title' => 'Expired Subscription',
-            'body' => "Looks like your subscription has expired. Subscribe now to continue enjoying unrestricted access to all your favourite features. We're here to help you get back on track!",
+            'body' => $message,
             'model' => 'subcription',
             'read' => 0,
             'status' => 1
         ]);
 
-        $user = User::find($current->user_id);
-        Mail::to($user)->send(new SubscriptionExpiry($user->name));
+        if($send_mail){
+            $user = User::find($current->user_id);
+            Mail::to($user)->send(new SubscriptionExpiry($user->name));
+        }
     }
 
     public function renew(){
