@@ -89,7 +89,7 @@ class NotificationController extends Controller
                 $current = CurrentSubscription::find($notification->identifier);
                 $user = User::find($current->user_id);
                 if(!empty($user->profile_photo)){
-                    $url = $user->profile_photo;
+                    $url = FileManagerController::fetch_file($user->profile_photo)->url;
                 }            
             }
             $notification->image_url = $url;
