@@ -262,6 +262,14 @@ class BasicQuestionController extends Controller
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
         $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        if($new){
+            $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+            if(!empty($free_trial)){
+                $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
+                $sub = new SubscriptionController();
+                $sub->subscribe($this->user->id, $free_trial->id, $plan->id, 0);
+            }
+        }
         $current = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>', date('Y-m-d'))->first();
         if(!empty($current)){
             $package = SubscriptionPackage::find($current->subscription_package_id);
@@ -336,20 +344,20 @@ class BasicQuestionController extends Controller
             $key = mt_rand(0, (count($messages) - 1));
             $answer_summary->welcome_message = $messages[$key];
 
-            $admins = Admin::where('role', 'super')->get();
-            if(!empty($admins)){
-                foreach($admins as $admin){
-                    AdminNotification::create([
-                        'admin_id' => $admin->id,
-                        'title' => "OPEN AI KEY",
-                        'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
-                        'page' => 'home',
-                        'identifier' => 1,
-                        'opened' => 0,
-                        'status' => 1
-                    ]);
-                }
-            }
+            // $admins = Admin::where('role', 'super')->get();
+            // if(!empty($admins)){
+            //     foreach($admins as $admin){
+            //         AdminNotification::create([
+            //             'admin_id' => $admin->id,
+            //             'title' => "OPEN AI KEY",
+            //             'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
+            //             'page' => 'home',
+            //             'identifier' => 1,
+            //             'opened' => 0,
+            //             'status' => 1
+            //         ]);
+            //     }
+            // }
         }
 
         return response([

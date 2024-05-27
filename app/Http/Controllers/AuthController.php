@@ -122,12 +122,12 @@ class AuthController extends Controller
             ], 409);
         }
 
-        $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
-        if(!empty($free_trial)){
-            $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
-            $sub = new SubscriptionController();
-            $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
-        }
+        // $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+        // if(!empty($free_trial)){
+        //     $plan = PaymentPlan::where('subscription_package_id', $free_trial->id)->first();
+        //     $sub = new SubscriptionController();
+        //     $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
+        // }
 
         self::check_ip($request, $user->id);
 

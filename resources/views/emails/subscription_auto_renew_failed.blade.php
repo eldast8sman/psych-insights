@@ -41,7 +41,7 @@
           <p style="margin-top: 30px">
             Hello <span>{{ $name }}</span>,
           </p>
-          <p style="margin-bottom: 20px; text-align: center">
+          <p style="margin-bottom: 20px; text-align: left">
             Oops! There was an issue with auto-renewing your subscription to PsychInsights.
             Please update your payment details to continue enjoying seamless access to all our features without interruption. 
             <br /> 
