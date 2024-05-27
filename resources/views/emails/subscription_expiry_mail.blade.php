@@ -41,35 +41,12 @@
           <p style="margin-top: 30px">
             Hello <span>{{ $name }}</span>,
           </p>
-          <p style="margin-bottom: 20px; text-align: center">
+          <p style="margin-bottom: 20px; text-align: left">
             Hello! We've noticed your Psych Insights Premium Subscription has expired. 
             <br />
             To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
             Don’t let your progress stall—continue your journey with us today! 
           </p>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-
-<tr>
-  <td>
-    <table width="100%">
-      <tr>
-        <td style="text-align: center">
-          <p style="text-align: center">Your code:</p>
-          <a
-            href="{{ $link }}"
-            style="
-              color: #ffffff;
-              padding: 15px 55px;
-              background: #207384;
-              border-radius: 30px;
-              text-decoration: none;
-            "
-            >Dashboard</a
-          >
         </td>
       </tr>
     </table>
