@@ -106,6 +106,8 @@ class Controller extends BaseController
     public static function check_ip($ip_address, $user_id){
         if(!empty($ip_address)){
             $user = User::find($user_id);
+            $user->last_country = $ip_address;
+            $user->save();
             $address = UserIPAddress::where('user_id', $user_id)->where('ip_address', $ip_address)->first();
             if(!empty($address)){
                 $address->frequency += 1;
