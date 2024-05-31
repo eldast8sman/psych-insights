@@ -103,9 +103,7 @@ class Controller extends BaseController
         }
     }
 
-    public static function check_ip(Request $request, $user_id){
-        $ip_address = $request->ip();       
-
+    public static function check_ip($ip_address, $user_id){
         if(!empty($ip_address)){
             $user = User::find($user_id);
             $address = UserIPAddress::where('user_id', $user_id)->where('ip_address', $ip_address)->first();
@@ -119,7 +117,7 @@ class Controller extends BaseController
                 }
                 $user->save();
             } else {
-                $position = Location::get();
+                $position = Location::get($ip_address);
                 if($position){
                     $address = UserIPAddress::create([
                         'user_id' => $user_id,
