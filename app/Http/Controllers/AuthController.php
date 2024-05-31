@@ -719,7 +719,7 @@ class AuthController extends Controller
 
     public function test_ip(Request $request){
         $ip = $request->ip();
-        $position = Location::get($ip);
+        $position = Location::get("172.31.31.88");
 
         return response([
             'ip' => $ip,
