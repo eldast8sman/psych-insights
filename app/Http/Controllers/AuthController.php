@@ -377,7 +377,7 @@ class AuthController extends Controller
             $user->web_token = $request->web_token;
             $user->save();
         }
-        self::check_ip($request, $user->id);
+        self::check_ip($request->ip(), $user->id);
 
         $user = self::user_details($user);
         $user->authorization = $auth;
@@ -719,7 +719,7 @@ class AuthController extends Controller
 
     public function test_ip(Request $request){
         $ip = $request->ip();
-        $position = Location::get();
+        $position = Location::get('102.89.46.191');
 
         return response([
             'ip' => $ip,
