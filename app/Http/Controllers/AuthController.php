@@ -39,6 +39,7 @@ use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
 use App\Models\UserNotificationSetting;
 use Exception;
+use Stevebauman\Location\Facades\Location;
 
 class AuthController extends Controller
 {
@@ -714,5 +715,14 @@ class AuthController extends Controller
                 'message' => 'There was an Error in sending the message'
             ], 500);
         }
+    }
+
+    public function test_ip(Request $request){
+        $ip = $request->ip();
+        $position = Location::get($ip);
+
+        return response([
+            'data' => $position
+        ], 200);
     }
 }
