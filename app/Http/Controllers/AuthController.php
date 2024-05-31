@@ -722,6 +722,7 @@ class AuthController extends Controller
         $position = Location::get($ip);
 
         return response([
+            'ip' => $ip,
             'data' => $position
         ], 200);
     }
