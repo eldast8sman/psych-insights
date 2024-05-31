@@ -129,7 +129,7 @@ class AuthController extends Controller
         //     $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
         // }
 
-        self::check_ip($request, $user->id);
+        self::check_ip($request->ip(), $user->id);
 
         $user = self::user_details($user);
         $user->authorization = $login;
