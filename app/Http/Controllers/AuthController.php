@@ -569,7 +569,7 @@ class AuthController extends Controller
             $user->save();
         }
 
-        self::check_ip($request, $user->id);
+        self::check_ip($request->ip(), $user->id);
         $user = self::user_details($user);
         $user->authorization = $auth;
 
