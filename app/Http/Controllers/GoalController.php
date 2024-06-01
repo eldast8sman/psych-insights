@@ -91,7 +91,7 @@ class GoalController extends Controller
             if($next_answer->next_date > date('Y-m-d')){
                 return response([
                     'status' => 'failed',
-                    'message' => 'Cannot answer this questions from this Goal until '.$next_answer->next_date
+                    'message' => 'Let\'s focus on the reflections you\'ve already made this week. You can come back next week!'
                 ], 409);
             }
         }
@@ -165,7 +165,7 @@ class GoalController extends Controller
             if(($next_answer->next_date > date('Y-m-d')) and ($next_answer->goal_set == 1)){
                 return response([
                     'status' => 'failed',
-                    'message' => 'Cannot answer this questions from this Goal until '.$next_answer->next_date
+                    'message' => 'Let\'s focus on the goals you\'ve already set for this week. You can come back next week!'
                 ], 409);
             }
         }
