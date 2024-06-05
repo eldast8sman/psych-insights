@@ -337,12 +337,9 @@ class BasicQuestionController extends Controller
 
         if($new){
             $welcome_message = $range->welcome_message;
-            $welcome_message = str_replace('[NAME!]', $this->user->name, $welcome_message);
-            $answer_summary->welcome_message = $welcome_message;
             $name = explode(' ', $this->user->name);
-            $messages = $this->welcome_messages($name[0], $distress_level);
-            $key = mt_rand(0, (count($messages) - 1));
-            $answer_summary->welcome_message = $messages[$key];
+            $welcome_message = str_replace('[NAME!]', ucfirst($name[0]), $welcome_message);
+            $answer_summary->welcome_message = $welcome_message;
 
             // $admins = Admin::where('role', 'super')->get();
             // if(!empty($admins)){
