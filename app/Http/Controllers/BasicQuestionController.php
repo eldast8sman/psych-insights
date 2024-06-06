@@ -336,9 +336,9 @@ class BasicQuestionController extends Controller
         self::log_activity($this->user->id, "answered_basic_question", "question_answer_summaries", $answer_summary->id);
 
         if($new){
-            $welcome_message = nl2br($range->welcome_message);
+            $welcome_message = $range->welcome_message;
             $name = explode(' ', $this->user->name);
-            $welcome_message = str_replace(['[NAME!]', '\n'], [ucfirst($name[0]), ''], $welcome_message);
+            $welcome_message = str_replace('[NAME!]', ucfirst($name[0]), $welcome_message);
             $answer_summary->welcome_message = $welcome_message;
 
             // $admins = Admin::where('role', 'super')->get();
