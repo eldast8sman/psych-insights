@@ -338,8 +338,7 @@ class BasicQuestionController extends Controller
         if($new){
             $welcome_message = nl2br($range->welcome_message);
             $name = explode(' ', $this->user->name);
-            $welcome_message = str_replace('\n', '', $welcome_message);
-            $welcome_message = str_replace('[NAME!]', ucfirst($name[0]), $welcome_message);
+            $welcome_message = str_replace(['[NAME!]', '\n'], [ucfirst($name[0]), ''], $welcome_message);
             $answer_summary->welcome_message = $welcome_message;
 
             // $admins = Admin::where('role', 'super')->get();
