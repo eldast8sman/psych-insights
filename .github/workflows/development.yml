@@ -52,7 +52,7 @@ jobs:
             cd backend_dev
             git stash
             git pull origin development
-            composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+            composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
             php artisan migrate
             php artisan config:clear
             php artisan cache:clear
