@@ -76,7 +76,7 @@ class NotificationJob implements ShouldQueue
                 $type = "K10 Assessment";
             }
         } else {
-            $type = "K14 Assessment";
+            $type = "K10 Assessment";
         }
         
         $title = "Assessment Reminder";
