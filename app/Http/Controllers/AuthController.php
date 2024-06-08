@@ -2,43 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\DailyTip;
-use App\Models\DailyQuote;
-use App\Models\PaymentPlan;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\StripeCustomer;
-use App\Mail\ForgotPasswordMail;
-use App\Models\GoogleLoginToken;
-use App\Models\UserDeactivation;
-use App\Http\Requests\LoginRequest;
-use App\Mail\EmailVerificationMail;
-use App\Models\CurrentSubscription;
-use App\Models\DailyQuestionAnswer;
-use App\Models\SubscriptionHistory;
-use App\Models\SubscriptionPackage;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use App\Models\QuestionAnswerSummary;
-use Illuminate\Support\Facades\Crypt;
-use App\Models\EmailVerificationToken;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\ChangeNameRequest;
 use App\Http\Requests\ChangeEmailRequest;
-use App\Http\Requests\GoogleLoginRequest;
-use App\Http\Requests\VerifyEmailRequest;
-use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\ChangeNameRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ContactUsRequest;
-use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\DeactivateAccountRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\GoogleLoginRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UploadProfilePhotoRequest;
+use App\Http\Requests\VerifyEmailRequest;
+use App\Jobs\IpAddressJob;
 use App\Mail\ContactUsMail;
+use App\Mail\EmailVerificationMail;
+use App\Mail\ForgotPasswordMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
+use App\Models\CurrentSubscription;
+use App\Models\DailyQuestionAnswer;
+use App\Models\DailyQuote;
+use App\Models\DailyTip;
+use App\Models\EmailVerificationToken;
+use App\Models\GoogleLoginToken;
+use App\Models\PaymentPlan;
+use App\Models\QuestionAnswerSummary;
+use App\Models\StripeCustomer;
+use App\Models\SubscriptionHistory;
+use App\Models\SubscriptionPackage;
+use App\Models\User;
+use App\Models\UserDeactivation;
 use App\Models\UserNotificationSetting;
+use App\Services\IpApiService;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Stevebauman\Location\Facades\Location;
 
 class AuthController extends Controller
@@ -130,9 +132,8 @@ class AuthController extends Controller
         //     $sub->subscribe($user->id, $free_trial->id, $plan->id, 0);
         // }
 
-        self::check_ip($request->ip(), $user->id);
-
         $user = self::user_details($user);
+        IpAddressJob::dispatch($user, $request->ip());
         $user->authorization = $login;
 
         self::log_activity($user->id, "signup");
@@ -377,9 +378,9 @@ class AuthController extends Controller
             $user->web_token = $request->web_token;
             $user->save();
         }
-        self::check_ip($request->ip(), $user->id);
 
         $user = self::user_details($user);
+        IpAddressJob::dispatch($user, $request->ip());
         $user->authorization = $auth;
 
         self::log_activity($user->id, "login");
@@ -569,7 +570,7 @@ class AuthController extends Controller
             $user->save();
         }
 
-        self::check_ip($request->ip(), $user->id);
+        IpAddressJob::dispatch($user, $request->ip());
         $user = self::user_details($user);
         $user->authorization = $auth;
 
@@ -717,13 +718,11 @@ class AuthController extends Controller
         }
     }
 
-    public function test_ip(Request $request){
-        $ip = $request->ip();
-        $position = Location::get('102.89.46.191');
+    public function test_ip($ip_address){
+        $service = new IpApiService();
 
-        return response([
-            'ip' => $ip,
-            'data' => $position
-        ], 200);
+        $details = $service->ip_data($ip_address);
+
+        echo json_encode($details->object());
     }
 }

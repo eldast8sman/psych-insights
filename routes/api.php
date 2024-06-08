@@ -587,4 +587,4 @@ Route::get('/test-customer/{name}/{email}', [StripeController::class, 'create_cu
 Route::get('/test-gpt/{prompt}', [ChatGPTController::class, 'complete_chat']);
 Route::post('/test-gpt-chat', [ChatGPTController::class, 'chat']);
 
-Route::post('/test-ip', [ControllersAuthController::class, 'test_ip']);
+Route::get('/test-ip/{ip_address}', [ControllersAuthController::class, 'test_ip']);
