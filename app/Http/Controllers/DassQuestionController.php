@@ -9,23 +9,30 @@ use App\Models\DailyQuestionAnswer;
 use App\Models\DassQuestion;
 use App\Models\DassQuestionOption;
 use App\Models\PremiumCategoryScoreRange;
-use Illuminate\Http\Request;
 use App\Models\QuestionAnswerSummary;
 use App\Models\SubscriptionPackage;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DassQuestionController extends Controller
 {
     private $user;
+    private $time;
 
     public function __construct()
     {
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     private function check_validity(){
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', $this->time->format('Y-m-d'))->where('status', 1)->first();
         if(empty($current_subscription)){
             return false;
         }
@@ -51,7 +58,7 @@ class DassQuestionController extends Controller
             $fetch = true;
         } else {
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;
@@ -98,7 +105,7 @@ class DassQuestionController extends Controller
             $fetch = true;
         } else {
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;
@@ -233,7 +240,7 @@ class DassQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 7));
+        $next_question = $this->time->addDays(7)->format('Y-m-d');
         // $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([
@@ -256,7 +263,7 @@ class DassQuestionController extends Controller
         $answer_summary->premium_scores = $prem_scores;
         $answer_summary->category_scores = $categ_scores;
 
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', $this->time->format('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $package = SubscriptionPackage::find($current_subscription->subscription_package_id);
         } else {
@@ -341,7 +348,7 @@ class DassQuestionController extends Controller
             $fetch = true;
         } else {
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;

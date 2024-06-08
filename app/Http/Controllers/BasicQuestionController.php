@@ -19,16 +19,23 @@ use App\Http\Requests\AnswerBasicQuestionRequest;
 use App\Models\Admin\Admin;
 use App\Models\Admin\AdminNotification;
 use App\Models\PaymentPlan;
+use Carbon\Carbon;
 use Exception;
 
 class BasicQuestionController extends Controller
 {
     private $user;
+    private $time;
 
     public function __construct()
     {
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     private function welcome_messages($name, $diagnosis) : array
@@ -100,7 +107,7 @@ class BasicQuestionController extends Controller
             $new = true;
         } else {
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;
@@ -261,7 +268,7 @@ class BasicQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        $next_question = date('Y-m-d', time() + (60 * 60 * 24 * 14));
+        $next_question = $this->time->addDays(14)->format('Y-m-d');
         if($new){
             $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
             if(!empty($free_trial)){
@@ -270,13 +277,14 @@ class BasicQuestionController extends Controller
                 $sub->subscribe($this->user->id, $free_trial->id, $plan->id, 0);
             }
         }
-        $current = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>', date('Y-m-d'))->first();
+        $current = CurrentSubscription::where('user_id', $this->user->id)->where('end_date', '>', $this->time->format('Y-m-d'))->first();
         if(!empty($current)){
             $package = SubscriptionPackage::find($current->subscription_package_id);
             if($package->free_trial == 1){
                 $plan = PaymentPlan::where('subscription_package_id', $package->id)->first();
                 if(((strtolower($plan->duration_type) == 'week') and ($plan->duration < 2)) or ((strtolower($plan->durtion_type) == 'day') and ($plan->duration < 14))){
-                    $next_question = date('Y-m-d', strtotime($current->end_date.' 01:00:00') + (60 * 60 * 24));                    
+                    $end_time = Carbon::createFromFormat('Y-m-d', $current->end_date, $this->user->timezone);
+                    $next_question = $end_time->addDay()->format('Y-m-d');                    
                 }
             }
         }
@@ -304,7 +312,7 @@ class BasicQuestionController extends Controller
         $answer_summary->category_scores = $categ_scores;
         $answer_summary->welcome_message = "";
         
-        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
+        $current_subscription = CurrentSubscription::where('user_id', $this->user->id)->where('grace_end', '>=', $this->time->format('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'asc')->first();
         if(!empty($current_subscription)){
             $package = SubscriptionPackage::find($current_subscription->subscription_package_id);
         } else {
@@ -404,9 +412,9 @@ class BasicQuestionController extends Controller
         if($last_answer->count() < 1){
             $fetch = true;
             $new = true;
-        } else {
+        } else {            
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;

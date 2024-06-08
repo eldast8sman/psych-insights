@@ -21,12 +21,14 @@ use App\Models\SubscriptionPackage;
 use App\Models\SubscriptionPaymentAttempt;
 use App\Models\UsedPromoCode;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
     private $user;
+    private $time;
 
     public $errors = "";
 
@@ -34,6 +36,11 @@ class SubscriptionController extends Controller
     {
         $this->middleware('auth:user-api', ['except' => ['subscribe', 'calculate_total_payment']]);
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     public function subscribe($user_id, $package_id, $plan_id, $amount_paid, $promo_code=null, $auto_renew=0, $type="subscribe"){
@@ -64,56 +71,29 @@ class SubscriptionController extends Controller
             }
         }
 
-        $time = time();
-        $start_date = date('Y-m-d');
+        $time = $this->time;
+        $start_date = $time->format('Y-m-d');
 
         if(isset($history) and ($history->end_date > $start_date)){
-            $time = strtotime($history->end_date) + (60 * 60 * 24);
-            $start_date = date('Y-m-d', $time);
+            $time = Carbon::createFromFormat('Y-m-d', $history->end_date, $this->user->last_timezone)->addDay();
+            $start_date = $time->format('Y-m-d');
         } 
         
         if($plan->duration_type == 'week'){
-            $end_date = date('Y-m-d', $time + (60 * 60 * 24 * 7 * $plan->duration));
+            $end_time = $time->addWeeks($plan->duration);
         } elseif($plan->duration_type == 'day'){
-            $end_date = date('Y-m-d', $time + (60 * 60 * 24 * $plan->duration));
+            $end_time = $time->addDays($plan->duration);
         } elseif($plan->duration_type == 'year'){
-            $end_date = date('Y-m-d', $time + (60 * 60 * 24 * 365 * $plan->duration));
+            $end_time = $time->addYears($plan->duration);
         } elseif($plan->duration_type == 'month'){
-            $year = date('Y', $time);
-            $month = date('m', $time);
-            $date = date('d', $time);
-
-            $new_month = intval($month) + $plan->duration;
-            if($new_month > 12){
-                $new_month = $new_month - 12;
-                $year = strval(intval($year) + 1);
-            }
-            if(strlen(strval($new_month)) < 2){
-                $new_month = '0'.$new_month;
-            }
-            $new_month = strval($new_month);
-
-            if(($new_month == 4) or ($new_month == 6) or ($new_month == 9) or ($new_month == 11)){
-                if($date > 30){
-                    $date = strval(30);
-                }
-            } elseif($new_month == 2){
-                if(($year % 4) == 0){
-                    if($date > 29){
-                        $date = strval(29);
-                    }
-                } elseif($date > 28){
-                    $date = strval(28);
-                }
-            }
-
-            $end_date = $year.'-'.$new_month.'-'.$date;
+            $end_time = $time->addMonths($plan->duration);
         }
+
+        $end_date = $end_time->format('Y-m-d');
         
         if($auto_renew == 1){
-            $end_time = strtotime($end_date);
-            $grace_time = $end_time + (60 * 60 * 24 * 2);
-            $grace_end = date('Y-m-d', $grace_time);
+            $grace_time = $end_time->addDays(2);
+            $grace_end = $grace_time->format('Y-m-d');
         } else {
             $grace_end = $end_date;
         }
@@ -139,7 +119,7 @@ class SubscriptionController extends Controller
         if(empty($current)){
             $next_date = true;
         } else {
-            if(($current->end_date < date('Y-m-d')) and ($type == 'subscribe')){
+            if(($current->end_date < $this->time->format('Y-m-d')) and ($type == 'subscribe')){
                 $next_date = true;
             }
         }
@@ -163,7 +143,7 @@ class SubscriptionController extends Controller
 
             $answer_summary = QuestionAnswerSummary::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
             if(!empty($answer_summary)){
-                $today = date('Y-m-d');
+                $today = $this->time->format('Y-m-d');
 
                 if($next_date){
                     $answer_summary->next_question = $today;
@@ -406,7 +386,7 @@ class SubscriptionController extends Controller
     public function initiate_subscription(InitiateSubscriptionRequest $request){
         $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
         if(!empty($current_plan)){
-            if($current_plan->end_date > date('Y-m-d')){
+            if($current_plan->end_date > $this->time->format('Y-m-d')){
                 $pack = SubscriptionPackage::find($current_plan->subscription_package_id);
                 if($pack->free_trial != 1){
                     return response([
@@ -515,7 +495,7 @@ class SubscriptionController extends Controller
     public function initiate_subscription_old_card(OldCardSubscriptionRequest $request){
         $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
         if(!empty($current_plan)){
-            if($current_plan->end_date > date('Y-m-d')){
+            if($current_plan->end_date > $this->time->format('Y-m-d')){
                 return response([
                     'status' => 'failed',
                     'message' => 'You still have an active Subscription'
@@ -645,7 +625,7 @@ class SubscriptionController extends Controller
     public function initiate_subscription_renewal(InitiateSubscriptionRequest $request){
         $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
         if(!empty($current_plan)){
-            if($current_plan->grace_end < date('Y-m-d')){
+            if($current_plan->grace_end < $this->time->format('Y-m-d')){
                 return response([
                     'status' => 'failed',
                     'message' => 'You do not have an Active Subscription to Renew'
@@ -751,7 +731,7 @@ class SubscriptionController extends Controller
     public function initiate_subscription_renewal_old_card(OldCardSubscriptionRequest $request){
         $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
         if(!empty($current_plan)){
-            if($current_plan->grace_end < date('Y-m-d')){
+            if($current_plan->grace_end < $this->time->format('Y-m-d')){
                 return response([
                     'status' => 'failed',
                     'message' => 'You do not have an Active Subscription to Renew'
