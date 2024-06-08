@@ -13,6 +13,7 @@ class UserIPAddress extends Model
 
     protected $fillable = [
         'user_id',
+        'platform',
         'ip_address',
         'country',
         'location_details',
