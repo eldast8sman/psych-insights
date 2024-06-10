@@ -725,17 +725,13 @@ class AuthController extends Controller
         }
     }
 
-    public function test_ip(Request $request, $ip_address){
+    public function test_ip($ip_address){
         $service = new IpApiService();
 
-        $ip = !empty($request->ip()) ? $request->ip() : $ip_address;
-
-        $ip_details = !empty($request->ip()) ? "System".$request->ip() : "User".$ip_address;
-
-        echo $ip_details;
+        echo $ip_address;
 
         $details = $service->ip_data($ip_address);
 
-        var_dump($details);
+        var_dump($details->object());
     }
 }
