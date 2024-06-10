@@ -12,16 +12,23 @@ use App\Models\NextGoalAnswer;
 use App\Models\User;
 use App\Models\UserGoalAnswer;
 use App\Models\UserGoalReminder;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class GoalController extends Controller
 {
     private $user;
+    private $time;
 
     public function __construct()
     {
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     private static function category(GoalCategory $category, $user_id) : GoalCategory
@@ -29,12 +36,12 @@ class GoalController extends Controller
         $category->reflections = GoalReflection::where('goal_category_id', $category->id)->get();
         $category->goal_questions = GoalPlanQuestions::where('goal_category_id', $category->id)->get();
         $next_answer = NextGoalAnswer::where('user_id', $user_id)->where('goal_category_id', $category->id)->first();
-        if(!empty($next_answer) and ($next_answer->next_date <= date('Y-m-d'))){
+        if(!empty($next_answer) and ($next_answer->next_date <= self::$time->format('Y-m-d'))){
             $next_answer->reflection_answered = 0;
             $next_answer->goal_set = 0;
             $next_answer->save();
         }
-        $category->cannot_answer_until = (!empty($next_answer) and ($next_answer->next_date > date('Y-m-d'))) ? true : false; 
+        $category->cannot_answer_until = (!empty($next_answer) and ($next_answer->next_date > self::$time->format('Y-m-d'))) ? true : false; 
         $category->reflection_answered = !empty($next_answer) ? $next_answer->reflection_answered : 0;
         $category->goal_set = !empty($next_answer) ? $next_answer->goal_set : 0;
         return $category;
@@ -88,7 +95,7 @@ class GoalController extends Controller
 
         $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->first();
         if(!empty($next_answer)){
-            if($next_answer->next_date > date('Y-m-d')){
+            if($next_answer->next_date > $this->time->format('Y-m-d')){
                 return response([
                     'status' => 'failed',
                     'message' => 'Let\'s focus on the reflections you\'ve already made this week. You can come back next week!'
@@ -123,9 +130,9 @@ class GoalController extends Controller
         $next_sunday = "";
         $i = 1;
         while(empty($next_sunday)){
-            $time = time() + (60 * 60 * 24 * $i);
-            if(strtolower(date('l', $time)) == 'sunday'){
-                $next_sunday = date('Y-m-d', $time);
+            $time = $this->time->addDays($i);
+            if(strtolower($time->format('l')) == 'sunday'){
+                $next_sunday = $time->format('Y-m-d');
             }
             $i++;
         }
@@ -162,7 +169,7 @@ class GoalController extends Controller
 
         $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->orderBy('id', 'desc')->first();
         if(!empty($next_answer)){
-            if(($next_answer->next_date > date('Y-m-d')) and ($next_answer->goal_set == 1)){
+            if(($next_answer->next_date > $this->time->format('Y-m-d')) and ($next_answer->goal_set == 1)){
                 return response([
                     'status' => 'failed',
                     'message' => 'Let\'s focus on the goals you\'ve already set for this week. You can come back next week!'
@@ -232,9 +239,9 @@ class GoalController extends Controller
                 $next_time = "";
                 $i = 1;
                 while(empty($next_time)){
-                    $time = time() + (60 * 60 * 24 * $i);
-                    if(strtolower(date('l', $time)) == strtolower($reminder['reminder_day'])){
-                        $next_time = date('Y-m-d', $time).' '.$reminder['reminder_time'];
+                    $time = $this->time->addDays($i);
+                    if(strtolower($time->format('l')) == strtolower($reminder['reminder_day'])){
+                        $next_time = $time->format('Y-m-d').' '.$reminder['reminder_time'];
                     }
                     $i++;
                 }
