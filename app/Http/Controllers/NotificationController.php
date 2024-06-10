@@ -6,10 +6,12 @@ use App\Jobs\NotificationJob;
 use App\Jobs\SubscriptionAutoRenewal;
 use App\Models\CurrentSubscription;
 use App\Models\GoalCategory;
+use App\Models\PushNotificationLog;
 use App\Models\SubscriptionHistory;
 use App\Models\User;
 use App\Models\UserGoalReminder;
 use App\Services\PushNotificationService;
+use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Http\Request;
@@ -36,30 +38,102 @@ class NotificationController extends Controller
     }
 
     public static function check_inactivity(){
-        $fifteen_days = date('Y-m-d', time() - (60 * 60 * 24 * 15));
-        $users = User::where('last_login', '<', $fifteen_days.' 00:00:00');
-        if($users->count() < 0){
-            foreach($users->get() as $user){
-                NotificationJob::dispatch($user->id, 'inactive');
+        $timezones = self::pluck_timezones();
+
+        if(!empty($timezones)){
+            foreach($timezones as $timezone){
+                $time = Carbon::now($timezone);
+                $fifteen_days = date('Y-m-d', time() - (60 * 60 * 24 * 15));
+                $users = User::where('last_timezone', $timezone)->where('last_login', '<', $fifteen_days.' 00:00:00');
+                if($users->count() < 0){
+                    foreach($users->get() as $user){
+                        $log = PushNotificationLog::where('user_id', $user->id)->where('notification_type', 'inactive')->first();
+                        if(empty($log) or ($log->next_notification <= $time->format('Y-m-d H:i:s'))){
+                            NotificationJob::dispatch($user->id, 'inactive');
+                            self::update_notification_log($user->id, 'inactive', $time);
+                        }
+                    }
+                }   
             }
         }
+        // $fifteen_days = date('Y-m-d', time() - (60 * 60 * 24 * 15));
+        // $users = User::where('last_login', '<', $fifteen_days.' 00:00:00');
+        // if($users->count() < 0){
+        //     foreach($users->get() as $user){
+        //         NotificationJob::dispatch($user->id, 'inactive');
+        //     }
+        // }
     }
 
     public static function assessment_reminder(){
-        $users = User::where('next_assessment', '<=', date('Y-m-d'));
-        if($users->count() > 0){
-            foreach($users->get() as $user){
-                NotificationJob::dispatch($user->id, 'next_assessment');
+        $timezones = self::pluck_timezones();
+
+        if(!empty($timezones)){
+            foreach($timezones as $timezone){
+                $time = Carbon::now($timezone);
+                $today = $time->format('Y-m-d');
+                $users = User::where('last_timezone', $timezone)->where('next_assessment', '<=', $today);
+                if($users->count() > 0){
+                    foreach($users->get() as $user){
+                        $log = PushNotificationLog::where('user_id', $user->id)->where('notification_type', 'next_assessment')->first();
+                        if(empty($log) or ($log->next_notification <= $time->format('Y-m-d H:i:s'))){
+                            NotificationJob::dispatch($user->id, 'next_assessment');
+                            self::update_notification_log($user->id, 'next_assessment', $time);
+                        }
+                    }
+                }
             }
         }
+
+        // $users = User::where('next_assessment', '<=', date('Y-m-d'));
+        // if($users->count() > 0){
+        //     foreach($users->get() as $user){
+        //         NotificationJob::dispatch($user->id, 'next_assessment');
+        //     }
+        // }
     }
 
     public static function daily_reminder(){
-        $users = User::where('next_daily_question', '<=', date('Y-m-d'));
-        if($users->count() > 0){
-            foreach($users->get() as $user){
-                NotificationJob::dispatch($user->id, 'next_daily_question');
+        $timezones = self::pluck_timezones();
+
+        if(!empty($timezones)){
+            foreach($timezones as $timezone){
+                $time = Carbon::now($timezone);
+                $today = $time->format('Y-m-d');
+                $users = User::where('last_timezone', $timezone)->where('next_daily_question', '<=', $today);
+                if($users->count() > 0){
+                    foreach($users->get() as $user){
+                        $log = PushNotificationLog::where('user_id', $user->id)->where('notification_type', 'daily_reminder')->first();
+                        if(empty($log) or ($log->next_notification <= $time->format('Y-m-d H:i:s'))){
+                            NotificationJob::dispatch($user->id, 'next_daily_question');
+                            self::update_notification_log($user->id, 'daily_reminder', $time);
+                        }
+                    }
+                }
             }
+        }
+
+        // $users = User::where('next_daily_question', '<=', date('Y-m-d'));
+        // if($users->count() > 0){
+        //     foreach($users->get() as $user){
+        //         NotificationJob::dispatch($user->id, 'next_daily_question');
+        //     }
+        // }
+    }
+
+    public static function update_notification_log($user_id, $notification_type, Carbon $time){
+        $log = PushNotificationLog::where('user_id', $user_id)->where('notification_type', $notification_type)->first();
+        if(empty($log)){
+            PushNotificationLog::create([
+                'user_id' => $user_id,
+                'notification_type' => $notification_type,
+                'last_notification' => $time->format('Y-m-d H:i:s'),
+                'next_notification' => $time->addHours(12)->format('Y-m-d H:i:s')
+            ]);
+        } else {
+            $log->last_notification = $time->format('Y-m-d H:i:s');
+            $log->next_notification = $time->addHours(12)->format('Y-m-d H:i:s');
+            $log->save();
         }
     }
 
@@ -120,26 +194,81 @@ class NotificationController extends Controller
     }
 
     public static function check_subscriptions(){
-        $expired_histories = SubscriptionHistory::where('grace_end', '<', date('Y-m-d'))->where('status', 1);
-        if($expired_histories->count() > 0){
-            foreach($expired_histories->get() as $history){
-                $history->status = 2;
-                $history->save();
+        $timezones = self::pluck_timezones();
+
+        if(!empty($timezones)){
+            foreach($timezones as $timezone){
+                $time = Carbon::now($timezone);
+                $today = $time->format('Y-m-d');
+
+                $expired_histories = SubscriptionHistory::where('grace_end', '<', $today)->where('status', 1)
+                                    ->join('users', 'subscription_histories.user_id', '=', 'users.id')
+                                    ->where('users.last_timezone', $timezone)
+                                    ->select('subscription_histories.*');
+                if($expired_histories->count() > 0){
+                    foreach($expired_histories->get() as $history){
+                        $history->status = 2;
+                        $history->save();
+                    }
+                }
+
+
+
+                $expired_currents = CurrentSubscription::where('grace_end', '<=', $today)->where('status', 1)
+                                ->join('users', 'current_subscriptions.user_id', '=', 'users.id')
+                                ->where('users.last_timezone', $timezone)
+                                ->select('current_subscriptions.*');
+                if($expired_currents->count() > 0){
+                    foreach($expired_currents->get() as $expired){
+                        SubscriptionAutoRenewal::dispatch($expired->id, "expired");
+                    }
+                }
+
+                $to_renews = CurrentSubscription::where('end_date', '<=', $today)->where('grace_end', '>=', $today)->where('status', 1)
+                            ->join('users', 'current_subscriptions.user_id', '=', 'users.id')
+                            ->where('users.last_timezone', $timezone)
+                            ->select('current_subscriptions.*');
+                if($to_renews->count() > 0){
+                    foreach($to_renews as $renew){
+                        SubscriptionAutoRenewal::dispatch($renew->id, "renew");
+                    }
+                }
+            }           
+        }
+        // $expired_histories = SubscriptionHistory::where('grace_end', '<', date('Y-m-d'))->where('status', 1);
+        // if($expired_histories->count() > 0){
+        //     foreach($expired_histories->get() as $history){
+        //         $history->status = 2;
+        //         $history->save();
+        //     }
+        // }
+
+        // $expired_currents = CurrentSubscription::where('grace_end', '<=', date('Y-m-d'))->where('status', 1);
+        // if($expired_currents->count() > 0){
+        //     foreach($expired_currents->get() as $expired){
+        //         SubscriptionAutoRenewal::dispatch($expired->id, "expired");
+        //     }
+        // }
+
+        // $to_renews = CurrentSubscription::where('end_date', '<=', date('Y-m-d'))->where('grace_end', '>=', date('Y-m-d'))->where('status', 1);
+        // if($to_renews->count() > 0){
+        //     foreach($to_renews as $renew){
+        //         SubscriptionAutoRenewal::dispatch($renew->id, "renew");
+        //     }
+        // }
+    }
+
+    public static function pluck_timezones(){
+        $timezones = User::distinct()->pluck('last_timezone')->toArray();
+        $array = [];
+        foreach($timezones as $timezone){
+            $time = Carbon::now($timezone);
+            $hour = intval($time->format('H'));
+            if((($hour >= 6) and ($hour <= 8)) or (($hour >= 18) and ($hour <= 20))){
+                $array[] = $timezone;
             }
         }
 
-        $expired_currents = CurrentSubscription::where('grace_end', '<=', date('Y-m-d'))->where('status', 1);
-        if($expired_currents->count() > 0){
-            foreach($expired_currents->get() as $expired){
-                SubscriptionAutoRenewal::dispatch($expired->id, "expired");
-            }
-        }
-
-        $to_renews = CurrentSubscription::where('end_date', '<=', date('Y-m-d'))->where('grace_end', '>=', date('Y-m-d'))->where('status', 1);
-        if($to_renews->count() > 0){
-            foreach($to_renews as $renew){
-                SubscriptionAutoRenewal::dispatch($renew->id, "renew");
-            }
-        }
+        return $array;
     }
 }

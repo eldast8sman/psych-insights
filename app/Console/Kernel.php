@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
             NotificationController::assessment_reminder();
             NotificationController::check_inactivity();
             NotificationController::daily_reminder();
-        })->twiceDailyAt(8, 19);
+        })->everyThirtyMinutes();
     }
 
     /**

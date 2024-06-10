@@ -99,4 +99,12 @@ class User extends Authenticatable implements JWTSubject
         'last_login' => 'datetime',
         'prev_login' => 'datetime'
     ];
+
+    public function subscription_histories(){
+        return $this->hasMany(SubscriptionHistory::class);
+    }
+
+    public function current_subscription(){
+        return $this->hasOne(CurrentSubscription::class);
+    }
 }

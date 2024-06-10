@@ -25,4 +25,8 @@ class SubscriptionHistory extends Model
         'auto_renew',
         'status'
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }
