@@ -35,6 +35,7 @@ use App\Models\User;
 use App\Models\UserDeactivation;
 use App\Models\UserNotificationSetting;
 use App\Services\IpApiService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -243,17 +244,23 @@ class AuthController extends Controller
             return false;
         }
 
-        $user->prev_login = !empty($user->last_login) ? $user->last_login : date('Y-m-d H:i:s');
-        $user->last_login = date('Y-m-d H:i:s');
+        if(!empty($user->timezone)){
+            $time = Carbon::now($user->timezone);
+        } else {
+            $time = Carbon::now();
+        }
+
+        $user->prev_login = !empty($user->last_login) ? $user->last_login : $time->format('Y-m-d H:i:s');
+        $user->last_login = $time->format('Y-m-d H:i:s');
         if(empty($user->last_login_date)){
-            $user->last_login_date = date('Y-m-d');
+            $user->last_login_date = $time->format('Y-m-d');
             $user->present_streak = 1;
             $user->longest_streak = 1;
             $user->total_logins = 1;
         } else {
             $last_date = $user->last_login_date;
-            $user->last_login_date = date('Y-m-d');
-            $yesterday = date('Y-m-d', time() - (60 * 60 * 24));
+            $user->last_login_date = $time->format('Y-m-d');
+            $yesterday = $time->subDay()->format('Y-m-d');
             if($last_date == $yesterday){
                 $user->present_streak += 1;
                 $user->total_logins += 1;

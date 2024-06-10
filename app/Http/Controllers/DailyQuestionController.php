@@ -8,16 +8,23 @@ use App\Models\DailyQuestion;
 use App\Models\DailyQuestionAnswer;
 use App\Models\DailyQuestionOption;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DailyQuestionController extends Controller
 {
     private $user;
+    private $time;
 
     public function __construct()
     {
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     public function fetch_questions(){
@@ -116,9 +123,11 @@ class DailyQuestionController extends Controller
             ];
         }
 
+
+
         $answer_summary = DailyQuestionAnswer::create([
             'user_id' => $this->user->id,
-            'answer_date' => date('Y-m-d'),
+            'answer_date' => $this->time->format('Y-m-d'),
             'answers' => json_encode($answers),
             'category_scores' => json_encode($categ_scores),
             'computed' => 0
@@ -127,8 +136,9 @@ class DailyQuestionController extends Controller
         $answer_summary->answers = $answers;
         $answer_summary->category_scores = $categ_scores;
 
+        $tommorow_time = $this->time->addDay();
         $user = User::find($this->user->id);
-        $user->next_daily_question = date('Y-m-d', time() + (60 * 60 * 24));
+        $user->next_daily_question = $tommorow_time->format('Y-m-d');
         $user->save();
 
         self::log_activity($this->user->id, "checkin", "daily_question_answers", $answer_summary->id);
