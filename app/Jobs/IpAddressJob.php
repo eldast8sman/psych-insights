@@ -45,6 +45,14 @@ class IpAddressJob implements ShouldQueue
                 $details = $details->object();
                 if($details->status == "success"){
                     $loc_details = $details;
+                } else {
+                    UserIPAddress::create([
+                        'user_id' => $user->id,
+                        'platform' => 'Troubleshoot',
+                        'ip_address' => $this->ip_address,
+                        'frequency' => 1,
+                        'location_details' => json_encode($details)
+                    ]);
                 }
             }
         }
