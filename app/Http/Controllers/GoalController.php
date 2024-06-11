@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 class GoalController extends Controller
 {
     private $user;
-    private $time;
+    private static $time;
 
     public function __construct()
     {
