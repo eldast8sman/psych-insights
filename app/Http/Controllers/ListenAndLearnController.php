@@ -45,7 +45,7 @@ class ListenAndLearnController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $learns = ListenAndLearn::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $learns = ListenAndLearn::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($learns as $learn){
                 if(count($strategies_id) < $first_limit){
                     $categories = explode(',', $learn->categories);
@@ -83,7 +83,7 @@ class ListenAndLearnController extends Controller
                         $s_learns = $s_learns->where('id', '<>', $strategy_id->id);
                     }
                 }
-                $s_learns = $s_learns->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_learns = $s_learns->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_learns as $learn){
                     if(count($strategies_id) < $limit){
                         $categories = explode(',', $learn->categories);

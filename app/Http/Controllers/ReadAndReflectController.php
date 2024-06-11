@@ -46,7 +46,7 @@ class ReadAndReflectController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $reads = ReadAndReflect::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $reads = ReadAndReflect::where('status', 1)->where('published', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($reads as $read){
                 if(count($strategies_id) < $first_limit){
                     $categories = explode(',', $read->categories);
@@ -84,7 +84,7 @@ class ReadAndReflectController extends Controller
                         $s_reads = $s_reads->where('id', '<>', $strategy_id->id);
                     }
                 }
-                $s_reads = $s_reads->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_reads = $s_reads->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_reads as $read){
                     if(count($strategies_id) < $limit){
                         $categories = explode(',', $read->categories);

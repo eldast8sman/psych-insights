@@ -44,7 +44,7 @@ class AudioController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $audios = Audio::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $audios = Audio::where('status', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($audios as $audio){
                 if(count($audios_id) < $first_limit){
                     $categories = explode(',', $audio->categories);
@@ -82,7 +82,7 @@ class AudioController extends Controller
                         $s_audios = $s_audios->where('id', '<>', $audio_id->id);
                     }
                 }
-                $s_audios = $s_audios->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_audios = $s_audios->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_audios as $audio){
                     if(count($audios_id) < $limit){
                         $categories = explode(',', $audio->categories);

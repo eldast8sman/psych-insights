@@ -44,7 +44,7 @@ class ArticleController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $articles = Article::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $articles = Article::where('status', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($articles as $article){
                 if(count($articles_id) < $first_limit){
                     $categories = explode(',', $article->categories);
@@ -84,7 +84,7 @@ class ArticleController extends Controller
                         $s_articles = $s_articles->where('id', '<>', $article_id->id);
                     }
                 }
-                $s_articles = $s_articles->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_articles = $s_articles->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_articles as $article){
                     if(count($articles_id) < $limit){
                         $categories = explode(',', $article->categories);

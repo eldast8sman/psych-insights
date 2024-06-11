@@ -44,7 +44,7 @@ class PodcastController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $podcasts = Podcast::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $podcasts = Podcast::where('status', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($podcasts as $podcast){
                 if(count($podcasts_id) < $first_limit){
                     $categories = explode(',', $podcast->categories);
@@ -82,7 +82,7 @@ class PodcastController extends Controller
                         $s_podcasts = $s_podcasts->where('id', '<>', $podcast_id->id);
                     }
                 }
-                $s_podcasts = $s_podcasts->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_podcasts = $s_podcasts->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_podcasts as $podcast){
                     if(count($podcasts_id) < $limit){
                         $categories = explode(',', $podcast->categories);
