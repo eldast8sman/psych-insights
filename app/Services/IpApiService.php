@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Stevebauman\Location\Facades\Location;
 
 class IpApiService
 {
@@ -14,7 +15,8 @@ class IpApiService
     }
 
     public function ip_data($ip_address){
-        $response = Http::get($this->base_url.'/'.$ip_address);
-        return $response;
+        // $response = Http::get($this->base_url.'/'.$ip_address);
+        // return $response;
+        return Location::get($ip_address);
     }
 }

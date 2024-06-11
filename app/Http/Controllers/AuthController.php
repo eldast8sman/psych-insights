@@ -43,6 +43,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stevebauman\Location\Facades\Location;
+use Symfony\Component\VarDumper\VarDumper;
 
 class AuthController extends Controller
 {
@@ -134,7 +135,7 @@ class AuthController extends Controller
         // }
 
         $user = self::user_details($user);
-        IpAddressJob::dispatch($user, $request->ip());
+        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'););
         $user->authorization = $login;
 
         self::log_activity($user->id, "signup");
@@ -387,7 +388,7 @@ class AuthController extends Controller
         }
 
         $user = self::user_details($user);
-        IpAddressJob::dispatch($user, $request->ip());
+        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
         $user->authorization = $auth;
 
         self::log_activity($user->id, "login");
@@ -577,7 +578,7 @@ class AuthController extends Controller
             $user->save();
         }
 
-        IpAddressJob::dispatch($user, $request->ip());
+        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
         $user = self::user_details($user);
         $user->authorization = $auth;
 
@@ -725,13 +726,17 @@ class AuthController extends Controller
         }
     }
 
-    public function test_ip($ip_address){
-        $service = new IpApiService();
+    public function test_ip(Request $request, $ip_address){
+        // $ip = $request->headers->has('x-forwarded-for') ? $request->header('x-forwarded-for') : $request->ip();
+        // $service = new IpApiService();
 
-        echo $ip_address;
+        // echo $ip;
 
-        $details = $service->ip_data($ip_address);
+        // $details = $service->ip_data($ip);
 
-        var_dump($details->object());
+        // var_dump($details->object());
+        $ip = $request->header('x-forwarded-for');
+        $details = Location::get($ip);
+        var_dump($details);
     }
 }

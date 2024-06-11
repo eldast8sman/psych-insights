@@ -35,48 +35,51 @@ class IpAddressJob implements ShouldQueue
     public function handle(): void
     {
         $user = $this->user;
-        $ip_details = UserIPAddress::where('ip_address', $this->ip_address)->where('platform', 'IP-API')->first();
+        $ip_details = UserIPAddress::where('ip_address', $this->ip_address)->where('platform', 'BAUMAN')->first();
         if(!empty($ip_details) and !empty($ip_details->location_details)){
             $loc_details = json_decode($ip_details->location_details);
         } else {
             $service = new IpApiService();
             $details = $service->ip_data($this->ip_address);
-            if($details->ok()){
-                $details = $details->object();
-                if($details->status == "success"){
-                    $loc_details = $details;
-                } else {
-                    UserIPAddress::create([
-                        'user_id' => $user->id,
-                        'platform' => 'Troubleshoot',
-                        'ip_address' => $this->ip_address,
-                        'frequency' => 1,
-                        'location_details' => json_encode($details)
-                    ]);
-                }
+            if(!empty($details)){
+                $loc_details = $details;
             }
+            // if($details->ok()){
+            //     $details = $details->object();
+            //     if($details->status == "success"){
+            //         $loc_details = $details;
+            //     } else {
+            //         UserIPAddress::create([
+            //             'user_id' => $user->id,
+            //             'platform' => 'Troubleshoot',
+            //             'ip_address' => $this->ip_address,
+            //             'frequency' => 1,
+            //             'location_details' => json_encode($details)
+            //         ]);
+            //     }
+            // }
         }
         if(isset($loc_details)){
             if(empty($user->signup_country)){
-                $user->signup_country = $loc_details->country;
+                $user->signup_country = $loc_details->countryName;
                 $user->signup_timezone = $loc_details->timezone;
                 $user->signup_ip = $this->ip_address;
             }
-            $user->last_country = $loc_details->country;
+            $user->last_country = $loc_details->countryName;
             $user->last_timezone = $loc_details->timezone;
             $user->last_ip = $this->ip_address;
             $user->save();
 
-            $address = UserIPAddress::where('user_id', $user->id)->where('ip_address', $this->ip_address)->where('platform', 'IP-API')->first();
+            $address = UserIPAddress::where('user_id', $user->id)->where('ip_address', $this->ip_address)->where('platform', 'BAUMAN')->first();
             if(!empty($address)){
                 $address->frequency += 1;
                 $address->save();
             } else {
                 UserIPAddress::create([
                     'user_id' => $user->id,
-                    'platform' => 'IP-API',
+                    'platform' => 'BAUMAN',
                     'ip_address' => $this->ip_address,
-                    'country' => $loc_details->country,
+                    'country' => $loc_details->countryName,
                     'location_details' => json_encode($loc_details),
                     'frequency' => 1
                 ]);
