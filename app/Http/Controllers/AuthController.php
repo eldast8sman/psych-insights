@@ -135,7 +135,7 @@ class AuthController extends Controller
         // }
 
         $user = self::user_details($user);
-        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'););
+        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
         $user->authorization = $login;
 
         self::log_activity($user->id, "signup");
