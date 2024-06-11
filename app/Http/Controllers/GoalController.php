@@ -25,9 +25,9 @@ class GoalController extends Controller
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
         if(empty($this->user->last_timezone)){
-            $this->time = Carbon::now();
+            self::$time = Carbon::now();
         } else {
-            $this->time = Carbon::now($this->user->last_timezone);
+            self::$time = Carbon::now($this->user->last_timezone);
         }
     }
 
@@ -95,7 +95,7 @@ class GoalController extends Controller
 
         $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->first();
         if(!empty($next_answer)){
-            if($next_answer->next_date > $this->time->format('Y-m-d')){
+            if($next_answer->next_date > self::$time->format('Y-m-d')){
                 return response([
                     'status' => 'failed',
                     'message' => 'Let\'s focus on the reflections you\'ve already made this week. You can come back next week!'
@@ -130,7 +130,7 @@ class GoalController extends Controller
         $next_sunday = "";
         $i = 1;
         while(empty($next_sunday)){
-            $time = $this->time->addDays($i);
+            $time = self::$time->addDays($i);
             if(strtolower($time->format('l')) == 'sunday'){
                 $next_sunday = $time->format('Y-m-d');
             }
@@ -169,7 +169,7 @@ class GoalController extends Controller
 
         $next_answer = NextGoalAnswer::where('user_id', $this->user->id)->where('goal_category_id', $category->id)->orderBy('id', 'desc')->first();
         if(!empty($next_answer)){
-            if(($next_answer->next_date > $this->time->format('Y-m-d')) and ($next_answer->goal_set == 1)){
+            if(($next_answer->next_date > self::$time->format('Y-m-d')) and ($next_answer->goal_set == 1)){
                 return response([
                     'status' => 'failed',
                     'message' => 'Let\'s focus on the goals you\'ve already set for this week. You can come back next week!'
@@ -239,7 +239,7 @@ class GoalController extends Controller
                 $next_time = "";
                 $i = 1;
                 while(empty($next_time)){
-                    $time = $this->time->addDays($i);
+                    $time = self::$time->addDays($i);
                     if(strtolower($time->format('l')) == strtolower($reminder['reminder_day'])){
                         $next_time = $time->format('Y-m-d').' '.$reminder['reminder_time'];
                     }
