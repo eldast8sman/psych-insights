@@ -92,6 +92,29 @@ class AuthController extends Controller
         }
         $user->save();
 
+        if($request->device_token != $user->device_token){
+            $t_users = User::where('device_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->device_token = null;
+                    $t_user->save();
+                }
+            }
+            $user->device_token = $request->device_token;
+            $user->save();
+        }
+        if($request->web_token != $user->web_token){
+            $t_users = User::where('web`_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->web_token = null;
+                    $t_user->save();
+                }
+            }
+            $user->web_token = $request->web_token;
+            $user->save();
+        }
+
         $stripe = new StripeController();
         if($customer = $stripe->create_customer($user->name, $user->email)){
             StripeCustomer::create([
@@ -389,6 +412,29 @@ class AuthController extends Controller
 
         $user = self::user_details($user);
         IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
+
+        if($request->device_token != $user->device_token){
+            $t_users = User::where('device_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->device_token = null;
+                    $t_user->save();
+                }
+            }
+            $user->device_token = $request->device_token;
+            $user->save();
+        }
+        if($request->web_token != $user->web_token){
+            $t_users = User::where('web`_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->web_token = null;
+                    $t_user->save();
+                }
+            }
+            $user->web_token = $request->web_token;
+            $user->save();
+        }
         $user->authorization = $auth;
 
         self::log_activity($user->id, "login");
@@ -570,10 +616,24 @@ class AuthController extends Controller
             $user->save();
         }
         if($request->device_token != $user->device_token){
+            $t_users = User::where('device_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->device_token = null;
+                    $t_user->save();
+                }
+            }
             $user->device_token = $request->device_token;
             $user->save();
         }
         if($request->web_token != $user->web_token){
+            $t_users = User::where('web`_token', $request->device_token);
+            if($t_users->count() > 0){
+                foreach($t_users->get() as $t_user){
+                    $t_user->web_token = null;
+                    $t_user->save();
+                }
+            }
             $user->web_token = $request->web_token;
             $user->save();
         }
