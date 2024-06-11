@@ -264,7 +264,7 @@ class NotificationController extends Controller
         foreach($timezones as $timezone){
             $time = Carbon::now($timezone);
             $hour = intval($time->format('H'));
-            if((($hour >= 6) and ($hour <= 8)) or (($hour >= 18) and ($hour <= 20))){
+            if((($hour >= 9) and ($hour <= 11)) or (($hour >= 21) and ($hour <= 23))){
                 $array[] = $timezone;
             }
         }
