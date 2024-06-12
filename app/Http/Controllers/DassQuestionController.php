@@ -240,7 +240,7 @@ class DassQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        $next_question = $this->time->addDays(7)->format('Y-m-d');
+        $next_question = Carbon::now($this->user->last_timezone)->addDays(7)->format('Y-m-d');;
         // $next_question = date('Y-m-d');
 
         $answer_summary = QuestionAnswerSummary::create([

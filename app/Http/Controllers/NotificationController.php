@@ -201,9 +201,10 @@ class NotificationController extends Controller
                 $time = Carbon::now($timezone);
                 $today = $time->format('Y-m-d');
 
-                $expired_histories = SubscriptionHistory::where('grace_end', '<', $today)->where('status', 1)
-                                    ->join('users', 'subscription_histories.user_id', '=', 'users.id')
+                $expired_histories = SubscriptionHistory::join('users', 'subscription_histories.user_id', '=', 'users.id')
                                     ->where('users.last_timezone', $timezone)
+                                    ->where('subscription_histories.grace_end', '<', $today)
+                                    ->where('subscription_histories.status', 1)
                                     ->select('subscription_histories.*');
                 if($expired_histories->count() > 0){
                     foreach($expired_histories->get() as $history){
@@ -214,9 +215,10 @@ class NotificationController extends Controller
 
 
 
-                $expired_currents = CurrentSubscription::where('grace_end', '<=', $today)->where('status', 1)
-                                ->join('users', 'current_subscriptions.user_id', '=', 'users.id')
+                $expired_currents = CurrentSubscription::join('users', 'current_subscriptions.user_id', '=', 'users.id')
                                 ->where('users.last_timezone', $timezone)
+                                ->where('current_subscriptions.grace_end', '<=', $today)
+                                ->where('current_subscriptions.status', 1)
                                 ->select('current_subscriptions.*');
                 if($expired_currents->count() > 0){
                     foreach($expired_currents->get() as $expired){
@@ -224,9 +226,11 @@ class NotificationController extends Controller
                     }
                 }
 
-                $to_renews = CurrentSubscription::where('end_date', '<=', $today)->where('grace_end', '>=', $today)->where('status', 1)
-                            ->join('users', 'current_subscriptions.user_id', '=', 'users.id')
+                $to_renews = CurrentSubscription::join('users', 'current_subscriptions.user_id', '=', 'users.id')
                             ->where('users.last_timezone', $timezone)
+                            ->where('current_subscriptions.end_date', '<=', $today)
+                            ->where('current_subscriptions.grace_end', '>=', $today)
+                            ->where('current_subscriptions.status', 1)
                             ->select('current_subscriptions.*');
                 if($to_renews->count() > 0){
                     foreach($to_renews as $renew){
