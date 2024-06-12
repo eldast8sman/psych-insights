@@ -130,7 +130,7 @@ class GoalController extends Controller
         $next_sunday = "";
         $i = 1;
         while(empty($next_sunday)){
-            $time = self::$time->addDays($i);
+            $time = Carbon::now($this->user->last_timezone)->addDays($i);
             if(strtolower($time->format('l')) == 'sunday'){
                 $next_sunday = $time->format('Y-m-d');
             }
@@ -239,7 +239,7 @@ class GoalController extends Controller
                 $next_time = "";
                 $i = 1;
                 while(empty($next_time)){
-                    $time = self::$time->addDays($i);
+                    $time = Carbon::now($this->user->last_timezone)->addDays($i);
                     if(strtolower($time->format('l')) == strtolower($reminder['reminder_day'])){
                         $next_time = $time->format('Y-m-d').' '.$reminder['reminder_time'];
                     }
