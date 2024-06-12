@@ -58,7 +58,7 @@ class BasicQuestionController extends Controller
             $fetch = true;
         } else {
             $last_answer = $last_answer->first();
-            $today = date('Y-m-d');
+            $today = $this->time->format('Y-m-d');
 
             if($today >= $last_answer->next_question){
                 $fetch = true;
@@ -268,7 +268,7 @@ class BasicQuestionController extends Controller
         $second_highest_cat_id = array_shift($cat_list);
         $second_highest_category = Category::find($second_highest_cat_id)->category;
 
-        $next_question = $this->time->addDays(14)->format('Y-m-d');
+        $next_question = Carbon::now($this->user->last_timezone)->addDays(14)->format('Y-m-d');
         if($new){
             $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
             if(!empty($free_trial)){
@@ -283,7 +283,7 @@ class BasicQuestionController extends Controller
             if($package->free_trial == 1){
                 $plan = PaymentPlan::where('subscription_package_id', $package->id)->first();
                 if(((strtolower($plan->duration_type) == 'week') and ($plan->duration < 2)) or ((strtolower($plan->durtion_type) == 'day') and ($plan->duration < 14))){
-                    $end_time = Carbon::createFromFormat('Y-m-d', $current->end_date, $this->user->timezone);
+                    $end_time = Carbon::createFromFormat('Y-m-d', $current->end_date, $this->user->last_timezone);
                     $next_question = $end_time->addDay()->format('Y-m-d');                    
                 }
             }

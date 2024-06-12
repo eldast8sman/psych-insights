@@ -44,7 +44,7 @@ class BookController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $books = Book::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $books = Book::where('status', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($books as $book){
                 if(count($books_id) < $first_limit){
                     $categories = explode(',', $book->categories);
@@ -83,7 +83,7 @@ class BookController extends Controller
                         $s_books = $s_books->where('id', '<>', $book_id->id);
                     }
                 }
-                $s_books = $s_books->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_books = $s_books->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_books as $book){
                     if(count($books_id) < $limit){
                         $categories = explode(',', $book->categories);

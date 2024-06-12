@@ -196,6 +196,9 @@ class SubscriptionController extends Controller
             }
         }
 
+        $names = explode(' ', $user->name);
+        $firstname = $names[0];
+
         return true;
     }
 

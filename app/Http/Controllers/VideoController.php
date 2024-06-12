@@ -44,7 +44,7 @@ class VideoController extends Controller
 
             $first_limit = round(0.7 * $limit);
 
-            $videos = Video::where('status', 1)->where('subscription_level', '<=', $level)->orderBy('created_at', 'asc')->get(['id', 'slug', 'categories']);
+            $videos = Video::where('status', 1)->where('subscription_level', '<=', $level)->inRandomOrder()->get(['id', 'slug', 'categories']);
             foreach($videos as $video){
                 if(count($videos_id) < $first_limit){
                     $categories = explode(',', $video->categories);
@@ -82,7 +82,7 @@ class VideoController extends Controller
                         $s_videos = $s_videos->where('id', '<>', $video_id->id);
                     }
                 }
-                $s_videos = $s_videos->orderBy('created_at', 'desc')->get(['id', 'slug', 'categories']);
+                $s_videos = $s_videos->inRandomOrder()->get(['id', 'slug', 'categories']);
                 foreach($s_videos as $video){
                     if(count($videos_id) < $limit){
                         $categories = explode(',', $video->categories);
