@@ -7,6 +7,7 @@ use App\Http\Requests\CompleteSubscriptionPaymentRequest;
 use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\OldCardSubscriptionRequest;
 use App\Jobs\SubscriptionAutoRenewal;
+use App\Mail\SubscriptionSuccessMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
 use App\Models\CurrentSubscription;
@@ -23,6 +24,7 @@ use App\Models\UsedPromoCode;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
@@ -119,7 +121,7 @@ class SubscriptionController extends Controller
         if(empty($current)){
             $next_date = true;
         } else {
-            if(($current->end_date < $this->time->format('Y-m-d')) and ($type == 'subscribe')){
+            if(($current->end_date < Carbon::now($this->user->last_timezone)->format('Y-m-d')) and ($type == 'subscribe')){
                 $next_date = true;
             }
         }
@@ -143,7 +145,7 @@ class SubscriptionController extends Controller
 
             $answer_summary = QuestionAnswerSummary::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
             if(!empty($answer_summary)){
-                $today = $this->time->format('Y-m-d');
+                $today = Carbon::now($this->user->last_timezone)->format('Y-m-d');
 
                 if($next_date){
                     $answer_summary->next_question = $today;
@@ -198,6 +200,7 @@ class SubscriptionController extends Controller
 
         $names = explode(' ', $user->name);
         $firstname = $names[0];
+        Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
 
         return true;
     }
