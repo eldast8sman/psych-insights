@@ -48,7 +48,7 @@
             <br />
             With your premium subscription, you now have access to exclusive features and insights designed to help you better understand and manage your mental well-being.
             <br />
-            We are committed to supporting you every step of the way. If you have any questions or need help navigating your premium features, feel free to reach out to us at [Support Email].
+            We are committed to supporting you every step of the way. If you have any questions or need help navigating your premium features, feel free to reach out to us via our support mail. 
             <br />
             Thank you for choosing Psych Insights. We are so honoured to be supporting you on your mental health journey.
             <br />

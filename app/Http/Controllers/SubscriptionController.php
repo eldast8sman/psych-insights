@@ -198,9 +198,11 @@ class SubscriptionController extends Controller
             }
         }
 
-        $names = explode(' ', $user->name);
-        $firstname = $names[0];
-        Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+        if($package->free_trial != 1){
+            $names = explode(' ', $user->name);
+            $firstname = $names[0];
+            Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+        }
 
         return true;
     }
