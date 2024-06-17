@@ -416,9 +416,6 @@ class AuthController extends Controller
             $user->save();
         }
 
-        $user = self::user_details($user);
-        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
-
         if($request->device_token != $user->device_token){
             $t_users = User::where('device_token', $request->device_token);
             if($t_users->count() > 0){
@@ -441,6 +438,10 @@ class AuthController extends Controller
             $user->web_token = $request->web_token;
             $user->save();
         }
+
+        $user = self::user_details($user);
+        IpAddressJob::dispatch($user, $request->header('x-forwarded-for'));
+
         $user->authorization = $auth;
 
         self::log_activity($user->id, "login");
