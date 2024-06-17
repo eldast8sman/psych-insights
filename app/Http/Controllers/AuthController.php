@@ -102,6 +102,13 @@ class AuthController extends Controller
             }
             $user->device_token = $request->device_token;
             $user->save();
+            $others = User::where('device_token', $request->device_token)->where('id', '<>', $user->id);
+            if($others->count() > 0){
+                foreach($others->get() as $other){
+                    $other->device_token = null;
+                    $other->save();
+                }
+            }
         }
         if($request->web_token != $user->web_token){
             $t_users = User::where('web`_token', $request->device_token);
@@ -113,6 +120,13 @@ class AuthController extends Controller
             }
             $user->web_token = $request->web_token;
             $user->save();
+            $others = User::where('web_token', $request->web_token)->where('id', '<>', $user->id);
+            if($others->count() > 0){
+                foreach($others->get() as $other){
+                    $other->web_token = null;
+                    $other->save();
+                }
+            }
         }
 
         $stripe = new StripeController();
@@ -399,14 +413,6 @@ class AuthController extends Controller
         }
         if(!empty($daily_tip = DailyTip::inRandomOrder()->first())){
             $user->daily_tip_id = $daily_tip->id;
-            $user->save();
-        }
-        if($request->device_token != $user->device_token){
-            $user->device_token = $request->device_token;
-            $user->save();
-        }
-        if($request->web_token != $user->web_token){
-            $user->web_token = $request->web_token;
             $user->save();
         }
 
