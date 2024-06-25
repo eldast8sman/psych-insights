@@ -122,7 +122,7 @@ class NotificationJob implements ShouldQueue
     public function daily_question_reminder(){
         $user = User::find($this->id);
         $title = "Daily Check-in";
-        $body = "Don't forget to complete your daily check-in today! Take a few moments to reflect on how you’re feeling and track your overall well-being.";
+        $body = "Don't forget to complete your daily check-in today! Take a few moments to reflect on how you're feeling and track your overall well-being.";
 
         $setting = UserNotificationSetting::where('user_id', $user->id)->first();
         if(empty($setting)){
