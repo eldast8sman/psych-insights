@@ -22,7 +22,7 @@ class UserNotificationController extends Controller
      */
     public function index()
     {
-        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $limit = !empty($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $notifications = Notification::where('user_id', $this->user->id)->where('status', 1)->orderBy('created_at', 'desc');
         
         return response([
