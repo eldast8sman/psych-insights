@@ -485,6 +485,7 @@ Route::middleware('auth:user-api')->group(function(){
         Route::post('/subscriptions/initiate-renewal', 'initiate_subscription_renewal')->name('subscription.initiateRenewal');
         Route::post('/subscriptions/initiate-renewal/old-card', 'initiate_subscription_renewal_old_card')->name('subscriptionRenewal.complete.oldCard');
         Route::get('/subscriptions/initiate/apple-pay/{payment_plan}', 'initiate_subscription_apple_pay')->name('subscripton.initiate.applePay');
+        Route::get('/subscriptions/initiate-renewal/apple-pay/{payment_plan}', 'initiate_subscription_renewal_apple_pay')->name('subscription.initiateRenewal.applePay');
         Route::post('/subscriptions/complete/apple-pay', 'complete_subscription_apple_pay')->name('subscription.complete.applePay');
     });
 
