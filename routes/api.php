@@ -483,7 +483,9 @@ Route::middleware('auth:user-api')->group(function(){
         Route::get('/payment-methods/{method}/charge', 'charge_previous_card')->name('paymentMethod.charge');
         Route::post('/subscriptions/initiate/old-card', 'initiate_subscription_old_card')->name('subscription.complete.oldCard');
         Route::post('/subscriptions/initiate-renewal', 'initiate_subscription_renewal')->name('subscription.initiateRenewal');
-        Route::post('/subscriptions/initiate-renewal/old-card', 'initiate_subscription_renewal_old_card')->name('subscriotionRenewal.compleye.oldCard');
+        Route::post('/subscriptions/initiate-renewal/old-card', 'initiate_subscription_renewal_old_card')->name('subscriptionRenewal.complete.oldCard');
+        Route::get('/subscriptions/initiate/apple-pay/{payment_plan}', 'initiate_subscription_apple_pay')->name('subscripton.initiate.applePay');
+        Route::post('/subscriptions/complete/apple-pay', 'complete_subscription_apple_pay')->name('subscription.complete.applePay');
     });
 
     Route::controller(JournalController::class)->group(function(){

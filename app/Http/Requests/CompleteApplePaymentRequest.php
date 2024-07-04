@@ -11,7 +11,7 @@ class CompleteApplePaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class CompleteApplePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'token' => 'required|string|exists:apple_pay_tokens,token',
+            'amount_paid' => 'required|numeric'
         ];
     }
 }
