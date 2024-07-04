@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CalculateSubscriptionAmountRequest;
+use App\Http\Requests\CompleteApplePaymentRequest;
 use App\Http\Requests\CompleteSubscriptionPaymentRequest;
 use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\OldCardSubscriptionRequest;
@@ -10,6 +11,7 @@ use App\Jobs\SubscriptionAutoRenewal;
 use App\Mail\SubscriptionSuccessMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
+use App\Models\ApplePayToken;
 use App\Models\CurrentSubscription;
 use App\Models\PaymentPlan;
 use App\Models\PromoCode;
@@ -500,6 +502,46 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
+    public function initiate_subscription_apple_pay(PaymentPlan $payment_plan){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->end_date > $this->time->format('Y-m-d')){
+                $pack = SubscriptionPackage::find($current_plan->subscription_package_id);
+                if($pack->free_trial != 1){
+                    return response([
+                        'status' => 'failed',
+                        'message' => 'You still have an active Subscription'
+                    ], 409);
+                }
+            }
+        }
+
+        $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
+        if(empty($package)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Subscription Package was fetched'
+            ], 404);
+        }
+
+        $token = ApplePayToken::create([
+            'user_id' => $this->user->id,
+            'payment_plan_id' => $payment_plan->id,
+            'token' => Str::random(50).time(),
+            'token_expiry' => $this->time->addMinutes(30)->format('Y-m-d H:i:s'),
+            'value_given' => 0,
+            'type' => 'subscribe'
+        ]);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription Initiated successfully',
+            'data' => [
+                'token' => $token->token
+            ]
+        ]);
+    }
+
     public function initiate_subscription_old_card(OldCardSubscriptionRequest $request){
         $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
         if(!empty($current_plan)){
@@ -867,6 +909,50 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
+    public function initiate_subscription_renewal_apple_pay(PaymentPlan $payment_plan){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(!empty($current_plan)){
+            if($current_plan->grace_end < $this->time->format('Y-m-d')){
+                return response([
+                    'status' => 'failed',
+                    'message' => 'You do not have an Active Subscription to Renew'
+                ], 409);
+            }
+        }
+
+        $package = SubscriptionPackage::find($current_plan->subscription_package_id);
+        if($package->free_trial == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew Free Trial'
+            ], 409);
+        }
+
+        if($payment_plan->subscription_package_id != $package->id){
+            return response([
+                'status' => 'failed',
+                'message' => 'You cannot renew a Subscription you are not subscribed to'
+            ], 409);
+        }
+
+        $token = ApplePayToken::create([
+            'user_id' => $this->user->id,
+            'payment_plan_id' => $payment_plan->id,
+            'token' => Str::random(50).time(),
+            'token_expiry' => $this->time->addMinutes(30)->format('Y-m-d H:i:s'),
+            'value_given' => 0,
+            'type' => 'renew_subscription'
+        ]);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription Initiated successfully',
+            'data' => [
+                'token' => $token->token
+            ]
+        ]);
+    }
+
     public function complete_subscription(CompleteSubscriptionPaymentRequest $request){
         $intent = StripePaymentIntent::where('user_id', $this->user->id)->where('internal_ref', $request->intent_ref)->first();
         if(empty($intent)){
@@ -969,6 +1055,45 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
+    public function complete_subscription_apple_pay(CompleteApplePaymentRequest $request){
+        $apple_pay = ApplePayToken::where('user_id', $this->user->id)->where('token', $request->token)->first();
+        if(empty($apple_pay)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Payment Intent fetched'
+            ], 404); 
+        }
+        if($apple_pay->value_given == 1){
+            return response([
+                'status' => 'failed',
+                'message' => 'Value already gien for this Payment'
+            ], 404);
+        }
+
+        $payment_plan = PaymentPlan::find($apple_pay->payment_plan_id);
+        $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
+
+        if(!$this->subscribe($this->user->id, $package->id, $payment_plan->id, $request->amount_paid, null, 0, $apple_pay->type)){
+            return response([
+                'status' => 'failed',
+                'message' => $this->errors
+            ], 409);
+        }
+
+        $apple_pay->value_given = 1;
+        $apple_pay->save();
+
+        $user = AuthController::user_details($this->user);
+
+        self::log_activity($this->user->id, "complete_subscription", "apple_pay_tokens", $apple_pay->id);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Subscription successful',
+            'data' => $user
+        ], 200);
+    }
+
     public function subscription_attempts(){
         $filter = isset($_GET['filter']) ? $_GET['filter'] : NULL;
         $from = !empty($_GET['from']) ? (string)$_GET['from'] : "";
@@ -1055,4 +1180,6 @@ class SubscriptionController extends Controller
             ], 405);
         }
     }
+
+    
 }
