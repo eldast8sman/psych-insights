@@ -591,3 +591,5 @@ Route::get('/test-gpt/{prompt}', [ChatGPTController::class, 'complete_chat']);
 Route::post('/test-gpt-chat', [ChatGPTController::class, 'chat']);
 
 Route::get('/test-ip/{ip_address}', [ControllersAuthController::class, 'test_ip']);
+
+Route::get('/subscription/subscription/apple-pay/server-notification/{type}', [SubscriptionController::class, 'applepay_notification']);

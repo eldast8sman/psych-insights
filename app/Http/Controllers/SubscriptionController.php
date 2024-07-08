@@ -27,6 +27,7 @@ use App\Models\UsedPromoCode;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -1183,10 +1184,12 @@ class SubscriptionController extends Controller
     }
 
     public function applepay_notification(Request $request, $type){
-        ApplePayNotification::create([
+        $type = ApplePayNotification::create([
             'type' => $type,
             'notification_data' => json_encode($request->all())
         ]);
+
+        Log::error($type);
 
         return response([
             'status' => 'success',
