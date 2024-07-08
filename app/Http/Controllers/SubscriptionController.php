@@ -11,6 +11,7 @@ use App\Jobs\SubscriptionAutoRenewal;
 use App\Mail\SubscriptionSuccessMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
+use App\Models\ApplePayNotification;
 use App\Models\ApplePayToken;
 use App\Models\CurrentSubscription;
 use App\Models\PaymentPlan;
@@ -1181,5 +1182,15 @@ class SubscriptionController extends Controller
         }
     }
 
-    
+    public function applepay_notification(Request $request, $type){
+        ApplePayNotification::create([
+            'type' => $type,
+            'notification_data' => json_encode($request->all())
+        ]);
+
+        return response([
+            'status' => 'success',
+            'message' => 'Apple Notification Done'
+        ]);
+    }
 }
