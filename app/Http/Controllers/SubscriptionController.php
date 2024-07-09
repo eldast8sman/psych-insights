@@ -40,7 +40,6 @@ class SubscriptionController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:user-api', ['except' => ['subscribe', 'calculate_total_payment']]);
         $this->user = AuthController::user();
         if(empty($this->user->last_timezone)){
             $this->time = Carbon::now();
@@ -1184,12 +1183,37 @@ class SubscriptionController extends Controller
     }
 
     public function applepay_notification(Request $request, $type){
+        Log::error('Apple Notification');
         $type = ApplePayNotification::create([
             'type' => $type,
-            'notification_data' => json_encode($request->all())
+            'notification_data' => json_encode($request->all()),
+            'user_id' => isset($request->userID) ? $request->userID : null,
+            'product_id' => isset($request->productId) ? $request->productId : null
         ]);
 
-        Log::error($type);
+        if($request->status == "PurchaseStatus.purchased"){
+            $current_plan = CurrentSubscription::where('user_id', intval($request->userID))->first();
+            if(!empty($current_plan) and ($current_plan->grace_end > $this->time->format('Y-m-d'))){
+                $type = "renew_subscription";
+            } else {
+                $type = "subscribe";
+            }
+        }
+
+        $plan_id = intval($request->productId);
+        $payment_plan = PaymentPlan::find($plan_id);
+        $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
+
+        if(!$this->subscribe($request->userID, $package->id, $payment_plan->id, $payment_plan->amount, null, 0, $type)){
+            return response([
+                'status' => 'failed',
+                'message' => $this->errors
+            ], 409);
+        }
+
+        $type->value_given = 1;
+        $type->save();
+
 
         return response([
             'status' => 'success',
