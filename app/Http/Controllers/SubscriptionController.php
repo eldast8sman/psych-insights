@@ -49,6 +49,12 @@ class SubscriptionController extends Controller
     }
 
     public function subscribe($user_id, $package_id, $plan_id, $amount_paid, $promo_code=null, $auto_renew=0, $type="subscribe"){
+        $this->user = User::find($user_id);
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
         $plan = PaymentPlan::find($plan_id);
         if(empty($plan) or $plan->subscription_package_id != $package_id){
             $this->errors = "No Payment Plan";
