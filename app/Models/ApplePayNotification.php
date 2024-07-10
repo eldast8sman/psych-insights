@@ -13,6 +13,7 @@ class ApplePayNotification extends Model
         'type',
         'notification_data',
         'product_id',
-        'user_id'
+        'user_id',
+        'value_given'
     ];
 }
