@@ -1190,7 +1190,7 @@ class SubscriptionController extends Controller
 
     public function applepay_notification(Request $request, $type){
         Log::error('Apple Notification');
-        $type = ApplePayNotification::create([
+        $notification = ApplePayNotification::create([
             'type' => $type,
             'notification_data' => json_encode($request->all()),
             'user_id' => isset($request->userID) ? $request->userID : null,
@@ -1217,8 +1217,8 @@ class SubscriptionController extends Controller
             ], 409);
         }
 
-        $type->value_given = 1;
-        $type->save();
+        $notification->value_given = 1;
+        $notification->save();
 
 
         return response([
