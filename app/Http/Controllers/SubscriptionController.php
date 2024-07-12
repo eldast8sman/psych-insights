@@ -1204,6 +1204,21 @@ class SubscriptionController extends Controller
             } else {
                 $type = "subscribe";
             }
+
+            $intent = StripePaymentIntent::create([
+                'internal_ref' => 'SUB_APL'.Str::random(17).time(),
+                'user_id' => $request->userID,
+                'client_secret' => 'NOT-STRIPE-'.Str::random(10).time(),
+                'intent_id' => 'NOT_STRIPE-'.Str::random(10).time(),
+                'intent_data' => json_encode($request->all()),
+                'amount' => $request->amount,
+                'purpose' => 'subscription',
+                'purpose_id' =>  intval($request->productId),
+                'auto_renew' => false,
+                'value_given' => 0
+            ]);
+        } else {
+            return false;
         }
 
         $plan_id = intval($request->productId);
@@ -1217,6 +1232,9 @@ class SubscriptionController extends Controller
             ], 409);
         }
 
+        $intent->value_given = 1;
+        $intent->save();
+        
         $notification->value_given = 1;
         $notification->save();
 
