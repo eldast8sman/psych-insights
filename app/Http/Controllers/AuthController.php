@@ -311,7 +311,7 @@ class AuthController extends Controller
             }
         }
         $user->save();
-
+        
         $auth = [
             'token' => $token,
             'type' => 'Bearer',
@@ -339,6 +339,10 @@ class AuthController extends Controller
     public static function user_details(User $user) : User
     {
         $user = User::find($user->id);
+        if(empty($user->app_account_token)){
+            $user->app_account_token = Str::uuid().'-'.time();
+            $user->save();
+        }
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'desc')->first();
         if(!empty($current_subscription)){
             $user->current_subscription = $current_subscription;

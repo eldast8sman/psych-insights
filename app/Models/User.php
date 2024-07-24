@@ -70,6 +70,7 @@ class User extends Authenticatable implements JWTSubject
         'signup_timezone',
         'device_token',
         'web_token',
+        'app_account_token',
         'next_daily_question',
         'next_assessment'
     ];

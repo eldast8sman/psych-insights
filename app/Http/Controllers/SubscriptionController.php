@@ -25,6 +25,7 @@ use App\Models\SubscriptionPackage;
 use App\Models\SubscriptionPaymentAttempt;
 use App\Models\UsedPromoCode;
 use App\Models\User;
+use App\Services\AppleAPIService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -1190,53 +1191,74 @@ class SubscriptionController extends Controller
 
     public function applepay_notification(Request $request, $type){
         Log::error('Apple Notification');
-        $notification = ApplePayNotification::create([
-            'type' => $type,
-            'notification_data' => json_encode($request->all()),
-            'user_id' => isset($request->userID) ? $request->userID : null,
-            'product_id' => isset($request->productId) ? $request->productId : null
-        ]);
+        // $notification = ApplePayNotification::create([
+        //     'type' => $type,
+        //     'notification_data' => json_encode($request->all()),
+        //     'user_id' => isset($request->userID) ? $request->userID : null,
+        //     'product_id' => isset($request->productId) ? $request->productId : null
+        // ]);
 
-        if($request->status == "PurchaseStatus.purchased"){
-            $current_plan = CurrentSubscription::where('user_id', intval($request->userID))->first();
-            if(!empty($current_plan) and ($current_plan->grace_end > $this->time->format('Y-m-d'))){
-                $type = "renew_subscription";
+        if(isset($request->status)){
+            if($request->status == "PurchaseStatus.purchased"){
+                $current_plan = CurrentSubscription::where('user_id', intval($request->userID))->first();
+                if(!empty($current_plan) and ($current_plan->grace_end > $this->time->format('Y-m-d'))){
+                    $type = "renew_subscription";
+                } else {
+                    $type = "subscribe";
+                }
+    
+                $intent = StripePaymentIntent::create([
+                    'internal_ref' => 'SUB_APL'.Str::random(17).time(),
+                    'user_id' => $request->userID,
+                    'client_secret' => 'NOT-STRIPE-'.Str::random(10).time(),
+                    'intent_id' => 'NOT_STRIPE-'.Str::random(10).time(),
+                    'intent_data' => json_encode($request->all()),
+                    'amount' => $request->amount,
+                    'purpose' => 'subscription',
+                    'purpose_id' =>  intval($request->productId),
+                    'auto_renew' => false,
+                    'value_given' => 0
+                ]);
             } else {
-                $type = "subscribe";
+                return false;
             }
+    
+            $plan_id = intval($request->productId);
+            $payment_plan = PaymentPlan::find($plan_id);
+            $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
+    
+            if(!$this->subscribe($request->userID, $package->id, $payment_plan->id, $payment_plan->amount, null, 0, $type)){
+                return response([
+                    'status' => 'failed',
+                    'message' => $this->errors
+                ], 409);
+            }
+    
+            $intent->value_given = 1;
+            $intent->save();
+            
+            // $notification->value_given = 1;
+            // $notification->save();
+        } elseif(isset($request->signedPayload)){
+            $array = explode('.', $request->signedPayload);
+            $data = json_decode(base64_decode($array[1]));
 
-            $intent = StripePaymentIntent::create([
-                'internal_ref' => 'SUB_APL'.Str::random(17).time(),
-                'user_id' => $request->userID,
-                'client_secret' => 'NOT-STRIPE-'.Str::random(10).time(),
-                'intent_id' => 'NOT_STRIPE-'.Str::random(10).time(),
-                'intent_data' => json_encode($request->all()),
-                'amount' => $request->amount,
-                'purpose' => 'subscription',
-                'purpose_id' =>  intval($request->productId),
-                'auto_renew' => false,
-                'value_given' => 0
-            ]);
-        } else {
-            return false;
-        }
+            $info_token = $data->data->signedTransactionInfo;
+            $array2 = explode('.', $info_token);
+            $data2 = json_decode(base64_decode($array2[1]));
 
-        $plan_id = intval($request->productId);
-        $payment_plan = PaymentPlan::find($plan_id);
-        $package = SubscriptionPackage::find($payment_plan->subscription_package_id);
-
-        if(!$this->subscribe($request->userID, $package->id, $payment_plan->id, $payment_plan->amount, null, 0, $type)){
             return response([
-                'status' => 'failed',
-                'message' => $this->errors
-            ], 409);
-        }
+                'data' => date('Y-m-d H:i:s', $data2->expiresDate)
+            ]);
 
-        $intent->value_given = 1;
-        $intent->save();
-        
-        $notification->value_given = 1;
-        $notification->save();
+            $service = new AppleAPIService();
+
+            $status = $service->subscriptionStatus($data2->originalTransactionId, $data2->environment);
+
+            return response([
+                'data' => $status
+            ]);
+        }
 
 
         return response([
