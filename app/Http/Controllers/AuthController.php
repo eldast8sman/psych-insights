@@ -310,7 +310,8 @@ class AuthController extends Controller
                 $user->longest_streak = $user->present_streak;
             }
         }
-
+        $user->save();
+        
         $auth = [
             'token' => $token,
             'type' => 'Bearer',
