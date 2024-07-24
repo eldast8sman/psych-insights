@@ -18,6 +18,18 @@ mkdir -p storage/app/public/fcm
 # Copy psychinsightsapp.json to storage/app/public/fcm folder
 cp /tmp/psychinsightsapp.json storage/app/public/fcm/psychinsightsapp.json
 
+# Navigate to the Laravel app directory
+cd /var/app/current
+
+# Download AppleKey file from S3 bucket
+aws s3 cp s3://psychenv/AppleKey.p8 /tmp/AppleKey.p8
+
+# Create directory if it doesn't exist
+mkdir -p storage/app/public/apple
+
+# Copy psychinsightsapp.json to storage/app/public/apple folder
+cp /tmp/AppleKey.p8 storage/app/public/fcm/AppleKey.p8
+
 # Run Laravel Artisan commands
 php artisan migrate
 php artisan config:clear
