@@ -28,7 +28,7 @@ aws s3 cp s3://psychenv/AppleKey.p8 /tmp/AppleKey.p8
 mkdir -p storage/app/public/apple
 
 # Copy psychinsightsapp.json to storage/app/public/apple folder
-cp /tmp/AppleKey.p8 storage/app/public/fcm/AppleKey.p8
+cp /tmp/AppleKey.p8 storage/app/public/apple/AppleKey.p8
 
 # Run Laravel Artisan commands
 php artisan migrate
