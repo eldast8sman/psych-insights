@@ -311,7 +311,7 @@ class AuthController extends Controller
             }
         }
         $user->save();
-        
+
         $auth = [
             'token' => $token,
             'type' => 'Bearer',
@@ -340,7 +340,27 @@ class AuthController extends Controller
     {
         $user = User::find($user->id);
         if(empty($user->app_account_token)){
-            $user->app_account_token = Str::uuid().'-'.time();
+            $time = time();
+            $uuid = Str::uuid();
+
+            if(strlen(strval($time)) <= 12){
+                $rem = 12 - strlen(strval($time));
+                if($rem > 0){
+                    $characters = '0123456789abcdef';
+                    $random = '';
+                    for($i=1; $i<=$rem; $i++){
+                        $random .= $characters[random_int(0, strlen($characters) - 1)];
+                    }
+                    $append = $random.strval($time);
+                } else {
+                    $append = strval($time);
+                }
+            } else {
+                $append = substr(strval($time), -12);
+            }
+            $new_uuid = substr($uuid, 0, 24).$append;
+            
+            $user->app_account_token = $new_uuid;
             $user->save();
         }
         $current_subscription = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', date('Y-m-d'))->where('status', 1)->orderBy('grace_end', 'desc')->first();
