@@ -1191,12 +1191,12 @@ class SubscriptionController extends Controller
 
     public function applepay_notification(Request $request, $type){
         Log::error('Apple Notification');
-        // $notification = ApplePayNotification::create([
-        //     'type' => $type,
-        //     'notification_data' => json_encode($request->all()),
-        //     'user_id' => isset($request->userID) ? $request->userID : null,
-        //     'product_id' => isset($request->productId) ? $request->productId : null
-        // ]);
+        $notification = ApplePayNotification::create([
+            'type' => $type,
+            'notification_data' => json_encode($request->all()),
+            'user_id' => isset($request->userID) ? $request->userID : null,
+            'product_id' => isset($request->productId) ? $request->productId : null
+        ]);
 
         if(isset($request->status)){
             if($request->status == "PurchaseStatus.purchased"){
@@ -1237,8 +1237,8 @@ class SubscriptionController extends Controller
             $intent->value_given = 1;
             $intent->save();
             
-            // $notification->value_given = 1;
-            // $notification->save();
+            $notification->value_given = 1;
+            $notification->save();
         } elseif(isset($request->signedPayload)){
             $array = explode('.', $request->signedPayload);
             $data = json_decode(base64_decode($array[1]));
@@ -1247,15 +1247,13 @@ class SubscriptionController extends Controller
             $array2 = explode('.', $info_token);
             $data2 = json_decode(base64_decode($array2[1]));
 
-            return response([
-                'data' => date('Y-m-d H:i:s', $data2->expiresDate)
-            ]);
-
             $service = new AppleAPIService();
 
             $status = $service->subscriptionStatus($data2->originalTransactionId, $data2->environment);
 
             return response([
+                'status' => 'success',
+                'message' => 'Notification received and appropriate action will be taken',
                 'data' => $status
             ]);
         }
