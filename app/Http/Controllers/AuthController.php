@@ -140,6 +140,7 @@ class AuthController extends Controller
 
         $names = explode(' ', $user->name);
         $first_name = $names[0];
+        //This is added to trigger the new .env
         Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
 
         $not_settings = NotificationSetting::where('new_user_notification', 1);
