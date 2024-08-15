@@ -4,16 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreJournalRequest;
 use App\Models\Journal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class JournalController extends Controller
 {
     private $user;
+    private $time;
 
     public function __construct()
     {
         $this->middleware('auth:user-api');
         $this->user = AuthController::user();
+        if(empty($this->user->last_timezone)){
+            $this->time = Carbon::now();
+        } else {
+            $this->time = Carbon::now($this->user->last_timezone);
+        }
     }
 
     
@@ -29,7 +36,7 @@ class JournalController extends Controller
             ], 200);
         }
 
-        $journals = $journals->paginate($limit);
+        $journals = $journals->orderBy('created_time', 'desc')->orderBy('created_at', 'desc')->paginate($limit);
         foreach($journals as $journal){
             unset($journal->user_id);
         }
@@ -64,7 +71,9 @@ class JournalController extends Controller
             'user_id' => $this->user->id,
             'journal' => $request->journal,
             'title' => $request->title,
-            'color' => $request->color
+            'color' => $request->color,
+            'created_time' => $this->time->format('Y-m-d H:i:s'),
+            'updated_time' => $this->time->format('Y-m-d H:i:s')
         ]);
 
         unset($journal->user_id);
@@ -104,6 +113,9 @@ class JournalController extends Controller
                 'message' => 'No Journal was fetched'
             ], 404);
         }
+
+        $all = $request->all();
+        $all['updated_time'] = $this->time->format('Y-m-d H:i:s');
 
         $journal->update($request->all());
 

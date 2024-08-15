@@ -14,6 +14,8 @@ class Journal extends Model
         'title',
         'journal',
         'color',
-        'pinned'
+        'pinned',
+        'created_time',
+        'updated_time'
     ];
 }
