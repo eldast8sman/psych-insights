@@ -86,6 +86,7 @@ class SubscriptionController extends Controller
         $time = $this->time;
         $start_date = $time->format('Y-m-d');
 
+        $history = CurrentSubscription::where('user_id', $user_id)->first();
         if(isset($history) and ($history->end_date > $start_date)){
             $time = Carbon::createFromFormat('Y-m-d', $history->end_date, $this->user->last_timezone)->addDay();
             $start_date = $time->format('Y-m-d');
@@ -168,6 +169,7 @@ class SubscriptionController extends Controller
         } elseif($type == "renew_subscription"){
             $current->update([
                 'payment_plan_id' => $plan->id,
+                'subscription_package_id' => $package->id,
                 'amount_paid' => $amount_paid,
                 'end_date' => $end_date,
                 'auto_renew' => $auto_renew,
@@ -1201,7 +1203,8 @@ class SubscriptionController extends Controller
         if(isset($request->status)){
             if($request->status == "PurchaseStatus.purchased"){
                 $current_plan = CurrentSubscription::where('user_id', intval($request->userID))->first();
-                if(!empty($current_plan) and ($current_plan->grace_end > $this->time->format('Y-m-d'))){
+                $free_trial = SubscriptionPackage::where('free_trial', 1)->first();
+                if(!empty($current_plan) and ($current_plan->grace_end > $this->time->format('Y-m-d')) and ($current_plan->subscription_package_id != $free_trial->id)){
                     $type = "renew_subscription";
                 } else {
                     $type = "subscribe";
