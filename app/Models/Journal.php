@@ -16,6 +16,6 @@ class Journal extends Model
         'color',
         'pinned',
         'created_time',
-        'updated_time,'
+        'updated_time'
     ];
 }
