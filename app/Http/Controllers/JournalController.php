@@ -67,13 +67,14 @@ class JournalController extends Controller
 
     public function store(StoreJournalRequest $request)
     {
+        $current_time = $this->time->format('Y-m-d H:i:s');
         $journal = Journal::create([
             'user_id' => $this->user->id,
             'journal' => $request->journal,
             'title' => $request->title,
             'color' => $request->color,
-            'created_time' => $this->time->format('Y-m-d H:i:s'),
-            'updated_time' => $this->time->format('Y-m-d H:i:s')
+            'created_time' => $current_time,
+            'updated_time' => $current_time
         ]);
 
         unset($journal->user_id);
