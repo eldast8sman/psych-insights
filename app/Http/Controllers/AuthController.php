@@ -29,12 +29,10 @@ use App\Models\GoogleLoginToken;
 use App\Models\PaymentPlan;
 use App\Models\QuestionAnswerSummary;
 use App\Models\StripeCustomer;
-use App\Models\SubscriptionHistory;
 use App\Models\SubscriptionPackage;
 use App\Models\User;
 use App\Models\UserDeactivation;
 use App\Models\UserNotificationSetting;
-use App\Services\IpApiService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -43,7 +41,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Stevebauman\Location\Facades\Location;
-use Symfony\Component\VarDumper\VarDumper;
 
 class AuthController extends Controller
 {
@@ -339,6 +336,12 @@ class AuthController extends Controller
     public static function user_details(User $user) : User
     {
         $user = User::find($user->id);
+        if(empty($user->last_timezone)){
+            $timing = Carbon::now();
+        } else {
+            $timing = Carbon::now($user->last_timezone);
+        }
+
         if(empty($user->app_account_token)){
             $time = time();
             $uuid = Str::uuid();
@@ -402,8 +405,8 @@ class AuthController extends Controller
 
         $last_answer = QuestionAnswerSummary::where('user_id', $user->id)->orderBy('created_at', 'desc')->orderBy('id', 'desc')->first();
         $user->dass_question = empty(QuestionAnswerSummary::where('user_id', $user->id)->where('question_type', 'dass_question')->first()) ? 'first' : 'subsequent';
-        $user->next_question_date = !empty($last_answer) ? $last_answer->next_question : date('Y-m-d');
-        $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', date('Y-m-d'));
+        $user->next_question_date = !empty($last_answer) ? $last_answer->next_question : $timing->format('Y-m-d');
+        $answered = DailyQuestionAnswer::where('user_id', $user->id)->where('answer_date', $timing->format('Y-m-d'));
         $user->daily_question = ($answered->count() < 1) ? true : false;
         $user->incomplete_answers = self::fetch_temp_answer($user->id);
         $user->first_time_dass = (QuestionAnswerSummary::where('user_id', $user->id)->where('question_type', 'dass_question')->count() < 1) ? true : false;
