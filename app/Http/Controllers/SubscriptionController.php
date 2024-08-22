@@ -8,6 +8,7 @@ use App\Http\Requests\CompleteSubscriptionPaymentRequest;
 use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\OldCardSubscriptionRequest;
 use App\Jobs\SubscriptionAutoRenewal;
+use App\Mail\FreeTrialSubscription;
 use App\Mail\SubscriptionSuccessMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
@@ -85,11 +86,16 @@ class SubscriptionController extends Controller
 
         $time = $this->time;
         $start_date = $time->format('Y-m-d');
-
+        $free_trial_mail = false;
         $history = CurrentSubscription::where('user_id', $user_id)->first();
         if(isset($history) and ($history->end_date > $start_date)){
             $time = Carbon::createFromFormat('Y-m-d', $history->end_date, $this->user->last_timezone)->addDay();
             $start_date = $time->format('Y-m-d');
+
+            $cur_package = SubscriptionPackage::find($history->subscription_package_id);
+            if($cur_package->free_trial == 1){
+                $free_trial_mail = true;
+            }
         } 
         
         if($plan->duration_type == 'week'){
@@ -213,7 +219,11 @@ class SubscriptionController extends Controller
         if($package->free_trial != 1){
             $names = explode(' ', $user->name);
             $firstname = $names[0];
-            Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+            if($free_trial_mail){
+                Mail::to($user)->send(new FreeTrialSubscription($firstname));
+            } else {
+                Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+            }
         }
 
         return true;
