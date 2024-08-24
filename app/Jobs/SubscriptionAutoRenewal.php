@@ -68,6 +68,8 @@ class SubscriptionAutoRenewal implements ShouldQueue
         if($send_mail){
             $user = User::find($current->user_id);
             Mail::to($user)->send(new SubscriptionExpiry($user->name));
+        } else {
+            
         }
     }
 
