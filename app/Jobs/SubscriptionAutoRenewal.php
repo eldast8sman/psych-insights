@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SubscriptionController;
+use App\Mail\ExpiredFreeTrial;
 use App\Mail\SubscriptionAutoRenewalFailure;
 use App\Mail\SubscriptionExpiry;
 use App\Models\CurrentSubscription;
@@ -69,7 +70,8 @@ class SubscriptionAutoRenewal implements ShouldQueue
             $user = User::find($current->user_id);
             Mail::to($user)->send(new SubscriptionExpiry($user->name));
         } else {
-            
+            $user = User::find($current->user_id);
+            Mail::to($user)->send(new ExpiredFreeTrial($user->name));
         }
     }
 
