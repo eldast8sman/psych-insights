@@ -45,7 +45,7 @@
             Hello! We've noticed your Psych Insights Premium Subscription has expired. 
             <br />
             To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
-            Don’t let your progress stall—continue your journey with us today! 
+            Don't let your progress stall—continue your journey with us today! 
           </p>
         </td>
       </tr>
