@@ -25,7 +25,8 @@ class ContactUsRequest extends FormRequest
             'name' => 'required|string',
             'subject' => 'string|nullable',
             'email' => 'required|string|email',
-            'message' => 'required|string'
+            'message' => 'required|string',
+            'g-recaptcha-response' => 'required|string'
         ];
     }
 }
