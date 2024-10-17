@@ -1264,12 +1264,16 @@ class SubscriptionController extends Controller
                 'notification_id' => $data->notificationUUID
             ]);
 
+            Log::info("Stage 1". json_encode($notification));
+
             $type = strtolower($notification->notification_type);
             if(($type == 'one_time_charge') or ($type == 'subscribed') or ($type == 'renewal') or ($type == 'did_renew')){
                 $info_token = $data->data->signedTransactionInfo;
 
                 $array2 = explode('.', $info_token);
                 $data2 = json_decode(base64_decode($array2[1]));
+
+                Log::info("Stage 2". json_encode($data2));
 
                 $transaction_id = $data2->transactionId;
                 $token = !empty($data2->appAccountToken) ? $data2->appAccountToken : null;
@@ -1289,6 +1293,8 @@ class SubscriptionController extends Controller
                             'transaction_id' => $data2->transactionId,
                             'original_transaction_id' => $data2->originalTransactionId
                         ]);
+
+                        Log::info("Stage 3". json_encode($notification));
 
                         $own_type = strtolower($data2->inAppOwnershipType);
                         $reason = strtolower($data2->transactionReason);
@@ -1332,7 +1338,7 @@ class SubscriptionController extends Controller
 
             return response([
                 'status' => 'success',
-                'Notification Received'
+                'message' => 'Notification Received'
             ], 200);
         }
 
