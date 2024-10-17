@@ -49,7 +49,6 @@
                   <a href="https://psychinsightsapp.com/" title="PsychInsights">
                     <img
                       src="https://psychinsight-email-icons.s3.us-east-2.amazonaws.com/logo_with_text.png"
-                      alt="Psych-logo"
                     />
                   </a>
                 </td>
