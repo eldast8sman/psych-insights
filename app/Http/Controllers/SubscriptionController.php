@@ -1202,7 +1202,7 @@ class SubscriptionController extends Controller
     }
 
     public function applepay_notification(Request $request, $type){
-        Log::error('Apple Notification');
+        Log::info('Apple Notification received');
         $notification = ApplePayNotification::create([
             'type' => $type,
             'notification_data' => json_encode($request->all()),
@@ -1254,23 +1254,93 @@ class SubscriptionController extends Controller
             $notification->save();
         } elseif(isset($request->signedPayload)){
             $array = explode('.', $request->signedPayload);
+            if (!isset($array[1])) {
+                return response(['status' => 'error', 'message' => 'Invalid payload'], 400);
+            }
             $data = json_decode(base64_decode($array[1]));
 
-            $info_token = $data->data->signedTransactionInfo;
-            $array2 = explode('.', $info_token);
-            $data2 = json_decode(base64_decode($array2[1]));
+            $notification->update([
+                'notification_type' => $data->notificationType,
+                'notification_id' => $data->notificationUUID
+            ]);
 
-            $service = new AppleAPIService();
+            Log::info("Stage 1". json_encode($notification));
 
-            $status = $service->subscriptionStatus($data2->originalTransactionId, $data2->environment);
+            $type = strtolower($notification->notification_type);
+            if(($type == 'one_time_charge') or ($type == 'subscribed') or ($type == 'renewal') or ($type == 'did_renew')){
+                $info_token = $data->data->signedTransactionInfo;
+
+                $array2 = explode('.', $info_token);
+                $data2 = json_decode(base64_decode($array2[1]));
+
+                Log::info("Stage 2". json_encode($data2));
+
+                $transaction_id = $data2->transactionId;
+                $token = !empty($data2->appAccountToken) ? $data2->appAccountToken : null;
+
+                if (empty($token)) {
+                    Log::error("Apple Notification: {$notification->id} did not carry App Account Token");
+                    return response(['status' => 'error', 'message' => 'App Account Token missing'], 400);
+                }
+
+                if(empty(ApplePayNotification::where('transaction_id', $transaction_id)->where('app_account_token', $token)->where('value_given', 1)->first())){
+                    $user = User::where('app_account_token', $token)->first();
+                    if(!empty($user)){
+                        $notification->update([
+                            'product_id' => $data2->productId,
+                            'app_account_token' => $data2->appAccountToken,
+                            'user_id' => $user->id,
+                            'transaction_id' => $data2->transactionId,
+                            'original_transaction_id' => $data2->originalTransactionId
+                        ]);
+
+                        Log::info("Stage 3". json_encode($notification));
+
+                        $own_type = strtolower($data2->inAppOwnershipType);
+                        $reason = strtolower($data2->transactionReason);
+
+                        if(($own_type == "purchased") and (($reason == "purchase") or ($reason == "renewal"))){
+                            $plan_id = intval($notification->product_id);
+                            $plan = PaymentPlan::find($plan_id);
+                            $current = CurrentSubscription::where('user_id', $user->id)->where('subscription_package_id', $plan->subscription_package_id)->where('grace_end', '>=', $this->time->format('Y-m-d'))->first();
+                            if(empty($current)){
+                                $sub_type = "subscribe";
+                            } else {
+                                $sub_type = "renew_subscription";
+                            }
+
+                            $intent = StripePaymentIntent::create([
+                                'internal_ref' => 'SUB_APL'.Str::random(17).time(),
+                                'user_id' => $user->id,
+                                'client_secret' => 'NOT-STRIPE-'.Str::random(10).time(),
+                                'intent_id' => 'NOT_STRIPE-'.Str::random(10).time(),
+                                'intent_data' => json_encode($data2),
+                                'amount' => $data2->price,
+                                'purpose' => 'subscription',
+                                'purpose_id' =>  intval($data2->productId),
+                                'auto_renew' => false,
+                                'value_given' => 0
+                            ]);
+
+                            if($this->subscribe($user->id, $plan->subscription_package_id, $plan->id, $plan->amount, null, 0, $sub_type)){
+                                $intent->value_given = 1;
+                                $intent->save();
+                                
+                                $notification->value_given = 1;
+                                $notification->save();
+                            }
+                        }
+                    }
+                } else {
+                    $notification->delete();
+                }
+            }
 
             return response([
                 'status' => 'success',
-                'message' => 'Notification received and appropriate action will be taken',
-                'data' => $status
-            ]);
+                'message' => 'Notification Received'
+            ], 200);
         }
-
 
         return response([
             'status' => 'success',
