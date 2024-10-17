@@ -12,8 +12,13 @@ class ApplePayNotification extends Model
     protected $fillable = [
         'type',
         'notification_data',
+        'notification_type',
+        'notification_id',
+        'transaction_id',
+        'original_transaction_id',
         'product_id',
         'user_id',
+        'app_account_token',
         'value_given'
     ];
 }

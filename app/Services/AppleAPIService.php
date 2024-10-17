@@ -58,10 +58,10 @@ class AppleAPIService
         }
 
         return json_decode($response->body());
-        $response = json_decode($response->body());
-        $enc_renewal = array_shift($response->data)->lastTransactions[0]->signedTransactionInfo;
-        $exploded = explode('.', $enc_renewal);
-        $payload = $exploded[1];
-        return json_decode(base64_decode($payload));
+        // $response = json_decode($response->body());
+        // $enc_renewal = array_shift($response->data)->lastTransactions[0]->signedTransactionInfo;
+        // $exploded = explode('.', $enc_renewal);
+        // $payload = $exploded[1];
+        // return json_decode(base64_decode($payload));
     }
 }
