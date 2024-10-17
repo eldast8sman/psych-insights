@@ -42,7 +42,7 @@
             Hello <span>{{ $name }}</span>,
           </p>
           <p style="margin-bottom: 20px; text-align: left">
-            Hello! We've noticed your Psych Insights Premium Subscription has expired. 
+            We've noticed your Psych Insights Premium Subscription has expired. 
             <br />
             To keep enjoying all the great resources and features available through Psych Insights, simply renew your subscription by upgrading to our Premium Plan.
             Don't let your progress stall—continue your journey with us today! 
