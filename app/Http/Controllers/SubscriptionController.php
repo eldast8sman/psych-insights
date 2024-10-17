@@ -1332,7 +1332,7 @@ class SubscriptionController extends Controller
 
             return response([
                 'status' => 'success',
-                'Notification Receied'
+                'Notification Received'
             ], 200);
         }
 
