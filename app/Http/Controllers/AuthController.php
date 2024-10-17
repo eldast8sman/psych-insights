@@ -808,20 +808,20 @@ class AuthController extends Controller
 
     public function contact_us(ContactUsRequest $request){
         try{
-            $service = new RecaptchaService();
-            $verify = $service->verify($request->g_recaptcha_response);
-            if(isset($verify['success']) and ($verify['success'] == true)){
+            // $service = new RecaptchaService();
+            // $verify = $service->verify($request->g_recaptcha_response);
+            // if(isset($verify['success']) and ($verify['success'] == true)){
                 Mail::to('support@psychinsightsapp.com')->send(new ContactUsMail($request->message, $request->email, $request->name, $request->subject));
                 return response([
                     'status' => 'success',
                     'message' => 'Message sent successfully. You\'ll receive a reply from us soonest'
                 ], 200);
-            } else{
-                return response([
-                    'status' => 'failed',
-                    'message' => 'Recaptcha error'
-                ]);
-            } 
+            // } else{
+            //     return response([
+            //         'status' => 'failed',
+            //         'message' => 'Recaptcha error'
+            //     ]);
+            // } 
         } catch(Exception $e){
             return response([
                 'status' => 'failed',
