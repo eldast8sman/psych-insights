@@ -72,6 +72,7 @@ class JournalController extends Controller
             'user_id' => $this->user->id,
             'journal' => $request->journal,
             'title' => $request->title,
+            'emoji' => $request->emoji ?? null,
             'color' => $request->color,
             'created_time' => $current_time,
             'updated_time' => $current_time
