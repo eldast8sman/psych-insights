@@ -14,6 +14,7 @@ class Journal extends Model
         'title',
         'journal',
         'color',
+        'emoji',
         'pinned',
         'created_time',
         'updated_time'
