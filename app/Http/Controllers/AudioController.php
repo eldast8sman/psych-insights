@@ -442,6 +442,12 @@ class AudioController extends Controller
         }
 
         $action = self::favourite_resource('audio', $this->user->id, $audio->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $audio->favourite_count += 1;
         } else {

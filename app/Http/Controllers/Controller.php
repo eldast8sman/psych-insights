@@ -6,11 +6,13 @@ use App\Models\User;
 use App\Models\Audio;
 use App\Models\Category;
 use App\Models\ActivityLog;
+use App\Models\CurrentSubscription;
 use App\Models\UserCategoryLog;
 use App\Models\FavouriteResource;
 use App\Models\TempAnswer;
 use App\Models\UserGoalMilestone;
 use App\Models\UserIPAddress;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -45,6 +47,12 @@ class Controller extends BaseController
     }
 
     public static function favourite_resource($type, $user_id, $resource_id){
+        $user = User::find($user_id);
+        $time = Carbon::now($user->last_timezone);
+        $current = CurrentSubscription::where('user_id', $user->id)->where('grace_end', '>=', $time->format('Y-m-d'))->where('status', 1)->first();
+        if(empty($current)){
+            return false;
+        }
         $resource = FavouriteResource::where('type', $type)->where('user_id', $user_id)->where('resource_id', $resource_id)->first();
         if(empty($resource)){
             FavouriteResource::create([

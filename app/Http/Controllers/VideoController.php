@@ -445,6 +445,12 @@ class VideoController extends Controller
         }
 
         $action = self::favourite_resource('video', $this->user->id, $video->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $video->favourite_count += 1;
         } else {

@@ -439,6 +439,12 @@ class ReadAndReflectController extends Controller
         }
 
         $action = self::favourite_resource('read_and_reflect', $this->user->id, $read->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $read->favourite_count += 1;
         } else {
