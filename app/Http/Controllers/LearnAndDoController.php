@@ -453,6 +453,12 @@ class LearnAndDoController extends Controller
         }
 
         $action = self::favourite_resource('learn_and_do', $this->user->id, $learn->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $learn->favourite_count += 1;
         } else {

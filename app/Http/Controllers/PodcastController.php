@@ -436,6 +436,12 @@ class PodcastController extends Controller
         }
 
         $action = self::favourite_resource('podcast', $this->user->id, $podcast->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $podcast->favourite_count += 1;
         } else {

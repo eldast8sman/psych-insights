@@ -443,6 +443,12 @@ class BookController extends Controller
         }
 
         $action = self::favourite_resource('book', $this->user->id, $book->id);
+        if(!$action){
+            return response([
+                'status' => 'failed',
+                'message' => "Apologies, the 'favourites' feature is only available to premium users!"
+            ], 400);
+        }
         if($action == 'saved'){
             $book->favourite_count += 1;
         } else {

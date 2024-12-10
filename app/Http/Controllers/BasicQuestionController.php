@@ -348,21 +348,6 @@ class BasicQuestionController extends Controller
             $name = explode(' ', $this->user->name);
             $welcome_message = str_replace('[NAME!]', ucfirst($name[0]), $welcome_message);
             $answer_summary->welcome_message = $welcome_message;
-
-            // $admins = Admin::where('role', 'super')->get();
-            // if(!empty($admins)){
-            //     foreach($admins as $admin){
-            //         AdminNotification::create([
-            //             'admin_id' => $admin->id,
-            //             'title' => "OPEN AI KEY",
-            //             'body' => 'This is to  notify you that there is a possibility that the OPEN AI KEY for this Application is no longer active. Therefore, the App might not be working at full capacity currently',
-            //             'page' => 'home',
-            //             'identifier' => 1,
-            //             'opened' => 0,
-            //             'status' => 1
-            //         ]);
-            //     }
-            // }
         }
 
         return response([
