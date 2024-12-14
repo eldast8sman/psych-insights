@@ -42,19 +42,17 @@
             Hi <span>{{ $name }}</span>,
           </p>
           <p style="margin-bottom: 20px; text-align: left">
-            Welcome to the Psych Insights Premium community!
+            Welcome to the <strong>Psych Insights Premium</strong> community!  We are absolutely thrilled to have you on board.
             <br />
-            We are thrilled to have you on board.
+            With your premium subscription, you've unlocked a suite of exclusive features and tools designed to empower your mental health journey and provide deeper insights into your well-being
             <br />
-            With your premium subscription, you now have access to exclusive features and insights designed to help you better understand and manage your mental well-being.
+            We're here to support you every step of the way. If you have any questions or need assistance with your Premium features, don't hesitate to reach out to us at <i>support@psychinsightsapp.com</i>
             <br />
-            We are committed to supporting you every step of the way. If you have any questions or need help navigating your premium features, feel free to reach out to us via our support mail. 
+            Thank you for choosing <strong>Psych Insights</strong> - It's an honour to be part of your journey toward greated mental wekk-being
             <br />
-            Thank you for choosing Psych Insights. We are so honoured to be supporting you on your mental health journey.
+            Warm regards,
             <br />
-            Best regards,
-            <br />
-            Psych Insights Team.
+            The Psych Insights Team.
           </p>
         </td>
       </tr>
