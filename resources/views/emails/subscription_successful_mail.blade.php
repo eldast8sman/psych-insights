@@ -50,8 +50,7 @@
             <br />
             We're here to support you every step of the way. If you have any questions or need assistance with your Premium features, don't hesitate to reach out to us at <i>support@psychinsightsapp.com</i>
             <br />
-            <br />
-            Thank you for choosing <strong>Psych Insights</strong> - It's an honour to be part of your journey toward greated mental wekk-being
+            Thank you for choosing <strong>Psych Insights</strong> - It's an honour to be part of your journey toward greater mental well-being
             <br />
             <br />
             Warm regards,
