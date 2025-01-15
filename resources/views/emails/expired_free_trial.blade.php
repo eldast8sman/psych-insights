@@ -42,23 +42,25 @@
             Hi <span>{{ $name }}</span>,
           </p>
           <p style="margin-bottom: 20px; text-align: left">
-            Thank you for completing your 7-day free trial of Psych Insights Premium! We hope you found value in the enhanced features designed to support your mental well-being.
+            Thank you for trying out the 7-day free trial of <strong>Psych Insights Premium!</strong> We hope the enhanced features added value to your mental well-being journey.
             <br />
-            As of today, your account has been automatically downgraded to our Basic (Free) version, where you can still access many essential tools to continue your mental health journey.
-            <br />
-            However, if you'd like to regain access to the full range of Premium features, you can easily upgrade back to Premium at any time by clicking the “Upgrade Now” button at the top of your home page.
+            As of today, your account has been automatically transitioned to our <strong>Basic (Free)</strong> plan.
+            You'll still have access to many essential tools to support your mental health. But if you're missing the added benefits of Premium,
+            upgradig is quick and easy. Simply click the <strong>"Upgrade Now"</strong> button at the top of your home page to unlock Premium features again.
           </p>
           <p>
-            <strong>With the Premium plan, you'll enjoy:</strong>
+            With <strong>Psych Insights Premium</strong>, you'll gain access to:
             <ul>
-              <li>Exclusive video content</li>
-              <li>More comprehensive assessments and further personalisation</li>
-              <li>Distress scores to track your stress, anxiety, and depression levels over time</li>
-              <li>Resource Library and Answers Archive to access previous resources and responses</li>
-              <li>Expanded resource library with even more valuable tools</li>
+              <li><strong>Exclusive video content</strong></li>
+              <li>More comprehensive assessments and personalised insights</li>
+              <li><strong>Distress scores</strong> to track your stress, anxiety, and depression over time</li>
+              <li><strong>Resource Library and Answers Archive</strong> to revisit past resources and responses</li>
+              <li><strong>Weekly resource refreshes</strong> (compared to fortnightly with Basic) and access to <strong>more resourceseach time,</strong>
+                ensuring you have an ever-growing libraryof valuable tools to support your mental health journey  
+              </li>
             </ul>
 
-            We're grateful to have you in our community and are here to support you every step of the way. If you have any questions or need assistance, feel free to reach out via the 'contact us' option.
+            We're so grateful to have you as part of our community. If you have questions or need assistance, don't hesitate to reach out through the <strong>'Contact Us'</strong> option
           </p>
           <p style="margin-bottom: 20px; text-align: left">
             Take care,
