@@ -1347,4 +1347,23 @@ class SubscriptionController extends Controller
             'message' => 'Apple Notification Done'
         ]);
     }
+
+    public function auto_renew(){
+        $current_plan = CurrentSubscription::where('user_id', $this->user->id)->first();
+        if(empty($current_plan)){
+            return response([
+                'status' => 'failed',
+                'message' => 'No Active Subscription'
+            ], 404);
+        }
+        if($current_plan->end_date < $this->time->format('Y-m-d')){
+            return response([
+                'status' => 'failed',
+                'message' => 'Subscription has expired'
+            ], 409);
+        }
+
+        $current_plan->auto_renew = ($current_plan->auto_renew == 1) ? 0 : 1;
+        $current_plan->save();
+    }
 }
