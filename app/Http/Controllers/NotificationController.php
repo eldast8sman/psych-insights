@@ -233,7 +233,7 @@ class NotificationController extends Controller
                             ->where('current_subscriptions.status', 1)
                             ->select('current_subscriptions.*');
                 if($to_renews->count() > 0){
-                    foreach($to_renews as $renew){
+                    foreach($to_renews->get() as $renew){
                         SubscriptionAutoRenewal::dispatch($renew->id, "renew");
                     }
                 }
