@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Http\Requests\Admin\UpdateAdminRequest;
 use App\Models\Admin\NotificationSetting;
+use App\Models\SentMail;
 
 class AdminController extends Controller
 {
@@ -58,6 +59,11 @@ class AdminController extends Controller
             NotificationSetting::create(['admin_id' => $admin->id]);
 
             Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+            SentMail::create([
+                'recipient_type' => 'admin',
+                'recipient_id' => $admin->id,
+                'mail_class' => 'AddAdminMail'
+            ]);
             return response([
                 'status' => 'success',
                 'message' => 'Admin added successfully',
@@ -91,6 +97,11 @@ class AdminController extends Controller
         $admin->save();
 
         Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+        SentMail::create([
+            'recipient_type' => 'admin',
+            'recipient_id' => $admin->id,
+            'mail_class' => 'AddAdminMail'
+        ]);
         return response([
             'status' => 'success',
             'message' => 'Admin Activation Mail resent',
