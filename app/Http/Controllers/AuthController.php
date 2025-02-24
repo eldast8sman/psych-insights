@@ -28,6 +28,7 @@ use App\Models\EmailVerificationToken;
 use App\Models\GoogleLoginToken;
 use App\Models\PaymentPlan;
 use App\Models\QuestionAnswerSummary;
+use App\Models\SentMail;
 use App\Models\StripeCustomer;
 use App\Models\SubscriptionPackage;
 use App\Models\User;
@@ -139,6 +140,10 @@ class AuthController extends Controller
         $names = explode(' ', $user->name);
         $first_name = $names[0];
         Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+        SentMail::create([
+            'recipient_id' => $user->id,
+            'mail_class' => 'EmailVerification'
+        ]);
 
         $not_settings = NotificationSetting::where('new_user_notification', 1);
         if($not_settings->count() > 0){
@@ -255,6 +260,10 @@ class AuthController extends Controller
         $names = explode(' ', $user->name);
         $first_name = $names[0];
         Mail::to($user)->send(new EmailVerificationMail($first_name, $token));
+        SentMail::create([
+            'recipient_id' => $user->id,
+            'mail_class' => 'EmailVerification'
+        ]);
 
         return response([
             'status' => 'success',
@@ -502,6 +511,10 @@ class AuthController extends Controller
         $names = explode(' ', $user->name);
         $first_name = $names[0];
         Mail::to($user)->send(new ForgotPasswordMail($first_name, $token));
+        SentMail::create([
+            'recipient_id' => $user->id,
+            'mail_class' => 'ForgotPaasswordMail'
+        ]);
 
         self::log_activity($user->id, "forgot_password");
 

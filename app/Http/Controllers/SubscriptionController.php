@@ -18,6 +18,7 @@ use App\Models\CurrentSubscription;
 use App\Models\PaymentPlan;
 use App\Models\PromoCode;
 use App\Models\QuestionAnswerSummary;
+use App\Models\SentMail;
 use App\Models\StripeCustomer;
 use App\Models\StripePaymentIntent;
 use App\Models\StripePaymentMethod;
@@ -221,8 +222,16 @@ class SubscriptionController extends Controller
             $firstname = $names[0];
             if($free_trial_mail){
                 Mail::to($user)->send(new FreeTrialSubscription($firstname));
+                SentMail::create([
+                    'recipient_id' => $user->id,
+                    'mail_class' => 'FreeTrialSubscription'
+                ]);
             } else {
                 Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+                SentMail::create([
+                    'recipient_id' => $user->id,
+                    'mail_class' => 'SubscriptionSuccessMail'
+                ]);
             }
         }
 

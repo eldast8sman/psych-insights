@@ -22,6 +22,7 @@ use App\Http\Requests\Admin\ForgotPasswordRequest;
 use App\Http\Requests\Admin\ActivateAccountRequest;
 use App\Http\Requests\Admin\UpdateProfileRequest;
 use App\Models\Admin\NotificationSetting;
+use App\Models\SentMail;
 use Illuminate\Notifications\Events\NotificationSent;
 
 class AuthController extends Controller
@@ -42,6 +43,11 @@ class AuthController extends Controller
             $admin->save();
 
             Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+            SentMail::create([
+                'recipient_type' => 'admin',
+                'recipient_id' => $admin->id,
+                'mail_class' => 'AddAdminMail'
+            ]);
             return response([
                 'status' => 'success',
                 'message' => 'Admin added successfully',
@@ -71,6 +77,11 @@ class AuthController extends Controller
         $admin->save();
 
         Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+        SentMail::create([
+            'recipient_type' => 'admin',
+            'recipient_id' => $admin->id,
+            'mail_class' => 'AddAdminMail'
+        ]);
         return response([
             'status' => 'success',
             'message' => 'Admin added successfully',
@@ -93,6 +104,11 @@ class AuthController extends Controller
             $admin->save();
 
             Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+            SentMail::create([
+                'recipient_type' => 'admin',
+                'recipient_id' => $admin->id,
+                'mail_class' => 'AddAdminMail'
+            ]);
             return response([
                 'status' => 'failed',
                 'message' => 'Link has expired. However another link has been sent to '.$admin->email
@@ -121,6 +137,11 @@ class AuthController extends Controller
             $admin->save();
 
             Mail::to($admin)->send(new AddAdminMail($admin->name, $admin->token));
+            SentMail::create([
+                'recipient_type' => 'admin',
+                'recipient_id' => $admin->id,
+                'mail_class' => 'AddAdminMail'
+            ]);
             return response([
                 'status' => 'failed',
                 'message' => 'Link has expired. However another link has been sent to '.$admin->email
@@ -208,6 +229,11 @@ class AuthController extends Controller
         $admin->save();
 
         Mail::to($admin)->send(new ForgotPasswordMail($admin->name, $admin->token));
+        SentMail::create([
+            'recipient_type' => 'admin',
+            'recipient_id' => $admin->id,
+            'mail_class' => 'ForgotPasswordMail'
+        ]);
         return response([
             'status' => 'success',
             'message' => 'Password Reset Link sent to '.$admin->email
