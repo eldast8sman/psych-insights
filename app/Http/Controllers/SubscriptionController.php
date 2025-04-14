@@ -9,6 +9,7 @@ use App\Http\Requests\InitiateSubscriptionRequest;
 use App\Http\Requests\OldCardSubscriptionRequest;
 use App\Jobs\SubscriptionAutoRenewal;
 use App\Mail\FreeTrialSubscription;
+use App\Mail\SubscriptionRenewalMail;
 use App\Mail\SubscriptionSuccessMail;
 use App\Models\Admin\AdminNotification;
 use App\Models\Admin\NotificationSetting;
@@ -227,11 +228,19 @@ class SubscriptionController extends Controller
                     'mail_class' => 'FreeTrialSubscription'
                 ]);
             } else {
-                Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
-                SentMail::create([
-                    'recipient_id' => $user->id,
-                    'mail_class' => 'SubscriptionSuccessMail'
-                ]);
+                if($type == 'subscribe'){
+                    Mail::to($user)->send(new SubscriptionSuccessMail($firstname));
+                    SentMail::create([
+                        'recipient_id' => $user->id,
+                        'mail_class' => 'SubscriptionSuccessMail'
+                    ]);
+                } elseif($type == 'renew_subscription'){
+                    Mail::to($user)->send(new SubscriptionRenewalMail($firstname));
+                    SentMail::create([
+                        'recipient_id' => $user->id,
+                        'mail_class' => 'SubscriptionRenewalMail'
+                    ]);
+                }
             }
         }
 
